@@ -6,8 +6,7 @@
     <br>
 </p>
 
-The package is PSR-11 compatible injector. Given a DI container and a callable it injects objects from DI container
-based on types specified in callable signature.
+The package is PSR-11 compatible injector that is able to invoke methods resolving their dependencies via autowiring.
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/injector/v/stable.png)](https://packagist.org/packages/yiisoft/injector)
 [![Total Downloads](https://poser.pugx.org/yiisoft/injector/downloads.png)](https://packagist.org/packages/yiisoft/injector)
@@ -17,9 +16,19 @@ based on types specified in callable signature.
 ## General usage
 
 ```php
-$callable = function (CacheInterface $cache) {
-    // ...
-}
+$container = new Container([
+    EngineInterface::class => EngineMarkTwo::class,
+]);
 
-$result = (new Injector($container))->invoke($callable);
+$getEngineName = function (EngineInterface $engine) {
+    return $engine->getName();
+};
+
+$injector = new Injector($container);
+echo $injector->invoke($getEngineName);
+// outputs "Mark Two"
 ```
+
+In the code above we feed out container to `Injector` when creating it. Any PSR-11 container could be used.
+When `invoke` is called, injector reads method signature of the method invoked and, based on type hinting
+automatically obtains objects for corresponding interfaces from container.
