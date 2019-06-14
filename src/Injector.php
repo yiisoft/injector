@@ -63,13 +63,13 @@ class Injector
      * components.
      *
      * @param callable $callback callable to be invoked.
-     * @param array $params The array of parameters for the function, can be either numeric or associative.
+     * @param array $parameters The array of parameters for the function, can be either numeric or associative.
      * @return array The resolved dependencies.
      * @throws MissingRequiredArgument if required argument is missing.
      * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
      * @throws \ReflectionException
      */
-    private function resolveCallableDependencies(callable $callback, array $params = []): array
+    private function resolveCallableDependencies(callable $callback, array $parameters = []): array
     {
         if (\is_object($callback) && !$callback instanceof \Closure) {
             $callback = [$callback, '__invoke'];
@@ -87,8 +87,8 @@ class Injector
             $name = $param->getName();
             if (($class = $param->getClass()) !== null) {
                 $className = $class->getName();
-                if (isset($params[0]) && $params[0] instanceof $className) {
-                    $arguments[] = array_shift($params);
+                if (isset($parameters[0]) && $parameters[0] instanceof $className) {
+                    $arguments[] = array_shift($parameters);
                 } else {
                     // If the argument is optional we catch not instantiable exceptions
                     try {
@@ -101,8 +101,8 @@ class Injector
                         }
                     }
                 }
-            } elseif (\count($params)) {
-                $arguments[] = array_shift($params);
+            } elseif (\count($parameters)) {
+                $arguments[] = array_shift($parameters);
             } elseif ($param->isDefaultValueAvailable()) {
                 $arguments[] = $param->getDefaultValue();
             } elseif (!$param->isOptional()) {
@@ -111,7 +111,7 @@ class Injector
             }
         }
 
-        foreach ($params as $value) {
+        foreach ($parameters as $value) {
             $arguments[] = $value;
         }
 
