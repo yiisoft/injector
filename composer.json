@@ -1,31 +1,33 @@
 {
-    "name": "yiisoft/_____",
+    "name": "yiisoft/injector",
     "type": "library",
-    "description": "_____",
-    "keywords": ["_____"],
+    "description": "PSR-11 compatible injector. Executes a callable injecting dependencies from a given DI container.",
+    "keywords": ["PSR-11", "DI", "dependency injection", "reflection", "injector"],
     "homepage": "http://www.yiiframework.com/",
     "license": "BSD-3-Clause",
     "support": {
-        "issues": "https://github.com/yiisoft/_____/issues?state=open",
+        "issues": "https://github.com/yiisoft/injector/issues?state=open",
         "forum": "http://www.yiiframework.com/forum/",
         "wiki": "http://www.yiiframework.com/wiki/",
         "irc": "irc://irc.freenode.net/yii",
-        "source": "https://github.com/yiisoft/_____"
+        "source": "https://github.com/yiisoft/injector"
     },
     "require": {
-        "php": "^7.2"
+        "php": "^7.2",
+        "psr/container": "1.0.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.2"
+        "phpunit/phpunit": "^7.2",
+        "yiisoft/di": "^3.0@dev"
     },
     "autoload": {
         "psr-4": {
-            "Yiisoft\\_____\\": "src"
+            "Yiisoft\\Injector\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Yiisoft\\_____\\Tests\\": "tests"
+            "Yiisoft\\Injector\\Tests\\": "tests"
         }
     },
     "extra": {

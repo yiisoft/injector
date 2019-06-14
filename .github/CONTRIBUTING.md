@@ -1,4 +1,4 @@
-# Contributing to _____
+# Contributing to Injector
 
 - [Report an issue](https://github.com/yiisoft/yii2/blob/master/docs/internals/report-an-issue.md)
 - [Translate documentation or messages](https://github.com/yiisoft/yii2/blob/master/docs/internals/translation-workflow.md)
