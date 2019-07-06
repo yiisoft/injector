@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;
 use yii\di\Container;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Injector\MissingRequiredArgument;
+use Yiisoft\Injector\MissingRequiredArgumentException;
 use Yiisoft\Injector\Tests\Support\ColorInterface;
 use Yiisoft\Injector\Tests\Support\EngineInterface;
 use Yiisoft\Injector\Tests\Support\EngineMarkTwo;
@@ -42,7 +42,7 @@ class InjectorTest extends TestCase
 
         $injector = new Injector($container);
 
-        $this->expectException(MissingRequiredArgument::class);
+        $this->expectException(MissingRequiredArgumentException::class);
         $injector->invoke($getEngineName);
     }
 

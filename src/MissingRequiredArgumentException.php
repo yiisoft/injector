@@ -3,7 +3,7 @@ namespace Yiisoft\Injector;
 
 use \Psr\Container\ContainerExceptionInterface;
 
-class MissingRequiredArgument extends \InvalidArgumentException implements ContainerExceptionInterface
+class MissingRequiredArgumentException extends \InvalidArgumentException implements ContainerExceptionInterface
 {
     public function __construct(string $name, string $functionName)
     {

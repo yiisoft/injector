@@ -47,7 +47,7 @@ class Injector
      * @param array $params The array of parameters for the function.
      * This can be either a list of parameters, or an associative array representing named function parameters.
      * @return mixed the callback return value.
-     * @throws MissingRequiredArgument  if required argument is missing.
+     * @throws MissingRequiredArgumentException  if required argument is missing.
      * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
      * @throws \ReflectionException
      */
@@ -65,7 +65,7 @@ class Injector
      * @param callable $callback callable to be invoked.
      * @param array $parameters The array of parameters for the function, can be either numeric or associative.
      * @return array The resolved dependencies.
-     * @throws MissingRequiredArgument if required argument is missing.
+     * @throws MissingRequiredArgumentException if required argument is missing.
      * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
      * @throws \ReflectionException
      */
@@ -107,7 +107,7 @@ class Injector
                 $arguments[] = $param->getDefaultValue();
             } elseif (!$param->isOptional()) {
                 $functionName = $reflection->getName();
-                throw new MissingRequiredArgument($name, $functionName);
+                throw new MissingRequiredArgumentException($name, $functionName);
             }
         }
 
