@@ -3,7 +3,7 @@ namespace Yiisoft\Injector\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;
-use yii\di\Container;
+use Yiisoft\Di\Container;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\MissingRequiredArgumentException;
 use Yiisoft\Injector\Tests\Support\ColorInterface;
