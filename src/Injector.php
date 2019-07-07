@@ -8,9 +8,6 @@ use Psr\Container\NotFoundExceptionInterface;
 /**
  * Injector is able to analyze callable dependencies based on
  * type hinting and inject them from any PSR-11 compatible container.
- *
- * @author Alexander Makarov <sam@rmcreative.ru>
- * @since 1.0
  */
 class Injector
 {
