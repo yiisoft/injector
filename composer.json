@@ -2,7 +2,13 @@
     "name": "yiisoft/injector",
     "type": "library",
     "description": "PSR-11 compatible injector. Executes a callable injecting dependencies from a given DI container.",
-    "keywords": ["PSR-11", "DI", "dependency injection", "reflection", "injector"],
+    "keywords": [
+        "PSR-11",
+        "DI",
+        "dependency injection",
+        "reflection",
+        "injector"
+    ],
     "homepage": "http://www.yiiframework.com/",
     "license": "BSD-3-Clause",
     "support": {
@@ -35,5 +41,8 @@
         "branch-alias": {
             "dev-master": "3.0.x-dev"
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
