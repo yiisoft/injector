@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Injector;
 
 use Psr\Container\ContainerExceptionInterface;

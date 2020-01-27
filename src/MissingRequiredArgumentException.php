@@ -1,7 +1,8 @@
 <?php
+
 namespace Yiisoft\Injector;
 
-use \Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerExceptionInterface;
 
 class MissingRequiredArgumentException extends \InvalidArgumentException implements ContainerExceptionInterface
 {

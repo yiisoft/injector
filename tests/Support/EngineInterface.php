@@ -1,4 +1,5 @@
 <?php
+
 namespace Yiisoft\Injector\Tests\Support;
 
 /**
