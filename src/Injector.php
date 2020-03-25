@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yiisoft\Injector;
 
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 
 /**
  * Injector is able to analyze callable dependencies based on
@@ -12,12 +15,8 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 class Injector
 {
-    private $container;
+    private ContainerInterface $container;
 
-    /**
-     * Injector constructor.
-     * @param $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -47,7 +46,7 @@ class Injector
      * @return mixed the callback return value.
      * @throws MissingRequiredArgumentException  if required argument is missing.
      * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function invoke(callable $callback, array $params = [])
     {
@@ -65,7 +64,7 @@ class Injector
      * @return array The resolved dependencies.
      * @throws MissingRequiredArgumentException if required argument is missing.
      * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     private function resolveCallableDependencies(callable $callback, array $parameters = []): array
     {

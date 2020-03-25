@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector\Tests\Support;
 
-class EngineMarkTwo extends LightEngine
+class EngineZIL130 implements EngineInterface
 {
-    public const NAME = 'Mark Two';
+    public const NAME = 'ZIL 130';
 
-    protected int $power = 160;
+    private int $power = 148;
 
     public function getName(): string
     {
