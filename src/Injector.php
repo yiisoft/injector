@@ -12,12 +12,8 @@ use Psr\Container\NotFoundExceptionInterface;
  */
 class Injector
 {
-    private $container;
+    private ContainerInterface $container;
 
-    /**
-     * Injector constructor.
-     * @param $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
