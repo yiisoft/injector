@@ -16,11 +16,13 @@ The package is PSR-11 compatible injector that is able to invoke methods resolvi
 ## General usage
 
 ```php
+use Yiisoft\Injector\Injector;
+
 $container = new Container([
     EngineInterface::class => EngineMarkTwo::class,
 ]);
 
-$getEngineName = function (EngineInterface $engine) {
+$getEngineName = static function (EngineInterface $engine) {
     return $engine->getName();
 };
 
@@ -29,6 +31,6 @@ echo $injector->invoke($getEngineName);
 // outputs "Mark Two"
 ```
 
-In the code above we feed out container to `Injector` when creating it. Any PSR-11 container could be used.
+In the code above we feed our container to `Injector` when creating it. Any PSR-11 container could be used.
 When `invoke` is called, injector reads method signature of the method invoked and, based on type hinting
-automatically obtains objects for corresponding interfaces from container.
+automatically obtains objects for corresponding interfaces from the container.
