@@ -89,18 +89,10 @@ class Injector
             $variadic = $param->isVariadic();
             $error = null;
 
-            // by name
+            // Get argument by name
             if (key_exists($name, $parameters)) {
                 if ($variadic && is_array($parameters[$name])) {
-                    // $arguments += array_values($parameters[$name]);
-
-                    // $arguments = [...$arguments, ...array_values($parameters[$name])];
-
                     $arguments = array_merge($arguments, array_values($parameters[$name]));
-
-                    // foreach ($parameters[$name] as $value) {
-                    //     $arguments[] = $value;
-                    // }
                 } else {
                     $arguments[] = $parameters[$name];
                 }
@@ -109,7 +101,7 @@ class Injector
             }
 
             if ($class !== null) {
-                // unnamed parameters
+                // Unnamed parameters
                 $className = $class->getName();
                 $found = false;
                 foreach ($parameters as $key => $item) {
