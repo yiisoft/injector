@@ -80,38 +80,85 @@ class Injector
 
         $arguments = [];
 
+        $pushUnusedParams = true;
         foreach ($reflection->getParameters() as $param) {
             $name = $param->getName();
-            if (($class = $param->getClass()) !== null) {
-                $className = $class->getName();
-                if (isset($parameters[0]) && $parameters[0] instanceof $className) {
-                    $arguments[] = array_shift($parameters);
+            $class = $param->getClass();
+            $hasType = $param->hasType();
+            $nullable = $param->allowsNull() && $hasType;
+            $variadic = $param->isVariadic();
+            $error = null;
+
+            // by name
+            if (key_exists($name, $parameters)) {
+                if ($variadic && is_array($parameters[$name])) {
+                    // $arguments += array_values($parameters[$name]);
+
+                    // $arguments = [...$arguments, ...array_values($parameters[$name])];
+
+                    $arguments = array_merge($arguments, array_values($parameters[$name]));
+
+                    // foreach ($parameters[$name] as $value) {
+                    //     $arguments[] = $value;
+                    // }
                 } else {
-                    // If the argument is optional we catch not instantiable exceptions
-                    try {
-                        $arguments[] = $this->container->get($className);
-                    } catch (NotFoundExceptionInterface $e) {
-                        if ($param->isDefaultValueAvailable()) {
-                            $arguments[] = $param->getDefaultValue();
-                        } else {
-                            throw $e;
+                    $arguments[] = $parameters[$name];
+                }
+                unset($parameters[$name]);
+                continue;
+            }
+
+            if ($class !== null) {
+                // unnamed parameters
+                $className = $class->getName();
+                $found = false;
+                foreach ($parameters as $key => $item) {
+                    if (!is_int($key)) {
+                        continue;
+                    }
+                    if ($item instanceof $className) {
+                        $found = true;
+                        $arguments[] = $item;
+                        unset($parameters[$key]);
+                        if (!$variadic) {
+                            break;
                         }
                     }
                 }
-            } elseif (\count($parameters)) {
-                $arguments[] = array_shift($parameters);
-            } elseif ($param->isDefaultValueAvailable()) {
+                if ($found) {
+                    $pushUnusedParams = false;
+                    continue;
+                }
+
+                // If the argument is optional we catch not instantiable exceptions
+                try {
+                    $arguments[] = $this->container->get($className);
+                    continue;
+                } catch (NotFoundExceptionInterface $e) {
+                    $error = $e;
+                }
+            }
+
+            if ($param->isDefaultValueAvailable()) {
                 $arguments[] = $param->getDefaultValue();
             } elseif (!$param->isOptional()) {
-                $functionName = $reflection->getName();
-                throw new MissingRequiredArgumentException($name, $functionName);
+                if ($nullable) {
+                    $arguments[] = null;
+                } else {
+                    throw $error ?? new MissingRequiredArgumentException($name, $reflection->getName());
+                }
+            } elseif ($hasType) {
+                $pushUnusedParams = false;
             }
         }
 
-        foreach ($parameters as $value) {
-            $arguments[] = $value;
+        if ($pushUnusedParams) {
+            foreach ($parameters as $key => $value) {
+                if (is_int($key)) {
+                    $arguments[] = $value;
+                }
+            }
         }
-
         return $arguments;
     }
 }
