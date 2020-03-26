@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;
 use Yiisoft\Di\Container;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Injector\InvalidParameterException;
 use Yiisoft\Injector\MissingRequiredArgumentException;
 use Yiisoft\Injector\Tests\Support\ColorInterface;
 use Yiisoft\Injector\Tests\Support\EngineInterface;
@@ -31,18 +32,25 @@ class InjectorTest extends TestCase
         $this->assertSame('Mark Two', $engineName);
     }
 
-    // public function testInvokeCallableArray(): void
-    // {
-    //     $container = new Container([EngineInterface::class => VAZ2101::class]);
-    //
-    //     $object = $container->get(EngineInterface::class);
-    //
-    //     $engineName = (new Injector($container))->invoke([$object, 'rust'], ['index' => 5.0]);
-    //
-    //     $this->assertInstanceOf(VAZ2101::class, $engineName);
-    // }
+    public function testInvokeCallableArray(): void
+    {
+        $container = new Container([]);
 
-    // public function testInvokeStatic(): void
+        $object = new EngineVAZ2101();
+
+        $engineName = (new Injector($container))->invoke([$object, 'rust'], ['index' => 5.0]);
+
+        $this->assertInstanceOf(EngineVAZ2101::class, $engineName);
+    }
+
+    public function testInvokeStatic(): void
+    {
+        $container = new Container([]);
+
+        $engineName = (new Injector($container))->invoke([EngineVAZ2101::class, 'isWroomWroom']);
+
+        $this->assertIsBool($engineName);
+    }
 
     public function testInvokeWithoutArguments(): void
     {
@@ -296,9 +304,9 @@ class InjectorTest extends TestCase
 
         $callable = fn (string ...$engines) => $engines;
 
-        $result = (new Injector($container))->invoke($callable, ['str 1', 'str 2', 'str 3']);
+        $this->expectException(\Exception::class);
 
-        $this->assertSame([], $result);
+        $result = (new Injector($container))->invoke($callable, ['str 1', 'str 2', 'str 3']);
     }
 
     public function testNullableVariadicArgument(): void
@@ -312,7 +320,7 @@ class InjectorTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testPostParams(): void
+    public function testAppendingUnusedParams(): void
     {
         $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
 
@@ -321,5 +329,60 @@ class InjectorTest extends TestCase
         $result = (new Injector($container))->invoke($callable, [new \DateTimeImmutable(), new \DateTimeImmutable()]);
 
         $this->assertSame(4, $result);
+    }
+
+    public function testWrongNamedParam(): void
+    {
+        $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
+
+        $callable = fn (EngineInterface $engine) => $engine;
+
+        $this->expectException(\Throwable::class);
+
+        $result = (new Injector($container))->invoke($callable, ['engine' => new \DateTimeImmutable()]);
+    }
+
+    public function testArrayArgumentWithUnnamedType(): void
+    {
+        $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
+
+        $callable = fn (array $arg) => $arg;
+
+        $this->expectException(MissingRequiredArgumentException::class);
+
+        (new Injector($container))->invoke($callable, [['test']]);
+    }
+
+    public function testCallableArgumentWithUnnamedType(): void
+    {
+        $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
+
+        $callable = fn (callable $arg) => $arg();
+
+        $this->expectException(MissingRequiredArgumentException::class);
+
+        (new Injector($container))->invoke($callable, [fn () => true]);
+    }
+
+    public function testIterableArgumentWithUnnamedType(): void
+    {
+        $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
+
+        $callable = fn (iterable $arg) => $arg;
+
+        $this->expectException(MissingRequiredArgumentException::class);
+
+        (new Injector($container))->invoke($callable, [new \SplStack()]);
+    }
+
+    public function testUnnamedScalarParam(): void
+    {
+        $container = new Container([]);
+
+        $getEngineName = fn () => 42;
+
+        $this->expectException(InvalidParameterException::class);
+
+        (new Injector($container))->invoke($getEngineName, ['test']);
     }
 }

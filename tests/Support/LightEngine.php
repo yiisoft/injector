@@ -12,4 +12,9 @@ abstract class LightEngine implements EngineInterface
     {
         return $this->power;
     }
+
+    public static function isWroomWroom(): bool
+    {
+        return true;
+    }
 }

@@ -152,9 +152,12 @@ class Injector
             }
         }
 
-        if ($pushUnusedParams) {
-            foreach ($parameters as $key => $value) {
-                if (is_int($key)) {
+        foreach ($parameters as $key => $value) {
+            if (is_int($key)) {
+                if (!is_object($value)) {
+                    throw new InvalidParameterException((string)$key, $reflection->getName());
+                }
+                if ($pushUnusedParams) {
                     $arguments[] = $value;
                 }
             }

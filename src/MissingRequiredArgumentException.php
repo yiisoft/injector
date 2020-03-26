@@ -8,6 +8,6 @@ class MissingRequiredArgumentException extends \InvalidArgumentException impleme
 {
     public function __construct(string $name, string $functionName)
     {
-        parent::__construct("Missing required parameter \"$name\" when calling \"$functionName\".", 0, null);
+        parent::__construct("Missing required argument \"$name\" when calling \"$functionName\".", 0, null);
     }
 }
