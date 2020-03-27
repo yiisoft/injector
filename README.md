@@ -16,11 +16,14 @@ The package is PSR-11 compatible injector that is able to invoke methods resolvi
 ## General usage
 
 ```php
+use Yiisoft\Di\Container;
+use Yiisoft\Injector\Injector;
+
 $container = new Container([
     EngineInterface::class => EngineMarkTwo::class,
 ]);
 
-$getEngineName = function (EngineInterface $engine) {
+$getEngineName = static function (EngineInterface $engine) {
     return $engine->getName();
 };
 
@@ -29,6 +32,27 @@ echo $injector->invoke($getEngineName);
 // outputs "Mark Two"
 ```
 
-In the code above we feed out container to `Injector` when creating it. Any PSR-11 container could be used.
+In the code above we feed our container to `Injector` when creating it. Any PSR-11 container could be used.
 When `invoke` is called, injector reads method signature of the method invoked and, based on type hinting
-automatically obtains objects for corresponding interfaces from container.
+automatically obtains objects for corresponding interfaces from the container.
+
+Sometimes you either don't have an object in container or want to explicitly specify parameters. It could be done
+like the following:
+
+```php
+/** @var $dataProvider DataProvider */
+$dataProvider = /* ... */;
+$result = (new Injector($container))->invoke([$calculator, 'calculate'], ['multiplier' => 5.0, $dataProvider]);
+```
+
+In the above the "calculate" method looks like the following:
+
+```php
+public function calculate(DataProvider $dataProvider, float $multiplier)
+{
+    // ...
+}
+```
+
+We have passed two parameters. One is `multiplier`. It is explicitly named. Such parameters passed as is. Another is 
+data provider. It is not named explicitly so injector finds matching argument that has the same type.
