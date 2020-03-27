@@ -23,9 +23,7 @@ class InjectorTest extends TestCase
     {
         $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
 
-        $getEngineName = static function (EngineInterface $engine) {
-            return $engine->getName();
-        };
+        $getEngineName = fn (EngineInterface $engine) => $engine->getName();
 
         $engineName = (new Injector($container))->invoke($getEngineName);
 
@@ -38,23 +36,29 @@ class InjectorTest extends TestCase
 
         $object = new EngineVAZ2101();
 
-        $engineName = (new Injector($container))->invoke([$object, 'rust'], ['index' => 5.0]);
+        $engine = (new Injector($container))->invoke([$object, 'rust'], ['index' => 5.0]);
 
-        $this->assertInstanceOf(EngineVAZ2101::class, $engineName);
+        $this->assertInstanceOf(EngineVAZ2101::class, $engine);
     }
 
+    /**
+     * Injector should be able to invoke static method
+     */
     public function testInvokeStatic(): void
     {
         $container = new Container([]);
 
-        $engineName = (new Injector($container))->invoke([EngineVAZ2101::class, 'isWroomWroom']);
+        $result = (new Injector($container))->invoke([EngineVAZ2101::class, 'isWroomWroom']);
 
-        $this->assertIsBool($engineName);
+        $this->assertIsBool($result);
     }
 
+    /**
+     * Injector should be able to invoke method without arguments
+     */
     public function testInvokeWithoutArguments(): void
     {
-        $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
+        $container = new Container([]);
 
         $true = fn () => true;
 
@@ -63,6 +67,9 @@ class InjectorTest extends TestCase
         $this->assertTrue($result);
     }
 
+    /**
+     * Nullable arguments should be searched in container
+     */
     public function testWithNullableArgument(): void
     {
         $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
@@ -74,6 +81,9 @@ class InjectorTest extends TestCase
         $this->assertNotNull($result);
     }
 
+    /**
+     * Nullable arguments not found in container should be passed as `null`
+     */
     public function testWithNullableArgumentAndEmptyContainer(): void
     {
         $container = new Container([]);
@@ -85,6 +95,9 @@ class InjectorTest extends TestCase
         $this->assertNull($result);
     }
 
+    /**
+     * Nullable scalars should be set with `null` if not specified by name explicitly
+     */
     public function testWithNullableScalarArgument(): void
     {
         $container = new Container([]);
@@ -134,42 +147,42 @@ class InjectorTest extends TestCase
     {
         $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
 
-        $compareEngines = function (EngineInterface $engine1, EngineInterface $engine2) {
+        $compareEngines = static function (EngineInterface $engine1, EngineInterface $engine2) {
             return $engine1->getPower() <=> $engine2->getPower();
         };
         $zilEngine = new EngineZIL130();
 
-        $engineName = (new Injector($container))->invoke($compareEngines, [$zilEngine]);
+        $result = (new Injector($container))->invoke($compareEngines, [$zilEngine]);
 
-        $this->assertSame(-1, $engineName);
+        $this->assertSame(-1, $result);
     }
 
     public function testTwoEqualCustomArgumentsWithOneCustomNamedParameter(): void
     {
         $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
 
-        $compareEngines = function (EngineInterface $engine1, EngineInterface $engine2) {
+        $compareEngines = static function (EngineInterface $engine1, EngineInterface $engine2) {
             return $engine1->getPower() <=> $engine2->getPower();
         };
         $zilEngine = new EngineZIL130();
 
-        $engineName = (new Injector($container))->invoke($compareEngines, ['engine1' => $zilEngine]);
+        $result = (new Injector($container))->invoke($compareEngines, ['engine1' => $zilEngine]);
 
-        $this->assertSame(-1, $engineName);
+        $this->assertSame(-1, $result);
     }
 
     public function testTwoEqualCustomArgumentsWithOneCustomNamedParameter2(): void
     {
         $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
 
-        $compareEngines = function (EngineInterface $engine1, EngineInterface $engine2) {
+        $compareEngines = static function (EngineInterface $engine1, EngineInterface $engine2) {
             return $engine1->getPower() <=> $engine2->getPower();
         };
         $zilEngine = new EngineZIL130();
 
-        $engineName = (new Injector($container))->invoke($compareEngines, ['engine2' => $zilEngine]);
+        $result = (new Injector($container))->invoke($compareEngines, ['engine2' => $zilEngine]);
 
-        $this->assertSame(1, $engineName);
+        $this->assertSame(1, $result);
     }
 
     public function testExtendedArgumentsWithOneCustomNamedParameter2(): void
@@ -181,14 +194,14 @@ class InjectorTest extends TestCase
             ]
         );
 
-        $compareEngines = function (EngineInterface $engine1, LightEngine $engine2) {
+        $concatEngineNames = static function (EngineInterface $engine1, LightEngine $engine2) {
             return $engine1->getName() . $engine2->getName();
         };
         $zilEngine = new EngineMarkTwo();
 
-        $engineName = (new Injector($container))->invoke($compareEngines, [$zilEngine]);
+        $result = (new Injector($container))->invoke($concatEngineNames, [$zilEngine]);
 
-        $this->assertSame(EngineMarkTwo::NAME . EngineVAZ2101::NAME, $engineName);
+        $this->assertSame(EngineMarkTwo::NAME . EngineVAZ2101::NAME, $result);
     }
 
     public function testMissingRequiredTypedParameter(): void
@@ -295,7 +308,7 @@ class InjectorTest extends TestCase
             [new EngineZIL130(), new EngineVAZ2101(), new EngineMarkTwo(), new \stdClass()]
         );
 
-        $this->assertSame(4, count($result));
+        $this->assertCount(4, $result);
     }
 
     public function testVariadicStringArgumentWithUnnamedStringsParams(): void
@@ -306,7 +319,7 @@ class InjectorTest extends TestCase
 
         $this->expectException(\Exception::class);
 
-        $result = (new Injector($container))->invoke($callable, ['str 1', 'str 2', 'str 3']);
+        (new Injector($container))->invoke($callable, ['str 1', 'str 2', 'str 3']);
     }
 
     public function testNullableVariadicArgument(): void
@@ -339,7 +352,7 @@ class InjectorTest extends TestCase
 
         $this->expectException(\Throwable::class);
 
-        $result = (new Injector($container))->invoke($callable, ['engine' => new \DateTimeImmutable()]);
+        (new Injector($container))->invoke($callable, ['engine' => new \DateTimeImmutable()]);
     }
 
     public function testArrayArgumentWithUnnamedType(): void
