@@ -56,3 +56,4 @@ public function calculate(DataProvider $dataProvider, float $multiplier)
 
 We have passed two parameters. One is `multiplier`. It is explicitly named. Such parameters passed as is. Another is 
 data provider. It is not named explicitly so injector finds matching argument that has the same type.
+
