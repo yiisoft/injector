@@ -85,13 +85,13 @@ class Injector
             $name = $param->getName();
             $class = $param->getClass();
             $hasType = $param->hasType();
-            $nullable = $param->allowsNull() && $hasType;
-            $variadic = $param->isVariadic();
+            $isNullable = $param->allowsNull() && $hasType;
+            $isVariadic = $param->isVariadic();
             $error = null;
 
             // Get argument by name
-            if (key_exists($name, $parameters)) {
-                if ($variadic && is_array($parameters[$name])) {
+            if (array_key_exists($name, $parameters)) {
+                if ($isVariadic && is_array($parameters[$name])) {
                     $arguments = array_merge($arguments, array_values($parameters[$name]));
                 } else {
                     $arguments[] = $parameters[$name];
@@ -112,7 +112,7 @@ class Injector
                         $found = true;
                         $arguments[] = $item;
                         unset($parameters[$key]);
-                        if (!$variadic) {
+                        if (!$isVariadic) {
                             break;
                         }
                     }
@@ -134,7 +134,7 @@ class Injector
             if ($param->isDefaultValueAvailable()) {
                 $arguments[] = $param->getDefaultValue();
             } elseif (!$param->isOptional()) {
-                if ($nullable) {
+                if ($isNullable) {
                     $arguments[] = null;
                 } else {
                     throw $error ?? new MissingRequiredArgumentException($name, $reflection->getName());
