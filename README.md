@@ -36,7 +36,7 @@ In the code above we feed our container to `Injector` when creating it. Any PSR-
 When `invoke` is called, injector reads method signature of the method invoked and, based on type hinting
 automatically obtains objects for corresponding interfaces from the container.
 
-Sometimes you either don't have an object in container or want to explicitly specify parameters. It could be done
+Sometimes you either don't have an object in container or want to explicitly specify arguments. It could be done
 like the following:
 
 ```php
@@ -54,6 +54,6 @@ public function calculate(DataProvider $dataProvider, float $multiplier)
 }
 ```
 
-We have passed two parameters. One is `multiplier`. It is explicitly named. Such parameters passed as is. Another is 
-data provider. It is not named explicitly so injector finds matching argument that has the same type.
+We have passed two arguments. One is `multiplier`. It is explicitly named. Such arguments passed as is. Another is 
+data provider. It is not named explicitly so injector finds matching parameter that has the same type.
 
