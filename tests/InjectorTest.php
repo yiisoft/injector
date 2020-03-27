@@ -109,6 +109,9 @@ class InjectorTest extends TestCase
         $this->assertNull($result);
     }
 
+    /**
+     * Optional scalar arguments should be set with default value if not specified by name explicitly
+     */
     public function testWithNullableOptionalArgument(): void
     {
         $container = new Container([]);
@@ -120,6 +123,10 @@ class InjectorTest extends TestCase
         $this->assertSame(6, $result);
     }
 
+    /**
+     * Optional arguments with `null` by default should be set with `null` if other value not specified in parameters
+     * or container
+     */
     public function testWithNullableOptionalArgumentThatNull(): void
     {
         $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
@@ -131,6 +138,9 @@ class InjectorTest extends TestCase
         $this->assertNotNull($result);
     }
 
+    /**
+     * Ann object for a typed argument can be specified in parameters without named key and without following the order
+     */
     public function testCustomDependency(): void
     {
         $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
@@ -138,11 +148,17 @@ class InjectorTest extends TestCase
 
         $getEngineName = fn (EngineInterface $engine) => $engine->getName();
 
-        $engineName = (new Injector($container))->invoke($getEngineName, [$needleEngine]);
+        $engineName = (new Injector($container))->invoke(
+            $getEngineName,
+            [new \stdClass(), $needleEngine, new \DateTimeImmutable()]
+        );
 
         $this->assertSame(EngineZIL130::NAME, $engineName);
     }
 
+    /**
+     * In this case, first argument will be set from parameters, and second argument from container
+     */
     public function testTwoEqualCustomArgumentsWithOneCustom(): void
     {
         $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
@@ -157,21 +173,10 @@ class InjectorTest extends TestCase
         $this->assertSame(-1, $result);
     }
 
+    /**
+     * In this case, second argument will be set from parameters by name, and first argument from container
+     */
     public function testTwoEqualCustomArgumentsWithOneCustomNamedParameter(): void
-    {
-        $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
-
-        $compareEngines = static function (EngineInterface $engine1, EngineInterface $engine2) {
-            return $engine1->getPower() <=> $engine2->getPower();
-        };
-        $zilEngine = new EngineZIL130();
-
-        $result = (new Injector($container))->invoke($compareEngines, ['engine1' => $zilEngine]);
-
-        $this->assertSame(-1, $result);
-    }
-
-    public function testTwoEqualCustomArgumentsWithOneCustomNamedParameter2(): void
     {
         $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
 
@@ -185,11 +190,14 @@ class InjectorTest extends TestCase
         $this->assertSame(1, $result);
     }
 
+    /**
+     * Values for arguments are not matched by the greater similarity of parameter types and arguments, but simply pass
+     * in order as is
+     */
     public function testExtendedArgumentsWithOneCustomNamedParameter2(): void
     {
         $container = new Container(
             [
-                EngineInterface::class => EngineZIL130::class,
                 LightEngine::class => EngineVAZ2101::class,
             ]
         );
@@ -197,9 +205,11 @@ class InjectorTest extends TestCase
         $concatEngineNames = static function (EngineInterface $engine1, LightEngine $engine2) {
             return $engine1->getName() . $engine2->getName();
         };
-        $zilEngine = new EngineMarkTwo();
 
-        $result = (new Injector($container))->invoke($concatEngineNames, [$zilEngine]);
+        $result = (new Injector($container))->invoke($concatEngineNames, [
+            new EngineMarkTwo(), // LightEngine, EngineInterface
+            new EngineZIL130(), // EngineInterface
+        ]);
 
         $this->assertSame(EngineMarkTwo::NAME . EngineVAZ2101::NAME, $result);
     }
@@ -246,6 +256,9 @@ class InjectorTest extends TestCase
         $injector->invoke($getEngineName);
     }
 
+    /**
+     * A values collection for a variadic argument can be passed as an array in a named parameter
+     */
     public function testAloneScalarVariadicArgumentAnsNamedParam(): void
     {
         $container = new Container([]);
@@ -257,17 +270,10 @@ class InjectorTest extends TestCase
         $this->assertSame(6, $result);
     }
 
-    public function testScalarVariadicArgumentAnsNamedParam(): void
-    {
-        $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
-
-        $callable = fn (EngineInterface $engine, int ...$var) => array_sum($var);
-
-        $result = (new Injector($container))->invoke($callable, ['var' => [1, 2, 3]]);
-
-        $this->assertSame(6, $result);
-    }
-
+    /**
+     * If type of a variadic argument is a class and named parameter with values collection is not set then injector
+     * will search for objects by class name among all unnamed parameters
+     */
     public function testVariadicArgumentUnnamedParams(): void
     {
         $container = new Container([\DateTimeInterface::class => new \DateTimeImmutable()]);
@@ -276,27 +282,15 @@ class InjectorTest extends TestCase
 
         $result = (new Injector($container))->invoke(
             $callable,
-            [new EngineZIL130(), new EngineVAZ2101(), new EngineMarkTwo()]
+            [new EngineZIL130(), new EngineVAZ2101(), new \stdClass(), new EngineMarkTwo(), new \stdClass()]
         );
 
         $this->assertSame(3, $result);
     }
 
-    public function testVariadicArgumentUnnamedParamsWithIncorrectItem(): void
-    {
-        $container = new Container([\DateTimeInterface::class => new \DateTimeImmutable()]);
-
-        $callable = fn (\DateTimeInterface $dateTime, EngineInterface ...$engines) => count($engines);
-
-        $result = (new Injector($container))->invoke(
-            $callable,
-            [new EngineZIL130(), new EngineVAZ2101(), new EngineMarkTwo(), new \stdClass()]
-        );
-
-        // stdClass should be ignored
-        $this->assertSame(3, $result);
-    }
-
+    /**
+     * If calling method have an untyped variadic argument then all remaining unnamed parameters will be passed
+     */
     public function testVariadicMixedArgumentWithMixedParams(): void
     {
         $container = new Container([\DateTimeInterface::class => new \DateTimeImmutable()]);
@@ -311,6 +305,9 @@ class InjectorTest extends TestCase
         $this->assertCount(4, $result);
     }
 
+    /**
+     * Any unnamed parameter can only be an object. Scalar, array, null and other values can only be named parameters
+     */
     public function testVariadicStringArgumentWithUnnamedStringsParams(): void
     {
         $container = new Container([\DateTimeInterface::class => new \DateTimeImmutable()]);
@@ -322,6 +319,9 @@ class InjectorTest extends TestCase
         (new Injector($container))->invoke($callable, ['str 1', 'str 2', 'str 3']);
     }
 
+    /**
+     * In the absence of other values to a nullable variadic argument `null` is not passed by default
+     */
     public function testNullableVariadicArgument(): void
     {
         $container = new Container([]);
