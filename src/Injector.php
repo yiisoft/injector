@@ -13,7 +13,7 @@ use ReflectionException;
  * Injector is able to analyze callable dependencies based on
  * type hinting and inject them from any PSR-11 compatible container.
  */
-class Injector
+final class Injector
 {
     private ContainerInterface $container;
 

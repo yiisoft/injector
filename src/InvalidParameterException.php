@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector;
 
-class InvalidParameterException extends \InvalidArgumentException
+final class InvalidParameterException extends \InvalidArgumentException
 {
     public function __construct(string $name, string $functionName)
     {
