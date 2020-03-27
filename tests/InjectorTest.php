@@ -19,6 +19,9 @@ use Yiisoft\Injector\Tests\Support\LightEngine;
 
 class InjectorTest extends TestCase
 {
+    /**
+     * Injector should be able to invoke closure.
+     */
     public function testInvokeClosure(): void
     {
         $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
@@ -30,6 +33,9 @@ class InjectorTest extends TestCase
         $this->assertSame('Mark Two', $engineName);
     }
 
+    /**
+     * Injector should be able to invoke array callable.
+     */
     public function testInvokeCallableArray(): void
     {
         $container = new Container([]);
@@ -42,7 +48,7 @@ class InjectorTest extends TestCase
     }
 
     /**
-     * Injector should be able to invoke static method
+     * Injector should be able to invoke static method.
      */
     public function testInvokeStatic(): void
     {
@@ -54,7 +60,7 @@ class InjectorTest extends TestCase
     }
 
     /**
-     * Injector should be able to invoke method without arguments
+     * Injector should be able to invoke method without arguments.
      */
     public function testInvokeWithoutArguments(): void
     {
@@ -68,7 +74,7 @@ class InjectorTest extends TestCase
     }
 
     /**
-     * Nullable arguments should be searched in container
+     * Nullable arguments should be searched in container.
      */
     public function testWithNullableArgument(): void
     {
@@ -82,7 +88,7 @@ class InjectorTest extends TestCase
     }
 
     /**
-     * Nullable arguments not found in container should be passed as `null`
+     * Nullable arguments not found in container should be passed as `null`.
      */
     public function testWithNullableArgumentAndEmptyContainer(): void
     {
@@ -96,7 +102,7 @@ class InjectorTest extends TestCase
     }
 
     /**
-     * Nullable scalars should be set with `null` if not specified by name explicitly
+     * Nullable scalars should be set with `null` if not specified by name explicitly.
      */
     public function testWithNullableScalarArgument(): void
     {
@@ -110,7 +116,7 @@ class InjectorTest extends TestCase
     }
 
     /**
-     * Optional scalar arguments should be set with default value if not specified by name explicitly
+     * Optional scalar arguments should be set with default value if not specified by name explicitly.
      */
     public function testWithNullableOptionalArgument(): void
     {
@@ -125,7 +131,7 @@ class InjectorTest extends TestCase
 
     /**
      * Optional arguments with `null` by default should be set with `null` if other value not specified in parameters
-     * or container
+     * or container.
      */
     public function testWithNullableOptionalArgumentThatNull(): void
     {
@@ -139,7 +145,7 @@ class InjectorTest extends TestCase
     }
 
     /**
-     * Ann object for a typed argument can be specified in parameters without named key and without following the order
+     * An object for a typed argument can be specified in parameters without named key and without following the order.
      */
     public function testCustomDependency(): void
     {
@@ -157,7 +163,7 @@ class InjectorTest extends TestCase
     }
 
     /**
-     * In this case, first argument will be set from parameters, and second argument from container
+     * In this case, first argument will be set from parameters, and second argument from container.
      */
     public function testTwoEqualCustomArgumentsWithOneCustom(): void
     {
@@ -174,7 +180,7 @@ class InjectorTest extends TestCase
     }
 
     /**
-     * In this case, second argument will be set from parameters by name, and first argument from container
+     * In this case, second argument will be set from parameters by name, and first argument from container.
      */
     public function testTwoEqualCustomArgumentsWithOneCustomNamedParameter(): void
     {
@@ -192,7 +198,7 @@ class InjectorTest extends TestCase
 
     /**
      * Values for arguments are not matched by the greater similarity of parameter types and arguments, but simply pass
-     * in order as is
+     * in order as is.
      */
     public function testExtendedArgumentsWithOneCustomNamedParameter2(): void
     {
@@ -257,7 +263,7 @@ class InjectorTest extends TestCase
     }
 
     /**
-     * A values collection for a variadic argument can be passed as an array in a named parameter
+     * A values collection for a variadic argument can be passed as an array in a named parameter.
      */
     public function testAloneScalarVariadicArgumentAnsNamedParam(): void
     {
@@ -272,7 +278,7 @@ class InjectorTest extends TestCase
 
     /**
      * If type of a variadic argument is a class and named parameter with values collection is not set then injector
-     * will search for objects by class name among all unnamed parameters
+     * will search for objects by class name among all unnamed parameters.
      */
     public function testVariadicArgumentUnnamedParams(): void
     {
@@ -289,7 +295,7 @@ class InjectorTest extends TestCase
     }
 
     /**
-     * If calling method have an untyped variadic argument then all remaining unnamed parameters will be passed
+     * If calling method have an untyped variadic argument then all remaining unnamed parameters will be passed.
      */
     public function testVariadicMixedArgumentWithMixedParams(): void
     {
@@ -306,7 +312,7 @@ class InjectorTest extends TestCase
     }
 
     /**
-     * Any unnamed parameter can only be an object. Scalar, array, null and other values can only be named parameters
+     * Any unnamed parameter can only be an object. Scalar, array, null and other values can only be named parameters.
      */
     public function testVariadicStringArgumentWithUnnamedStringsParams(): void
     {
@@ -320,7 +326,7 @@ class InjectorTest extends TestCase
     }
 
     /**
-     * In the absence of other values to a nullable variadic argument `null` is not passed by default
+     * In the absence of other values to a nullable variadic argument `null` is not passed by default.
      */
     public function testNullableVariadicArgument(): void
     {
@@ -333,6 +339,10 @@ class InjectorTest extends TestCase
         $this->assertSame([], $result);
     }
 
+    /**
+     * Parameters that were passed but were not used are appended to the call so they could be obtained
+     * with func_get_args().
+     */
     public function testAppendingUnusedParams(): void
     {
         $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
