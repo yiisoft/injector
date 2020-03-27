@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;
 use Yiisoft\Di\Container;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Injector\InvalidParameterException;
+use Yiisoft\Injector\InvalidArgumentException;
 use Yiisoft\Injector\MissingRequiredArgumentException;
 use Yiisoft\Injector\Tests\Support\ColorInterface;
 use Yiisoft\Injector\Tests\Support\EngineInterface;
@@ -404,7 +404,7 @@ class InjectorTest extends TestCase
 
         $getEngineName = fn () => 42;
 
-        $this->expectException(InvalidParameterException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         (new Injector($container))->invoke($getEngineName, ['test']);
     }

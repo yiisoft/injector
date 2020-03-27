@@ -147,7 +147,7 @@ final class Injector
         foreach ($parameters as $key => $value) {
             if (is_int($key)) {
                 if (!is_object($value)) {
-                    throw new InvalidParameterException((string)$key, $reflection->getName());
+                    throw new InvalidArgumentException((string)$key, $reflection->getName());
                 }
                 if ($pushUnusedParams) {
                     $arguments[] = $value;
