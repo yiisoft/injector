@@ -26,31 +26,31 @@ final class Injector
      * Invoke a callback with resolving dependencies in parameters.
      *
      * This methods allows invoking a callback and let type hinted parameter names to be
-     * resolved as objects of the Container. It additionally allow calling function using named parameters.
+     * resolved as objects of the Container. It additionally allow calling function passing named arguments.
      *
      * For example, the following callback may be invoked using the Container to resolve the formatter dependency:
      *
      * ```php
-     * $formatString = function($string, \yii\i18n\Formatter $formatter) {
+     * $formatString = function($string, \Yiisoft\I18n\MessageFormatterInterface $formatter) {
      *    // ...
      * }
      * $container->invoke($formatString, ['string' => 'Hello World!']);
      * ```
      *
-     * This will pass the string `'Hello World!'` as the first param, and a formatter instance created
-     * by the DI container as the second param to the callable.
+     * This will pass the string `'Hello World!'` as the first argument, and a formatter instance created
+     * by the DI container as the second argument.
      *
-     * @param callable $callback callable to be invoked.
-     * @param array $parameters The array of parameters for the function.
-     * This can be either a list of parameters, or an associative array representing named function parameters.
-     * @return mixed the callback return value.
+     * @param callable $callable callable to be invoked.
+     * @param array $arguments The array of the function arguments.
+     * This can be either a list of arguments, or an associative array where keys are argument names.
+     * @return mixed the callable return value.
      * @throws MissingRequiredArgumentException  if required argument is missing.
      * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
      * @throws ReflectionException
      */
-    public function invoke(callable $callback, array $parameters = [])
+    public function invoke(callable $callable, array $arguments = [])
     {
-        return \call_user_func_array($callback, $this->resolveCallableDependencies($callback, $parameters));
+        return \call_user_func_array($callable, $this->resolveCallableDependencies($callable, $arguments));
     }
 
     /**
@@ -60,13 +60,13 @@ final class Injector
      * components.
      *
      * @param callable $callback callable to be invoked.
-     * @param array $parameters The array of parameters for the function, can be either numeric or associative.
+     * @param array $arguments The array of the function arguments, can be either numeric or associative.
      * @return array The resolved dependencies.
      * @throws MissingRequiredArgumentException if required argument is missing.
      * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
      * @throws ReflectionException
      */
-    private function resolveCallableDependencies(callable $callback, array $parameters = []): array
+    private function resolveCallableDependencies(callable $callback, array $arguments = []): array
     {
         if (\is_object($callback) && !$callback instanceof \Closure) {
             $callback = [$callback, '__invoke'];
@@ -78,82 +78,82 @@ final class Injector
             $reflection = new \ReflectionFunction($callback);
         }
 
-        $arguments = [];
+        $resolvedArguments = [];
 
-        $pushUnusedParams = true;
-        foreach ($reflection->getParameters() as $param) {
-            $name = $param->getName();
-            $class = $param->getClass();
-            $hasType = $param->hasType();
-            $isNullable = $param->allowsNull() && $hasType;
-            $isVariadic = $param->isVariadic();
+        $pushUnusedArguments = true;
+        foreach ($reflection->getParameters() as $parameter) {
+            $name = $parameter->getName();
+            $class = $parameter->getClass();
+            $hasType = $parameter->hasType();
+            $isNullable = $parameter->allowsNull() && $hasType;
+            $isVariadic = $parameter->isVariadic();
             $error = null;
 
             // Get argument by name
-            if (array_key_exists($name, $parameters)) {
-                if ($isVariadic && is_array($parameters[$name])) {
-                    $arguments = array_merge($arguments, array_values($parameters[$name]));
+            if (array_key_exists($name, $arguments)) {
+                if ($isVariadic && is_array($arguments[$name])) {
+                    $resolvedArguments = array_merge($resolvedArguments, array_values($arguments[$name]));
                 } else {
-                    $arguments[] = $parameters[$name];
+                    $resolvedArguments[] = $arguments[$name];
                 }
-                unset($parameters[$name]);
+                unset($arguments[$name]);
                 continue;
             }
 
             if ($class !== null) {
-                // Unnamed parameters
+                // Unnamed arguments
                 $className = $class->getName();
                 $found = false;
-                foreach ($parameters as $key => $item) {
+                foreach ($arguments as $key => $item) {
                     if (!is_int($key)) {
                         continue;
                     }
                     if ($item instanceof $className) {
                         $found = true;
-                        $arguments[] = $item;
-                        unset($parameters[$key]);
+                        $resolvedArguments[] = $item;
+                        unset($arguments[$key]);
                         if (!$isVariadic) {
                             break;
                         }
                     }
                 }
                 if ($found) {
-                    $pushUnusedParams = false;
+                    $pushUnusedArguments = false;
                     continue;
                 }
 
                 // If the argument is optional we catch not instantiable exceptions
                 try {
-                    $arguments[] = $this->container->get($className);
+                    $resolvedArguments[] = $this->container->get($className);
                     continue;
                 } catch (NotFoundExceptionInterface $e) {
                     $error = $e;
                 }
             }
 
-            if ($param->isDefaultValueAvailable()) {
-                $arguments[] = $param->getDefaultValue();
-            } elseif (!$param->isOptional()) {
+            if ($parameter->isDefaultValueAvailable()) {
+                $resolvedArguments[] = $parameter->getDefaultValue();
+            } elseif (!$parameter->isOptional()) {
                 if ($isNullable) {
-                    $arguments[] = null;
+                    $resolvedArguments[] = null;
                 } else {
                     throw $error ?? new MissingRequiredArgumentException($name, $reflection->getName());
                 }
             } elseif ($hasType) {
-                $pushUnusedParams = false;
+                $pushUnusedArguments = false;
             }
         }
 
-        foreach ($parameters as $key => $value) {
+        foreach ($arguments as $key => $value) {
             if (is_int($key)) {
                 if (!is_object($value)) {
                     throw new InvalidArgumentException((string)$key, $reflection->getName());
                 }
-                if ($pushUnusedParams) {
-                    $arguments[] = $value;
+                if ($pushUnusedArguments) {
+                    $resolvedArguments[] = $value;
                 }
             }
         }
-        return $arguments;
+        return $resolvedArguments;
     }
 }
