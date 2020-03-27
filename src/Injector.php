@@ -41,16 +41,16 @@ final class Injector
      * by the DI container as the second param to the callable.
      *
      * @param callable $callback callable to be invoked.
-     * @param array $params The array of parameters for the function.
+     * @param array $parameters The array of parameters for the function.
      * This can be either a list of parameters, or an associative array representing named function parameters.
      * @return mixed the callback return value.
      * @throws MissingRequiredArgumentException  if required argument is missing.
      * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
      * @throws ReflectionException
      */
-    public function invoke(callable $callback, array $params = [])
+    public function invoke(callable $callback, array $parameters = [])
     {
-        return \call_user_func_array($callback, $this->resolveCallableDependencies($callback, $params));
+        return \call_user_func_array($callback, $this->resolveCallableDependencies($callback, $parameters));
     }
 
     /**
