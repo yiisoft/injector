@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector;
 
-use Psr\Container\ContainerExceptionInterface;
-
-class InvalidParameterException extends \InvalidArgumentException implements ContainerExceptionInterface
+class InvalidParameterException extends \InvalidArgumentException
 {
     public function __construct(string $name, string $functionName)
     {
