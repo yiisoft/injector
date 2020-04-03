@@ -80,7 +80,7 @@ final class Injector
         $reflection = $classReflection->getConstructor();
         if ($reflection === null) {
             // Method __construct() does not exist
-            return new $class;
+            return new $class();
         }
 
         return new $class(...$this->resolveDependencies($reflection, $arguments));

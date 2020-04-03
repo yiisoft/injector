@@ -71,7 +71,7 @@ class InjectorTest extends TestCase
     public function testInvokeAnonymousClass(): void
     {
         $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
-        $class = new class () {
+        $class = new class() {
             public EngineInterface $engine;
             public function setEngine(EngineInterface $engine)
             {
@@ -518,7 +518,7 @@ class InjectorTest extends TestCase
     {
         $container = new Container([]);
 
-        $values = [new EngineMarkTwo, new EngineVAZ2101()];
+        $values = [new EngineMarkTwo(), new EngineVAZ2101()];
         $object = (new Injector($container))->make(MakeEngineCollector::class, $values);
 
         $this->assertSame($values, $object->engines);
