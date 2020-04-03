@@ -50,34 +50,52 @@ final class Injector
      */
     public function invoke(callable $callable, array $arguments = [])
     {
-        return \call_user_func_array($callable, $this->resolveCallableDependencies($callable, $arguments));
+        if (\is_object($callable) && !$callable instanceof \Closure) {
+            $callable = [$callable, '__invoke'];
+        }
+
+        if (\is_array($callable)) {
+            $reflection = new \ReflectionMethod($callable[0], $callable[1]);
+        } else {
+            $reflection = new \ReflectionFunction($callable);
+        }
+
+        return \call_user_func_array($callable, $this->resolveDependencies($reflection, $arguments));
     }
 
     /**
-     * Resolve dependencies for a function.
-     *
-     * This method can be used to implement similar functionality as provided by [[invoke()]] in other
-     * components.
-     *
-     * @param callable $callback callable to be invoked.
-     * @param array $arguments The array of the function arguments, can be either numeric or associative.
-     * @return array The resolved dependencies.
-     * @throws MissingRequiredArgumentException if required argument is missing.
-     * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
+     * @param string $class
+     * @param array $arguments
+     * @return mixed
+     * @throws ContainerExceptionInterface
+     * @throws MissingRequiredArgumentException|InvalidArgumentException
      * @throws ReflectionException
      */
-    private function resolveCallableDependencies(callable $callback, array $arguments = []): array
+    public function make(string $class, array $arguments = [])
     {
-        if (\is_object($callback) && !$callback instanceof \Closure) {
-            $callback = [$callback, '__invoke'];
+        $classReflection = new \ReflectionClass($class);
+        if (!$classReflection->isInstantiable()) {
+            throw new \InvalidArgumentException("Class $class is not instantiable");
+        }
+        $reflection = $classReflection->getConstructor();
+        if ($reflection === null) {
+            // Method __construct() does not exist
+            return new $class;
         }
 
-        if (\is_array($callback)) {
-            $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-        } else {
-            $reflection = new \ReflectionFunction($callback);
-        }
+        return new $class(...$this->resolveDependencies($reflection, $arguments));
+    }
 
+    /**
+     * @param \ReflectionFunctionAbstract $reflection
+     * @param array $arguments
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws MissingRequiredArgumentException|InvalidArgumentException
+     * @throws ReflectionException
+     */
+    private function resolveDependencies(\ReflectionFunctionAbstract $reflection, array $arguments = [])
+    {
         $resolvedArguments = [];
 
         $pushUnusedArguments = true;
