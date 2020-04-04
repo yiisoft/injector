@@ -81,7 +81,7 @@ final class Injector
      *         // ...
      *     }
      * }
-     * 
+     *
      * $injector = new Yiisoft\Injector\Injector($container);
      * $stringFormatter = $injector->make(StringFormatter::class, ['string' => 'Hello World!']);
      * ```

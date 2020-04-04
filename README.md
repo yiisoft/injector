@@ -6,7 +6,7 @@
     <br>
 </p>
 
-The package is PSR-11 compatible injector that is able to invoke methods or create objects resolving their dependencies
+The package is [PSR-11](http://www.php-fig.org/psr/psr-11/) compatible injector that is able to invoke methods or create objects resolving their dependencies
 via autowiring.
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/injector/v/stable.png)](https://packagist.org/packages/yiisoft/injector)
@@ -18,7 +18,7 @@ via autowiring.
 ## Features
 
 - Invoke callable or create and object of a given class.
-- Resolve dependencies by parameter types using the given container.
+- Resolve dependencies by parameter types using the given [PSR-11](http://www.php-fig.org/psr/psr-11/) container.
 - Pass concrete dependency instances by type.
 - Pass arguments by name.
 
@@ -83,3 +83,5 @@ class StringFormatter
 
 $stringFormatter = (new Injector($container))->make(StringFormatter::class, ['string' => 'Hello World!']);
 ```
+
+## 
