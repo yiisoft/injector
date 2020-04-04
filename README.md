@@ -22,7 +22,7 @@ via autowiring.
 - Pass concrete dependency instances by type.
 - Pass arguments by name.
 
-# Installation
+## Installation
 
 The preferred way to install this package is through [composer](http://getcomposer.org/download/):
 
