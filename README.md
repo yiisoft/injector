@@ -22,6 +22,14 @@ via autowiring.
 - Pass concrete dependency instances by type.
 - Pass arguments by name.
 
+# Installation
+
+The preferred way to install this extension is through [composer](http://getcomposer.org/download/):
+
+```
+composer require yiisoft/injector
+```
+
 ## General usage
 
 ```php
@@ -79,9 +87,13 @@ class StringFormatter
     {
         // ...
     }
+    public function getFormattedString(): string
+    {
+        // ...
+    }
 }
 
 $stringFormatter = (new Injector($container))->make(StringFormatter::class, ['string' => 'Hello World!']);
-```
 
-## 
+$result = $stringFormatter->getFormattedString();
+```
