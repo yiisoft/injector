@@ -24,7 +24,7 @@ via autowiring.
 
 # Installation
 
-The preferred way to install this extension is through [composer](http://getcomposer.org/download/):
+The preferred way to install this package is through [composer](http://getcomposer.org/download/):
 
 ```
 composer require yiisoft/injector
