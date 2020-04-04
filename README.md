@@ -6,13 +6,21 @@
     <br>
 </p>
 
-The package is PSR-11 compatible injector that is able to invoke methods resolving their dependencies via autowiring.
+The package is PSR-11 compatible injector that is able to invoke methods or create objects resolving their dependencies
+via autowiring.
 
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/injector/v/stable.png)](https://packagist.org/packages/yiisoft/injector)
 [![Total Downloads](https://poser.pugx.org/yiisoft/injector/downloads.png)](https://packagist.org/packages/yiisoft/injector)
 [![Build Status](https://travis-ci.com/yiisoft/injector.svg?branch=master)](https://travis-ci.com/yiisoft/injector)
 [![Code Coverage](https://scrutinizer-ci.com/g/yiisoft/injector/badges/coverage.png)](https://scrutinizer-ci.com/g/yiisoft/injector/)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yiisoft/injector/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/injector/?branch=master)
+
+## Features
+
+- Invoke callable or create and object of a given class.
+- Resolve dependencies by parameter types using the given container.
+- Pass concrete dependency instances by type.
+- Pass arguments by name.
 
 ## General usage
 
@@ -41,6 +49,8 @@ Sometimes you either don't have an object in container or want to explicitly spe
 like the following:
 
 ```php
+use Yiisoft\Injector\Injector;
+
 /** @var $dataProvider DataProvider */
 $dataProvider = /* ... */;
 $result = (new Injector($container))->invoke([$calculator, 'calculate'], ['multiplier' => 5.0, $dataProvider]);
@@ -58,3 +68,18 @@ public function calculate(DataProvider $dataProvider, float $multiplier)
 We have passed two arguments. One is `multiplier`. It is explicitly named. Such arguments passed as is. Another is 
 data provider. It is not named explicitly so injector finds matching parameter that has the same type.
 
+Creating an instance of an object of a given class behaves similar to `invoke()`:
+
+```php
+use Yiisoft\Injector\Injector;
+
+class StringFormatter
+{
+    public function __construct($string, \Yiisoft\I18n\MessageFormatterInterface $formatter)
+    {
+        // ...
+    }
+}
+
+$stringFormatter = (new Injector($container))->make(StringFormatter::class, ['string' => 'Hello World!']);
+```

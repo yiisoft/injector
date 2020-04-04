@@ -23,7 +23,7 @@ final class Injector
     }
 
     /**
-     * Invoke a callback with resolving dependencies in parameters.
+     * Invoke a callback with resolving dependencies based on parameter types.
      *
      * This methods allows invoking a callback and let type hinted parameter names to be
      * resolved as objects of the Container. It additionally allow calling function passing named arguments.
@@ -34,7 +34,9 @@ final class Injector
      * $formatString = function($string, \Yiisoft\I18n\MessageFormatterInterface $formatter) {
      *    // ...
      * }
-     * $container->invoke($formatString, ['string' => 'Hello World!']);
+     *
+     * $injector = new Yiisoft\Injector\Injector($container);
+     * $injector->invoke($formatString, ['string' => 'Hello World!']);
      * ```
      *
      * This will pass the string `'Hello World!'` as the first argument, and a formatter instance created
@@ -44,7 +46,7 @@ final class Injector
      * @param array $arguments The array of the function arguments.
      * This can be either a list of arguments, or an associative array where keys are argument names.
      * @return mixed the callable return value.
-     * @throws MissingRequiredArgumentException  if required argument is missing.
+     * @throws MissingRequiredArgumentException if required argument is missing.
      * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
      * @throws ReflectionException
      */
@@ -64,9 +66,33 @@ final class Injector
     }
 
     /**
-     * @param string $class
-     * @param array $arguments
-     * @return mixed
+     * Creates an object of a given class with resolving constructor dependencies based on parameter types.
+     *
+     * This methods allows invoking a constructor and let type hinted parameter names to be
+     * resolved as objects of the Container. It additionally allow calling constructor passing named arguments.
+     *
+     * For example, the following constructor may be invoked using the Container to resolve the formatter dependency:
+     *
+     * ```php
+     * class StringFormatter
+     * {
+     *     public function __construct($string, \Yiisoft\I18n\MessageFormatterInterface $formatter)
+     *     {
+     *         // ...
+     *     }
+     * }
+     * 
+     * $injector = new Yiisoft\Injector\Injector($container);
+     * $stringFormatter = $injector->make(StringFormatter::class, ['string' => 'Hello World!']);
+     * ```
+     *
+     * This will pass the string `'Hello World!'` as the first argument, and a formatter instance created
+     * by the DI container as the second argument.
+     *
+     * @param string $class name of the class to be created.
+     * @param array $arguments The array of the function arguments.
+     * This can be either a list of arguments, or an associative array where keys are argument names.
+     * @return mixed object of the given class.
      * @throws ContainerExceptionInterface
      * @throws MissingRequiredArgumentException|InvalidArgumentException
      * @throws ReflectionException
@@ -87,14 +113,17 @@ final class Injector
     }
 
     /**
-     * @param \ReflectionFunctionAbstract $reflection
-     * @param array $arguments
-     * @return array
+     * Resolve dependencies for the given function reflection object and a list of concrete arguments
+     * and return array of arguments to call the function with.
+     *
+     * @param \ReflectionFunctionAbstract $reflection function reflection.
+     * @param array $arguments concrete arguments.
+     * @return array resolved arguments.
      * @throws ContainerExceptionInterface
      * @throws MissingRequiredArgumentException|InvalidArgumentException
      * @throws ReflectionException
      */
-    private function resolveDependencies(\ReflectionFunctionAbstract $reflection, array $arguments = [])
+    private function resolveDependencies(\ReflectionFunctionAbstract $reflection, array $arguments = []): array
     {
         $resolvedArguments = [];
 
