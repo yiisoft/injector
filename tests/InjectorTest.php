@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector\Tests;
 
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;
 use Yiisoft\Di\Container;
@@ -16,6 +17,11 @@ use Yiisoft\Injector\Tests\Support\EngineMarkTwo;
 use Yiisoft\Injector\Tests\Support\EngineZIL130;
 use Yiisoft\Injector\Tests\Support\EngineVAZ2101;
 use Yiisoft\Injector\Tests\Support\LightEngine;
+use Yiisoft\Injector\Tests\Support\MakeEmptyConstructor;
+use Yiisoft\Injector\Tests\Support\MakeEngineCollector;
+use Yiisoft\Injector\Tests\Support\MakeEngineMatherWithParam;
+use Yiisoft\Injector\Tests\Support\MakeNoConstructor;
+use Yiisoft\Injector\Tests\Support\MakePrivateConstructor;
 
 class InjectorTest extends TestCase
 {
@@ -57,6 +63,25 @@ class InjectorTest extends TestCase
         $result = (new Injector($container))->invoke([EngineVAZ2101::class, 'isWroomWroom']);
 
         $this->assertIsBool($result);
+    }
+
+    /**
+     * Injector should be able to invoke static method.
+     */
+    public function testInvokeAnonymousClass(): void
+    {
+        $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
+        $class = new class() {
+            public EngineInterface $engine;
+            public function setEngine(EngineInterface $engine)
+            {
+                $this->engine = $engine;
+            }
+        };
+
+        (new Injector($container))->invoke([$class, 'setEngine']);
+
+        $this->assertInstanceOf(EngineInterface::class, $class->engine);
     }
 
     /**
@@ -156,7 +181,7 @@ class InjectorTest extends TestCase
 
         $engineName = (new Injector($container))->invoke(
             $getEngineName,
-            [new \stdClass(), $needleEngine, new \DateTimeImmutable()]
+            [new \stdClass(), $needleEngine, new DateTimeImmutable()]
         );
 
         $this->assertSame(EngineZIL130::NAME, $engineName);
@@ -282,7 +307,7 @@ class InjectorTest extends TestCase
      */
     public function testVariadicArgumentUnnamedParams(): void
     {
-        $container = new Container([\DateTimeInterface::class => new \DateTimeImmutable()]);
+        $container = new Container([\DateTimeInterface::class => new DateTimeImmutable()]);
 
         $callable = fn (\DateTimeInterface $dateTime, EngineInterface ...$engines) => count($engines);
 
@@ -299,7 +324,7 @@ class InjectorTest extends TestCase
      */
     public function testVariadicMixedArgumentWithMixedParams(): void
     {
-        $container = new Container([\DateTimeInterface::class => new \DateTimeImmutable()]);
+        $container = new Container([\DateTimeInterface::class => new DateTimeImmutable()]);
 
         $callable = fn (...$engines) => $engines;
 
@@ -316,7 +341,7 @@ class InjectorTest extends TestCase
      */
     public function testVariadicStringArgumentWithUnnamedStringsParams(): void
     {
-        $container = new Container([\DateTimeInterface::class => new \DateTimeImmutable()]);
+        $container = new Container([\DateTimeInterface::class => new DateTimeImmutable()]);
 
         $callable = fn (string ...$engines) => $engines;
 
@@ -349,7 +374,7 @@ class InjectorTest extends TestCase
 
         $callable = fn (?EngineInterface $engine, $id = 'test') => func_num_args();
 
-        $result = (new Injector($container))->invoke($callable, [new \DateTimeImmutable(), new \DateTimeImmutable()]);
+        $result = (new Injector($container))->invoke($callable, [new DateTimeImmutable(), new DateTimeImmutable()]);
 
         $this->assertSame(4, $result);
     }
@@ -362,7 +387,7 @@ class InjectorTest extends TestCase
 
         $this->expectException(\Throwable::class);
 
-        (new Injector($container))->invoke($callable, ['engine' => new \DateTimeImmutable()]);
+        (new Injector($container))->invoke($callable, ['engine' => new DateTimeImmutable()]);
     }
 
     public function testArrayArgumentWithUnnamedType(): void
@@ -407,5 +432,116 @@ class InjectorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         (new Injector($container))->invoke($getEngineName, ['test']);
+    }
+
+    /**
+     * Constructor method not defined
+     */
+    public function testMakeWithoutConstructor(): void
+    {
+        $container = new Container([]);
+
+        $object = (new Injector($container))->make(MakeNoConstructor::class);
+
+        $this->assertInstanceOf(MakeNoConstructor::class, $object);
+    }
+
+    /**
+     * Constructor without arguments
+     */
+    public function testMakeWithoutArguments(): void
+    {
+        $container = new Container([]);
+
+        $object = (new Injector($container))->make(MakeEmptyConstructor::class);
+
+        $this->assertInstanceOf(MakeEmptyConstructor::class, $object);
+    }
+
+    /**
+     * Private constructor unavailable from Injector context
+     */
+    public function testMakeWithPrivateConstructor(): void
+    {
+        $container = new Container([]);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/not instantiable/');
+
+        (new Injector($container))->make(MakePrivateConstructor::class);
+    }
+
+    public function testMakeInvalidClass(): void
+    {
+        $container = new Container([]);
+
+        $this->expectException(\ReflectionException::class);
+        $this->expectExceptionMessageMatches('/does not exist/');
+
+        (new Injector($container))->make(UndefinedClassThatShouldNotBeDefined::class);
+    }
+
+    public function testMakeInternalClass(): void
+    {
+        $container = new Container([]);
+        $object = (new Injector($container))->make(DateTimeImmutable::class);
+        $this->assertInstanceOf(DateTimeImmutable::class, $object);
+    }
+
+    public function testMakeAbstractClass(): void
+    {
+        $container = new Container([]);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/not instantiable/');
+        (new Injector($container))->make(LightEngine::class);
+    }
+
+    public function testMakeInterface(): void
+    {
+        $container = new Container([]);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/not instantiable/');
+        (new Injector($container))->make(EngineInterface::class);
+    }
+
+    public function testMakeWithVariadicFromContainer(): void
+    {
+        $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
+
+        $object = (new Injector($container))->make(MakeEngineCollector::class, []);
+
+        $this->assertSame(1, count($object->engines));
+        $this->assertSame([$container->get(EngineInterface::class)], $object->engines);
+    }
+
+    public function testMakeWithVariadicFromArguments(): void
+    {
+        $container = new Container([]);
+
+        $values = [new EngineMarkTwo(), new EngineVAZ2101()];
+        $object = (new Injector($container))->make(MakeEngineCollector::class, $values);
+
+        $this->assertSame($values, $object->engines);
+    }
+
+    public function testMakeWithCustomParam(): void
+    {
+        $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
+
+        $object = (new Injector($container))
+            ->make(MakeEngineMatherWithParam::class, [new EngineVAZ2101(), 'parameter' => 'power']);
+
+        $this->assertNotSame($object->engine1, $object->engine2);
+        $this->assertSame($object->parameter, 'power');
+    }
+
+    public function testMakeWithInvalidCustomParam(): void
+    {
+        $container = new Container([EngineInterface::class => EngineMarkTwo::class]);
+
+        $this->expectException(\TypeError::class);
+
+        (new Injector($container))
+            ->make(MakeEngineMatherWithParam::class, ['parameter' => 100500]);
     }
 }
