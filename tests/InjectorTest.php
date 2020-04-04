@@ -45,7 +45,7 @@ class InjectorTest extends TestCase
      */
     public function testInvokeCallableArray(): void
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(ContainerInterface::class);
 
         $object = new EngineVAZ2101();
 
@@ -59,7 +59,7 @@ class InjectorTest extends TestCase
      */
     public function testInvokeStatic(): void
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(ContainerInterface::class);
 
         $result = (new Injector($container))->invoke([EngineVAZ2101::class, 'isWroomWroom']);
 
@@ -90,7 +90,7 @@ class InjectorTest extends TestCase
      */
     public function testInvokeWithoutArguments(): void
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(ContainerInterface::class);
 
         $true = fn () => true;
 
@@ -132,7 +132,7 @@ class InjectorTest extends TestCase
      */
     public function testWithNullableScalarArgument(): void
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(ContainerInterface::class);
 
         $nullableInt = fn (?int $number) => $number;
 
@@ -146,7 +146,7 @@ class InjectorTest extends TestCase
      */
     public function testWithNullableOptionalArgument(): void
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(ContainerInterface::class);
 
         $nullableInt = fn (?int $number = 6) => $number;
 
@@ -289,7 +289,7 @@ class InjectorTest extends TestCase
      */
     public function testAloneScalarVariadicArgumentAnsNamedParam(): void
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(ContainerInterface::class);
 
         $callable = fn (...$var) => array_sum($var);
 
@@ -422,7 +422,7 @@ class InjectorTest extends TestCase
 
     public function testUnnamedScalarParam(): void
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(ContainerInterface::class);
 
         $getEngineName = fn () => 42;
 
@@ -436,7 +436,7 @@ class InjectorTest extends TestCase
      */
     public function testMakeWithoutConstructor(): void
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(ContainerInterface::class);
 
         $object = (new Injector($container))->make(MakeNoConstructor::class);
 
@@ -448,7 +448,7 @@ class InjectorTest extends TestCase
      */
     public function testMakeWithoutArguments(): void
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(ContainerInterface::class);
 
         $object = (new Injector($container))->make(MakeEmptyConstructor::class);
 
@@ -460,7 +460,7 @@ class InjectorTest extends TestCase
      */
     public function testMakeWithPrivateConstructor(): void
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(ContainerInterface::class);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/not instantiable/');
@@ -480,14 +480,14 @@ class InjectorTest extends TestCase
 
     public function testMakeInternalClass(): void
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(ContainerInterface::class);
         $object = (new Injector($container))->make(DateTimeImmutable::class);
         $this->assertInstanceOf(DateTimeImmutable::class, $object);
     }
 
     public function testMakeAbstractClass(): void
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(ContainerInterface::class);
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/not instantiable/');
         (new Injector($container))->make(LightEngine::class);
@@ -495,7 +495,7 @@ class InjectorTest extends TestCase
 
     public function testMakeInterface(): void
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(ContainerInterface::class);
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/not instantiable/');
         (new Injector($container))->make(EngineInterface::class);
@@ -513,7 +513,7 @@ class InjectorTest extends TestCase
 
     public function testMakeWithVariadicFromArguments(): void
     {
-        $container = $this->getContainer();
+        $container = $this->createMock(ContainerInterface::class);
 
         $values = [new EngineMarkTwo(), new EngineVAZ2101()];
         $object = (new Injector($container))->make(MakeEngineCollector::class, $values);
