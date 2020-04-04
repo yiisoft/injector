@@ -545,7 +545,7 @@ class InjectorTest extends TestCase
 
     private function getContainer(array $definitions = []): ContainerInterface
     {
-        return new class ($definitions) implements ContainerInterface {
+        return new class($definitions) implements ContainerInterface {
             private array $definitions = [];
             public function __construct(array $definitions = [])
             {
@@ -554,8 +554,7 @@ class InjectorTest extends TestCase
             public function get($id)
             {
                 if (!$this->has($id)) {
-                    throw new class() extends \Exception implements NotFoundExceptionInterface
-                    {
+                    throw new class() extends \Exception implements NotFoundExceptionInterface {
                     };
                 }
                 return $this->definitions[$id];
