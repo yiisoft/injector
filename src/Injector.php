@@ -101,7 +101,7 @@ final class Injector
     {
         $classReflection = new \ReflectionClass($class);
         if (!$classReflection->isInstantiable()) {
-            throw new \InvalidArgumentException("Class $class is not instantiable");
+            throw new \InvalidArgumentException("Class $class is not instantiable.");
         }
         $reflection = $classReflection->getConstructor();
         if ($reflection === null) {
