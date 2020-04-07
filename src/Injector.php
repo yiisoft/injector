@@ -135,13 +135,14 @@ final class Injector
             $isNullable = $parameter->allowsNull() && $hasType;
             $isVariadic = $parameter->isVariadic();
             $error = null;
+            unset($tmpValue);
 
             // Get argument by name
             if (array_key_exists($name, $arguments)) {
                 if ($isVariadic && is_array($arguments[$name])) {
                     $resolvedArguments = array_merge($resolvedArguments, array_values($arguments[$name]));
                 } else {
-                    $resolvedArguments[] = $arguments[$name];
+                    $resolvedArguments[] = &$arguments[$name];
                 }
                 unset($arguments[$name]);
                 continue;
@@ -158,8 +159,8 @@ final class Injector
                     }
                     if (is_object($item) and $className === null || $item instanceof $className) {
                         $found = true;
-                        $resolvedArguments[] = $item;
-                        unset($arguments[$key]);
+                        $resolvedArguments[] = &$arguments[$key];
+                        unset($arguments[$key], $item);
                         if (!$isVariadic) {
                             break;
                         }
@@ -173,7 +174,8 @@ final class Injector
                 if ($className !== null) {
                     // If the argument is optional we catch not instantiable exceptions
                     try {
-                        $resolvedArguments[] = $this->container->get($className);
+                        $tmpValue = $this->container->get($className);
+                        $resolvedArguments[] = &$tmpValue;
                         continue;
                     } catch (NotFoundExceptionInterface $e) {
                         $error = $e;
@@ -182,10 +184,12 @@ final class Injector
             }
 
             if ($parameter->isDefaultValueAvailable()) {
-                $resolvedArguments[] = $parameter->getDefaultValue();
+                $tmpValue = $parameter->getDefaultValue();
+                $resolvedArguments[] = &$tmpValue;
             } elseif (!$parameter->isOptional()) {
                 if ($isNullable) {
-                    $resolvedArguments[] = null;
+                    $tmpValue = null;
+                    $resolvedArguments[] = &$tmpValue;
                 } else {
                     throw $error ?? new MissingRequiredArgumentException($name, $reflection->getName());
                 }
