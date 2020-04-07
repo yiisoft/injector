@@ -52,17 +52,9 @@ final class Injector
      */
     public function invoke(callable $callable, array $arguments = [])
     {
-        if (\is_object($callable) && !$callable instanceof \Closure) {
-            $callable = [$callable, '__invoke'];
-        }
-
-        if (\is_array($callable)) {
-            $reflection = new \ReflectionMethod($callable[0], $callable[1]);
-        } else {
-            $reflection = new \ReflectionFunction($callable);
-        }
-
-        return \call_user_func_array($callable, $this->resolveDependencies($reflection, $arguments));
+        $callable = \Closure::fromCallable($callable);
+        $reflection = new \ReflectionFunction($callable);
+        return $reflection->invokeArgs($this->resolveDependencies($reflection, $arguments));
     }
 
     /**

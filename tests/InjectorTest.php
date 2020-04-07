@@ -19,6 +19,7 @@ use Yiisoft\Injector\Tests\Support\EngineInterface;
 use Yiisoft\Injector\Tests\Support\EngineMarkTwo;
 use Yiisoft\Injector\Tests\Support\EngineZIL130;
 use Yiisoft\Injector\Tests\Support\EngineVAZ2101;
+use Yiisoft\Injector\Tests\Support\Invokeable;
 use Yiisoft\Injector\Tests\Support\LightEngine;
 use Yiisoft\Injector\Tests\Support\MakeEmptyConstructor;
 use Yiisoft\Injector\Tests\Support\MakeEngineCollector;
@@ -540,6 +541,13 @@ class InjectorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         (new Injector($container))->invoke($getEngineName, ['test']);
+    }
+
+    public function testInvokeable(): void
+    {
+        $container = $this->getContainer();
+        $result = (new Injector($container))->invoke(new Invokeable());
+        $this->assertSame(42, $result);
     }
 
     /**
