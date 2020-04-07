@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector\Tests;
 
+use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use stdClass;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\InvalidArgumentException;
 use Yiisoft\Injector\MissingRequiredArgumentException;
@@ -182,7 +184,7 @@ class InjectorTest extends TestCase
 
         $engineName = (new Injector($container))->invoke(
             $getEngineName,
-            [new \stdClass(), $needleEngine, new DateTimeImmutable()]
+            [new stdClass(), $needleEngine, new DateTimeImmutable()]
         );
 
         $this->assertSame(EngineZIL130::NAME, $engineName);
@@ -310,7 +312,7 @@ class InjectorTest extends TestCase
 
         $result = (new Injector($container))->invoke(
             $callable,
-            [new EngineZIL130(), new EngineVAZ2101(), new \stdClass(), new EngineMarkTwo(), new \stdClass()]
+            [new EngineZIL130(), new EngineVAZ2101(), new stdClass(), new EngineMarkTwo(), new stdClass()]
         );
 
         $this->assertSame(3, $result);
@@ -327,7 +329,7 @@ class InjectorTest extends TestCase
 
         $result = (new Injector($container))->invoke(
             $callable,
-            [new EngineZIL130(), new EngineVAZ2101(), new EngineMarkTwo(), new \stdClass()]
+            [new EngineZIL130(), new EngineVAZ2101(), new EngineMarkTwo(), new stdClass()]
         );
 
         $this->assertCount(4, $result);
@@ -400,6 +402,89 @@ class InjectorTest extends TestCase
         $this->expectException(MissingRequiredArgumentException::class);
 
         (new Injector($container))->invoke($callable);
+    }
+
+    /**
+     * Arguments passed by reference
+     */
+    public function testInvokeReferencedArguments(): void
+    {
+        $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
+        $foo = 1;
+        $bar = new stdClass();
+        $baz = null;
+        $callable = static function (
+            int &$foo,
+            object &$bar,
+            &$baz,
+            ?ColorInterface &$nullable,
+            EngineInterface &$object, // from container
+            DateTimeInterface &...$dates // collect all unnamed DateTimeInterface objects
+        ) {
+            $return = func_get_args();
+            $bar = new DateTimeImmutable();
+            $baz = false;
+            $foo = count($dates);
+            return $return;
+        };
+        $result = (new Injector($container))
+            ->invoke($callable, [
+                new DateTimeImmutable(),
+                new DateTime(),
+                new DateTime(),
+                'foo' => &$foo,
+                'bar' => $bar,
+                'baz' => &$baz,
+            ]);
+
+        // passed
+        $this->assertSame(1, $result[0]);
+        $this->assertInstanceOf(stdClass::class, $result[1]);
+        $this->assertNull($result[2]);
+        $this->assertNull($result[3]);
+        $this->assertInstanceOf(EngineMarkTwo::class, $result[4]);
+        // transformed
+        $this->assertSame(3, $foo); // count of DateTimeInterface objects
+        $this->assertInstanceOf(stdClass::class, $bar);
+        $this->assertFalse($baz);
+    }
+
+    public function testInvokeReferencedArgumentNamedVariadic(): void
+    {
+        $container = $this->getContainer();
+
+        $callable = static function (DateTimeInterface &...$dates) {
+            $dates[0] = false;
+            $dates[1] = false;
+            return count($dates);
+        };
+        $foo = new DateTimeImmutable();
+        $bar = new DateTimeImmutable();
+        $result = (new Injector($container))
+            ->invoke($callable, [
+                $foo,
+                &$bar,
+                new DateTime(),
+            ]);
+
+        $this->assertSame(3, $result);
+        $this->assertInstanceOf(DateTimeImmutable::class, $foo);
+        $this->assertFalse($bar);
+    }
+
+    /**
+     * If argument passed by reference but it is not supported by function
+     */
+    public function testInvokeReferencedArgument(): void
+    {
+        $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
+        $foo = 1;
+        $callable = fn (int $foo) => ++$foo;
+        $result = (new Injector($container))->invoke($callable, ['foo' => &$foo]);
+
+        // $foo has been not changed
+        $this->assertSame(1, $foo);
+        $this->assertSame(2, $result);
     }
 
     public function testWrongNamedParam(): void
