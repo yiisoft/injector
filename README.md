@@ -76,14 +76,37 @@ public function calculate(DataProvider $dataProvider, float $multiplier)
 We have passed two arguments. One is `multiplier`. It is explicitly named. Such arguments passed as is. Another is 
 data provider. It is not named explicitly so injector finds matching parameter that has the same type.
 
+In case you need to call private method from within the class itself, you can pass context as a third argument:
+
+```php
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
+use Yiisoft\Injector\Injector;
+
+class Worker
+{
+    public function run(ContainerInterface $container)
+    {
+        (new Injector($container))->invoke([$this, 'process'], [], $this);
+    }
+    
+    private function process(LoggerInterface $logger): void
+    {
+        //
+        $logger->info('Processing done.');
+    }
+}
+```
+
 Creating an instance of an object of a given class behaves similar to `invoke()`:
 
 ```php
+use Yiisoft\I18n\MessageFormatterInterface;
 use Yiisoft\Injector\Injector;
 
 class StringFormatter
 {
-    public function __construct($string, \Yiisoft\I18n\MessageFormatterInterface $formatter)
+    public function __construct($string, MessageFormatterInterface $formatter)
     {
         // ...
     }
