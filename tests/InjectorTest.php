@@ -665,29 +665,6 @@ class InjectorTest extends TestCase
         (new Injector($container))->make(MakeEngineMatherWithParam::class, ['parameter' => 100500]);
     }
 
-    private function getContainer(array $definitions = []): ContainerInterface
-    {
-        return new class($definitions) implements ContainerInterface {
-            private array $definitions = [];
-            public function __construct(array $definitions = [])
-            {
-                $this->definitions = $definitions;
-            }
-            public function get($id)
-            {
-                if (!$this->has($id)) {
-                    throw new class() extends \Exception implements NotFoundExceptionInterface {
-                    };
-                }
-                return $this->definitions[$id];
-            }
-            public function has($id)
-            {
-                return array_key_exists($id, $this->definitions);
-            }
-        };
-    }
-
     // Context binding tests
 
     /**
@@ -807,5 +784,72 @@ class InjectorTest extends TestCase
         $result = (new Injector($container))->invoke($closure, [], $context);
 
         $this->assertTrue($result);
+    }
+
+    /**
+     * Rebinding static method to other class object.
+     */
+    public function testBindStaticMethodToOtherClassObject(): void
+    {
+        $container = $this->getContainer();
+        $engine = new EngineMarkTwo();
+
+        $this->expectError();
+        $this->expectErrorMessage('Cannot bind an instance to a static closure');
+
+        (new Injector($container))->invoke([ContextMethod::class, 'publicStaticMethod'], [], $engine);
+    }
+
+    /**
+     * Rebinding static method to other static context.
+     */
+    public function testBindStaticMethodToOtherClass(): void
+    {
+        $this->expectError();
+        $this->expectErrorMessageMatches('/^Cannot rebind scope/');
+
+        (new Injector($this->getContainer()))
+            ->invoke([ContextMethod::class, 'publicStaticMethod'], [], EngineMarkTwo::class);
+    }
+
+    /**
+     * Rebinding method to other object.
+     */
+    public function testInjectorInvokeBinding(): void
+    {
+        $container = $this->getContainer();
+        $injector = new Injector($container);
+        $context = new ContextMethod();
+
+        $this->expectError();
+        $this->expectErrorMessageMatches('/^Cannot bind method/');
+
+        (new Injector($container))->invoke([$injector, 'invoke'], [
+            /** @see ContextMethod::privateMethod() */
+            'callable' => [$context, 'privateMethod'],
+        ], $context);
+    }
+
+    private function getContainer(array $definitions = []): ContainerInterface
+    {
+        return new class($definitions) implements ContainerInterface {
+            private array $definitions = [];
+            public function __construct(array $definitions = [])
+            {
+                $this->definitions = $definitions;
+            }
+            public function get($id)
+            {
+                if (!$this->has($id)) {
+                    throw new class() extends \Exception implements NotFoundExceptionInterface {
+                    };
+                }
+                return $this->definitions[$id];
+            }
+            public function has($id)
+            {
+                return array_key_exists($id, $this->definitions);
+            }
+        };
     }
 }

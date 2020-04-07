@@ -18,4 +18,8 @@ class ContextMethod
     {
         return static::class;
     }
+    public static function publicStaticMethod(): string
+    {
+        return static::class;
+    }
 }
