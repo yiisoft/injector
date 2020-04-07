@@ -147,15 +147,16 @@ final class Injector
                 continue;
             }
 
-            if ($class !== null) {
+            $type = $hasType ? $parameter->getType()->getName() : null;
+            if ($class !== null || $type === 'object') {
                 // Unnamed arguments
-                $className = $class->getName();
+                $className = $class !== null ? $class->getName() : null;
                 $found = false;
                 foreach ($arguments as $key => $item) {
                     if (!is_int($key)) {
                         continue;
                     }
-                    if ($item instanceof $className) {
+                    if (is_object($item) and $className === null || $item instanceof $className) {
                         $found = true;
                         $resolvedArguments[] = $item;
                         unset($arguments[$key]);
@@ -169,12 +170,14 @@ final class Injector
                     continue;
                 }
 
-                // If the argument is optional we catch not instantiable exceptions
-                try {
-                    $resolvedArguments[] = $this->container->get($className);
-                    continue;
-                } catch (NotFoundExceptionInterface $e) {
-                    $error = $e;
+                if ($className !== null) {
+                    // If the argument is optional we catch not instantiable exceptions
+                    try {
+                        $resolvedArguments[] = $this->container->get($className);
+                        continue;
+                    } catch (NotFoundExceptionInterface $e) {
+                        $error = $e;
+                    }
                 }
             }
 

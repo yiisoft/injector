@@ -376,6 +376,32 @@ class InjectorTest extends TestCase
         $this->assertSame(4, $result);
     }
 
+    /**
+     * Object type may be passed as unnamed parameter
+     */
+    public function testInvokeWithObjectType(): void
+    {
+        $container = $this->getContainer();
+        $callable = fn (object $object) => get_class($object);
+
+        $result = (new Injector($container))->invoke($callable, [new DateTimeImmutable()]);
+
+        $this->assertSame(DateTimeImmutable::class, $result);
+    }
+
+    /**
+     * Required `object` type should not be requested from the container
+     */
+    public function testInvokeWithRequiredObjectTypeWithoutInstance(): void
+    {
+        $container = $this->getContainer();
+        $callable = fn (object $object) => get_class($object);
+
+        $this->expectException(MissingRequiredArgumentException::class);
+
+        (new Injector($container))->invoke($callable);
+    }
+
     public function testWrongNamedParam(): void
     {
         $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
