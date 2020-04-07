@@ -15,6 +15,7 @@ use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\InvalidArgumentException;
 use Yiisoft\Injector\MissingRequiredArgumentException;
 use Yiisoft\Injector\Tests\Support\ColorInterface;
+use Yiisoft\Injector\Tests\Support\ContextMethod;
 use Yiisoft\Injector\Tests\Support\EngineInterface;
 use Yiisoft\Injector\Tests\Support\EngineMarkTwo;
 use Yiisoft\Injector\Tests\Support\EngineZIL130;
@@ -550,6 +551,8 @@ class InjectorTest extends TestCase
         $this->assertSame(42, $result);
     }
 
+    // Injector::make tests
+
     /**
      * Constructor method not defined
      */
@@ -683,5 +686,126 @@ class InjectorTest extends TestCase
                 return array_key_exists($id, $this->definitions);
             }
         };
+    }
+
+    // Context binding tests
+
+    /**
+     * Bind closure to object
+     */
+    public function testClosureBinding(): void
+    {
+        $container = $this->getContainer();
+        $closure = function () {
+            /** @var EngineInterface $this */
+            return $this->getName();
+        };
+        $engine = new EngineMarkTwo();
+
+        $engineName = (new Injector($container))->invoke($closure, [], $engine);
+
+        $this->assertSame('Mark Two', $engineName);
+    }
+
+    public function testStaticClosureBindingFail(): void
+    {
+        $container = $this->getContainer();
+        $closure = static function () {
+            return $this->getName();
+        };
+        $engine = new EngineMarkTwo();
+
+        $this->expectError();
+        $this->expectErrorMessage('Cannot bind an instance to a static closure');
+
+        (new Injector($container))->invoke($closure, [], $engine);
+    }
+
+    /**
+     * Binding static closure to static context. Test returning of `self`
+     */
+    public function testStaticClosureToStaticContextBinding(): void
+    {
+        $container = $this->getContainer();
+        $closure = static function () {
+            return self::class;
+        };
+
+        $result = (new Injector($container))->invoke($closure, [], EngineMarkTwo::class);
+
+        $this->assertSame(EngineMarkTwo::class, $result);
+    }
+
+    /**
+     * Binding static closure to static context. Test returning of `self`
+     */
+    public function testStaticClosureToStaticContextAndCallPrivateStaticFunction(): void
+    {
+        $container = $this->getContainer();
+        $closure = static function () {
+            /** @see ContextMethod::staticMethod() */
+            return self::staticMethod();
+        };
+
+        $result = (new Injector($container))->invoke($closure, [], ContextMethod::class);
+
+        $this->assertSame(ContextMethod::class, $result);
+    }
+
+    public function testClosureToInternalContextBinding(): void
+    {
+        $container = $this->getContainer();
+        $closure = function () {
+            return get_class($this);
+        };
+
+        $this->expectError();
+        $this->expectErrorMessage('Cannot bind closure to scope of internal class DateTime');
+
+        (new Injector($container))->invoke($closure, [], new DateTime());
+    }
+
+    public function testStaticClosureToInternalStaticContextBinding(): void
+    {
+        $container = $this->getContainer();
+        $closure = static function () {
+            return self::class;
+        };
+
+        $this->expectError();
+        $this->expectErrorMessage('Cannot bind closure to scope of internal class DateTime');
+
+        (new Injector($container))->invoke($closure, [], DateTime::class);
+    }
+
+    /**
+     * Bind closure with access to protected property
+     */
+    public function testClosureBindingWithAccessToProtectedProperty(): void
+    {
+        $container = $this->getContainer();
+        $getPower = fn () => $this->power;
+        $engine = new EngineVAZ2101();
+
+        $power = (new Injector($container))->invoke($getPower, [], $engine);
+
+        /** @see EngineVAZ2101::$power */
+        $this->assertSame(59, $power);
+    }
+
+    /**
+     * Bind closure with access to protected and private methods
+     */
+    public function testInvokePrivateMethods(): void
+    {
+        $container = $this->getContainer();
+        /** @see ContextMethod::privateMethod() */
+        /** @see ContextMethod::protectedMethod() */
+        $closure = fn () => $this->privateMethod() && $this->protectedMethod();
+        $context = new ContextMethod();
+
+        $result = (new Injector($container))->invoke($closure, [], $context);
+
+        $this->assertTrue($result);
     }
 }

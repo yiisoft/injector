@@ -45,14 +45,19 @@ final class Injector
      * @param callable $callable callable to be invoked.
      * @param array $arguments The array of the function arguments.
      * This can be either a list of arguments, or an associative array where keys are argument names.
+     * @param object|string $context Object or class name to context binding.
+     * If you want to bind only a static context then pass the class name here.
      * @return mixed the callable return value.
      * @throws MissingRequiredArgumentException if required argument is missing.
      * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
      * @throws ReflectionException
      */
-    public function invoke(callable $callable, array $arguments = [])
+    public function invoke(callable $callable, array $arguments = [], $context = null)
     {
         $callable = \Closure::fromCallable($callable);
+        if ($context !== null) {
+            $callable = $callable->bindTo(is_string($context) ? null : $context, $context);
+        }
         $reflection = new \ReflectionFunction($callable);
         return $reflection->invokeArgs($this->resolveDependencies($reflection, $arguments));
     }
