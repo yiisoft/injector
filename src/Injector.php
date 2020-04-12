@@ -8,6 +8,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
+use ReflectionParameter;
 
 /**
  * Injector is able to analyze callable dependencies based on
@@ -121,72 +122,8 @@ final class Injector
 
         $pushUnusedArguments = true;
         foreach ($reflection->getParameters() as $parameter) {
-            $name = $parameter->getName();
-            $class = $parameter->getClass();
-            $hasType = $parameter->hasType();
-            $isNullable = $parameter->allowsNull() && $hasType;
-            $isVariadic = $parameter->isVariadic();
-            $error = null;
-            unset($tmpValue);
-
-            // Get argument by name
-            if (array_key_exists($name, $arguments)) {
-                if ($isVariadic && is_array($arguments[$name])) {
-                    $resolvedArguments = array_merge($resolvedArguments, array_values($arguments[$name]));
-                } else {
-                    $resolvedArguments[] = &$arguments[$name];
-                }
-                unset($arguments[$name]);
-                continue;
-            }
-
-            $type = $hasType ? $parameter->getType()->getName() : null;
-            if ($class !== null || $type === 'object') {
-                // Unnamed arguments
-                $className = $class !== null ? $class->getName() : null;
-                $found = false;
-                foreach ($arguments as $key => $item) {
-                    if (!is_int($key)) {
-                        continue;
-                    }
-                    if (is_object($item) and $className === null || $item instanceof $className) {
-                        $found = true;
-                        $resolvedArguments[] = &$arguments[$key];
-                        unset($arguments[$key], $item);
-                        if (!$isVariadic) {
-                            break;
-                        }
-                    }
-                }
-                if ($found) {
-                    $pushUnusedArguments = false;
-                    continue;
-                }
-
-                if ($className !== null) {
-                    // If the argument is optional we catch not instantiable exceptions
-                    try {
-                        $tmpValue = $this->container->get($className);
-                        $resolvedArguments[] = &$tmpValue;
-                        continue;
-                    } catch (NotFoundExceptionInterface $e) {
-                        $error = $e;
-                    }
-                }
-            }
-
-            if ($parameter->isDefaultValueAvailable()) {
-                $tmpValue = $parameter->getDefaultValue();
-                $resolvedArguments[] = &$tmpValue;
-            } elseif (!$parameter->isOptional()) {
-                if ($isNullable) {
-                    $tmpValue = null;
-                    $resolvedArguments[] = &$tmpValue;
-                } else {
-                    throw $error ?? new MissingRequiredArgumentException($name, $reflection->getName());
-                }
-            } elseif ($hasType) {
-                $pushUnusedArguments = false;
+            if (!$this->resolveParameter($parameter, $resolvedArguments, $arguments, $pushUnusedArguments)) {
+                throw new MissingRequiredArgumentException($parameter->getName(), $reflection->getName());
             }
         }
 
@@ -201,5 +138,91 @@ final class Injector
             }
         }
         return $resolvedArguments;
+    }
+
+    /**
+     * @param ReflectionParameter $parameter
+     * @param array $resolvedArguments
+     * @param array $arguments
+     * @param bool $pushUnusedArguments
+     * @return bool
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     */
+    private function resolveParameter(
+        ReflectionParameter $parameter,
+        array &$resolvedArguments,
+        array &$arguments,
+        bool &$pushUnusedArguments
+    ): bool {
+        $name = $parameter->getName();
+        $isVariadic = $parameter->isVariadic();
+
+        // Get argument by name
+        if (array_key_exists($name, $arguments)) {
+            if ($isVariadic && is_array($arguments[$name])) {
+                $resolvedArguments = array_merge($resolvedArguments, array_values($arguments[$name]));
+            } else {
+                $resolvedArguments[] = &$arguments[$name];
+            }
+            unset($arguments[$name]);
+            return true;
+        }
+
+        $class = $parameter->getClass();
+        $hasType = $parameter->hasType();
+        $type = $hasType ? $parameter->getType()->getName() : null;
+        $error = null;
+        if ($class !== null || $type === 'object') {
+            // Unnamed arguments
+            $className = $class !== null ? $class->getName() : null;
+            $found = false;
+            foreach ($arguments as $key => $item) {
+                if (!is_int($key)) {
+                    continue;
+                }
+                if (is_object($item) and $className === null || $item instanceof $className) {
+                    $found = true;
+                    $resolvedArguments[] = &$arguments[$key];
+                    unset($arguments[$key]);
+                    if (!$isVariadic) {
+                        return true;
+                    }
+                }
+            }
+            if ($found) {
+                // Only for variadic arguments
+                $pushUnusedArguments = false;
+                return true;
+            }
+
+            if ($className !== null) {
+                // If the argument is optional we catch not instantiable exceptions
+                try {
+                    $argument = $this->container->get($className);
+                    $resolvedArguments[] = &$argument;
+                    return true;
+                } catch (NotFoundExceptionInterface $e) {
+                    $error = $e;
+                }
+            }
+        }
+
+        if ($parameter->isDefaultValueAvailable()) {
+            $argument = $parameter->getDefaultValue();
+            $resolvedArguments[] = &$argument;
+        } elseif (!$parameter->isOptional()) {
+            if ($parameter->allowsNull() && $hasType) {
+                $argument = null;
+                $resolvedArguments[] = &$argument;
+            } elseif ($error === null) {
+                return false;
+            } else {
+                throw $error;
+            }
+        } elseif ($hasType) {
+            $pushUnusedArguments = false;
+        }
+        return true;
     }
 }

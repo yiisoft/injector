@@ -370,11 +370,15 @@ class InjectorTest extends TestCase
      */
     public function testAppendingUnusedParams(): void
     {
-        $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
+        $container = $this->getContainer();
 
         $callable = fn (?EngineInterface $engine, $id = 'test') => func_num_args();
 
-        $result = (new Injector($container))->invoke($callable, [new DateTimeImmutable(), new DateTimeImmutable()]);
+        $result = (new Injector($container))->invoke($callable, [
+            new DateTimeImmutable(),
+            new DateTimeImmutable(),
+            new EngineMarkTwo()
+        ]);
 
         $this->assertSame(4, $result);
     }
