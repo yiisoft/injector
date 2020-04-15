@@ -68,6 +68,8 @@ $stringFormatter = (new Injector($container))->make(StringFormatter::class, ['st
 $result = $stringFormatter->getFormattedString();
 ```
 
+The object isn't saved into container so `make()` works well for short-living dynamically created objects.
+
 ## How it works
 
 Both `invoke()` and `make()` are selecting arguments automatically for the method or constructor called based on
