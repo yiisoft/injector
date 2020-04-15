@@ -15,6 +15,13 @@ via autowiring.
 [![Code Coverage](https://scrutinizer-ci.com/g/yiisoft/injector/badges/coverage.png)](https://scrutinizer-ci.com/g/yiisoft/injector/)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yiisoft/injector/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yiisoft/injector/?branch=master)
 
+## Features
+
+- Invoke callable or create and object of a given class.
+- Resolve dependencies by parameter types using the given [PSR-11](http://www.php-fig.org/psr/psr-11/) container.
+- Pass concrete dependency instances by type.
+- Pass arguments by name.
+
 ## Installation
 
 The preferred way to install this package is through [composer](http://getcomposer.org/download/):
