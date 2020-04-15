@@ -1,13 +1,5 @@
 # Injector package
 
-
-## Features
-
-- Invoke callable or create and object of a given class.
-- Resolve dependencies by parameter types using the given [PSR-11](http://www.php-fig.org/psr/psr-11/) container.
-- Pass concrete dependency instances by type.
-- Pass arguments by name.
-
 ## General usage
 
 ```php
@@ -27,9 +19,9 @@ echo $injector->invoke($getEngineName);
 // outputs "Mark Two"
 ```
 
-In the code above we feed our container to `Injector` when creating it. Any PSR-11 container could be used.
-When `invoke` is called, injector reads method signature of the method invoked and, based on type hinting
-automatically obtains objects for corresponding interfaces from the container.
+In the code above we feed our container to `Injector` when creating it. Any [PSR-11](https://www.php-fig.org/psr/psr-11/)
+container could be used. When `invoke` is called, injector reads method signature of the method invoked and, based on
+type hinting automatically obtains objects for corresponding interfaces from the container.
 
 Sometimes you either don't have an object in container or want to explicitly specify arguments. It could be done
 like the following:
@@ -75,3 +67,27 @@ $stringFormatter = (new Injector($container))->make(StringFormatter::class, ['st
 
 $result = $stringFormatter->getFormattedString();
 ```
+
+## How it works
+
+Both `invoke()` and `make()` are selecting arguments automatically for the method or constructor called based on
+parameter names / types and an optional array of explicit values.
+
+Algorithm is the following:
+
+![Algorithm](img/algorithm.svg)
+
+Additionally:
+
+* Unused unnamed explicit arguments are passed at the end of arguments list. Their values could be obtained with
+  `func_get_args()`.
+* Unused named arguments are ignored.
+* If parameters are accepting arguments by reference, arguments should be explicitly passed by reference:
+  ```php
+  $foo = 1;
+  $increment = function (int &$value) {
+      ++$value;
+  };
+  (new Injector($container))->invoke($increment, ['value' => &$foo]);
+  echo $foo; // 2
+  ```
