@@ -81,6 +81,7 @@ Algorithm is the following:
 
 Additionally:
 
+* Passing unnamed argument that is not an object results in an exception.
 * Unused unnamed explicit arguments are passed at the end of arguments list. Their values could be obtained with
   `func_get_args()`.
 * Unused named arguments are ignored.
