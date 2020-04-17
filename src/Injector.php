@@ -122,9 +122,13 @@ final class Injector
 
         $pushUnusedArguments = true;
         foreach ($reflection->getParameters() as $parameter) {
-            if (!$this->resolveParameter($parameter, $resolvedArguments, $arguments, $pushUnusedArguments)) {
+            $resolved = $this->resolveParameter($parameter, $resolvedArguments, $arguments, $pushUnusedArguments);
+            if ($resolved === true) {
+                continue;
+            } elseif ($resolved === false) {
                 throw new MissingRequiredArgumentException($parameter->getName(), $reflection->getName());
             }
+            break;
         }
 
         foreach ($arguments as $key => $value) {
@@ -145,7 +149,8 @@ final class Injector
      * @param array $resolvedArguments
      * @param array $arguments
      * @param bool $pushUnusedArguments
-     * @return bool
+     * @return null|bool True if argument resolved; False if not resolved; Null if parameter is optional but without
+     * default value in a Reflection object. This is possible for internal functions.
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
@@ -154,7 +159,7 @@ final class Injector
         array &$resolvedArguments,
         array &$arguments,
         bool &$pushUnusedArguments
-    ): bool {
+    ): ?bool {
         $name = $parameter->getName();
         $isVariadic = $parameter->isVariadic();
 
@@ -211,18 +216,24 @@ final class Injector
         if ($parameter->isDefaultValueAvailable()) {
             $argument = $parameter->getDefaultValue();
             $resolvedArguments[] = &$argument;
+            return true;
         } elseif (!$parameter->isOptional()) {
             if ($parameter->allowsNull() && $hasType) {
                 $argument = null;
                 $resolvedArguments[] = &$argument;
+                return true;
             } elseif ($error === null) {
                 return false;
             } else {
+                // Throw container exception
                 throw $error;
             }
-        } elseif ($hasType) {
-            $pushUnusedArguments = false;
+        } elseif ($isVariadic) {
+            $pushUnusedArguments = !$hasType && $pushUnusedArguments;
+            return true;
         }
-        return true;
+        // Internal function with optional params
+        $pushUnusedArguments = false;
+        return null;
     }
 }

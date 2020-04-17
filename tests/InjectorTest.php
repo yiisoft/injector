@@ -608,6 +608,16 @@ class InjectorTest extends TestCase
         $this->assertInstanceOf(DateTimeImmutable::class, $object);
     }
 
+    public function testMakeInternalClassWithOptionalMiddleArgumentSkipped(): void
+    {
+        $container = $this->getContainer();
+        $object = (new Injector($container))->make(\SplFileObject::class, [
+            'file_name' => __FILE__,
+            'use_include_path' => false
+        ]);
+        $this->assertInstanceOf(\SplFileObject::class, $object);
+    }
+
     public function testMakeAbstractClass(): void
     {
         $container = $this->getContainer();
