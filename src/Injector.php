@@ -119,22 +119,36 @@ final class Injector
     private function resolveDependencies(\ReflectionFunctionAbstract $reflection, array $arguments = []): array
     {
         $resolvedArguments = [];
-
         $pushUnusedArguments = true;
+        $isInternalOptional = false;
+        $internalParameter = '';
         foreach ($reflection->getParameters() as $parameter) {
+            if ($isInternalOptional) {
+                // Check custom parameter definition for an internal function
+                if (array_key_exists($parameter->getName(), $arguments)) {
+                    throw new MissingInternalArgumentException($reflection, $internalParameter);
+                }
+                continue;
+            }
+            // Resolve parameter
             $resolved = $this->resolveParameter($parameter, $resolvedArguments, $arguments, $pushUnusedArguments);
             if ($resolved === true) {
                 continue;
             } elseif ($resolved === false) {
-                throw new MissingRequiredArgumentException($parameter->getName(), $reflection->getName());
+                throw new MissingRequiredArgumentException($reflection, $parameter->getName());
             }
-            break;
+            // Internal function. Parameter not resolved
+            $isInternalOptional = true;
+            $internalParameter = $parameter->getName();
+            if (count($arguments) === 0) {
+                break;
+            }
         }
 
         foreach ($arguments as $key => $value) {
             if (is_int($key)) {
                 if (!is_object($value)) {
-                    throw new InvalidArgumentException((string)$key, $reflection->getName());
+                    throw new InvalidArgumentException($reflection, (string)$key);
                 }
                 if ($pushUnusedArguments) {
                     $resolvedArguments[] = $value;
