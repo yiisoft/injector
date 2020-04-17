@@ -134,7 +134,9 @@ final class Injector
             $resolved = $this->resolveParameter($parameter, $resolvedArguments, $arguments, $pushUnusedArguments);
             if ($resolved === true) {
                 continue;
-            } elseif ($resolved === false) {
+            }
+
+            if ($resolved === false) {
                 throw new MissingRequiredArgumentException($reflection, $parameter->getName());
             }
             // Internal function. Parameter not resolved
@@ -231,21 +233,28 @@ final class Injector
             $argument = $parameter->getDefaultValue();
             $resolvedArguments[] = &$argument;
             return true;
-        } elseif (!$parameter->isOptional()) {
+        }
+
+        if (!$parameter->isOptional()) {
             if ($parameter->allowsNull() && $hasType) {
                 $argument = null;
                 $resolvedArguments[] = &$argument;
                 return true;
-            } elseif ($error === null) {
-                return false;
-            } else {
-                // Throw container exception
-                throw $error;
             }
-        } elseif ($isVariadic) {
+
+            if ($error === null) {
+                return false;
+            }
+
+            // Throw container exception
+            throw $error;
+        }
+
+        if ($isVariadic) {
             $pushUnusedArguments = !$hasType && $pushUnusedArguments;
             return true;
         }
+
         // Internal function with optional params
         $pushUnusedArguments = false;
         return null;
