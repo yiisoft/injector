@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector;
 
-final class InvalidArgumentException extends \InvalidArgumentException
+final class InvalidArgumentException extends ArgumentException
 {
-    public function __construct(string $name, string $functionName)
-    {
-        parent::__construct("Invalid argument on key \"$name\" when calling \"$functionName\".", 0, null);
-    }
+    protected const EXCEPTION_MESSAGE = 'Invalid argument on key "%s" when calling "%s".';
 }

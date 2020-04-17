@@ -119,18 +119,38 @@ final class Injector
     private function resolveDependencies(\ReflectionFunctionAbstract $reflection, array $arguments = []): array
     {
         $resolvedArguments = [];
-
         $pushUnusedArguments = true;
+        $isInternalOptional = false;
+        $internalParameter = '';
         foreach ($reflection->getParameters() as $parameter) {
-            if (!$this->resolveParameter($parameter, $resolvedArguments, $arguments, $pushUnusedArguments)) {
-                throw new MissingRequiredArgumentException($parameter->getName(), $reflection->getName());
+            if ($isInternalOptional) {
+                // Check custom parameter definition for an internal function
+                if (array_key_exists($parameter->getName(), $arguments)) {
+                    throw new MissingInternalArgumentException($reflection, $internalParameter);
+                }
+                continue;
+            }
+            // Resolve parameter
+            $resolved = $this->resolveParameter($parameter, $resolvedArguments, $arguments, $pushUnusedArguments);
+            if ($resolved === true) {
+                continue;
+            }
+
+            if ($resolved === false) {
+                throw new MissingRequiredArgumentException($reflection, $parameter->getName());
+            }
+            // Internal function. Parameter not resolved
+            $isInternalOptional = true;
+            $internalParameter = $parameter->getName();
+            if (count($arguments) === 0) {
+                break;
             }
         }
 
         foreach ($arguments as $key => $value) {
             if (is_int($key)) {
                 if (!is_object($value)) {
-                    throw new InvalidArgumentException((string)$key, $reflection->getName());
+                    throw new InvalidArgumentException($reflection, (string)$key);
                 }
                 if ($pushUnusedArguments) {
                     $resolvedArguments[] = $value;
@@ -145,7 +165,8 @@ final class Injector
      * @param array $resolvedArguments
      * @param array $arguments
      * @param bool $pushUnusedArguments
-     * @return bool
+     * @return null|bool True if argument resolved; False if not resolved; Null if parameter is optional but without
+     * default value in a Reflection object. This is possible for internal functions.
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
@@ -154,7 +175,7 @@ final class Injector
         array &$resolvedArguments,
         array &$arguments,
         bool &$pushUnusedArguments
-    ): bool {
+    ): ?bool {
         $name = $parameter->getName();
         $isVariadic = $parameter->isVariadic();
 
@@ -211,18 +232,31 @@ final class Injector
         if ($parameter->isDefaultValueAvailable()) {
             $argument = $parameter->getDefaultValue();
             $resolvedArguments[] = &$argument;
-        } elseif (!$parameter->isOptional()) {
+            return true;
+        }
+
+        if (!$parameter->isOptional()) {
             if ($parameter->allowsNull() && $hasType) {
                 $argument = null;
                 $resolvedArguments[] = &$argument;
-            } elseif ($error === null) {
-                return false;
-            } else {
-                throw $error;
+                return true;
             }
-        } elseif ($hasType) {
-            $pushUnusedArguments = false;
+
+            if ($error === null) {
+                return false;
+            }
+
+            // Throw container exception
+            throw $error;
         }
-        return true;
+
+        if ($isVariadic) {
+            $pushUnusedArguments = !$hasType && $pushUnusedArguments;
+            return true;
+        }
+
+        // Internal function with optional params
+        $pushUnusedArguments = false;
+        return null;
     }
 }

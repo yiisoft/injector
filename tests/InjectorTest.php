@@ -13,6 +13,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use stdClass;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\InvalidArgumentException;
+use Yiisoft\Injector\MissingInternalArgumentException;
 use Yiisoft\Injector\MissingRequiredArgumentException;
 use Yiisoft\Injector\Tests\Support\ColorInterface;
 use Yiisoft\Injector\Tests\Support\EngineInterface;
@@ -606,6 +607,21 @@ class InjectorTest extends TestCase
         $container = $this->getContainer();
         $object = (new Injector($container))->make(DateTimeImmutable::class);
         $this->assertInstanceOf(DateTimeImmutable::class, $object);
+    }
+
+    public function testMakeInternalClassWithOptionalMiddleArgumentSkipped(): void
+    {
+        $container = $this->getContainer();
+
+        $this->expectException(MissingInternalArgumentException::class);
+        $this->expectExceptionMessageMatches('/PHP internal/');
+
+        (new Injector($container))->make(\SplFileObject::class, [
+            'file_name' => __FILE__,
+            // second parameter skipped
+            'use_include_path' => false,
+            'other-parameter' => true,
+        ]);
     }
 
     public function testMakeAbstractClass(): void

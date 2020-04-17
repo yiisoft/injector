@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector;
 
-final class MissingRequiredArgumentException extends \InvalidArgumentException
+final class MissingRequiredArgumentException extends ArgumentException
 {
-    public function __construct(string $name, string $functionName)
-    {
-        parent::__construct("Missing required argument \"$name\" when calling \"$functionName\".", 0, null);
-    }
+    protected const EXCEPTION_MESSAGE = 'Missing required argument "%s" when calling "%s".';
 }
