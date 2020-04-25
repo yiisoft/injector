@@ -78,7 +78,7 @@ class InjectorTest extends TestCase
         $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
         $class = new class() {
             public EngineInterface $engine;
-            public function setEngine(EngineInterface $engine)
+            public function setEngine(EngineInterface $engine): void
             {
                 $this->engine = $engine;
             }
@@ -646,7 +646,7 @@ class InjectorTest extends TestCase
 
         $object = (new Injector($container))->make(MakeEngineCollector::class, []);
 
-        $this->assertSame(1, count($object->engines));
+        $this->assertCount(1, $object->engines);
         $this->assertSame([$container->get(EngineInterface::class)], $object->engines);
     }
 
@@ -685,7 +685,7 @@ class InjectorTest extends TestCase
     private function getContainer(array $definitions = []): ContainerInterface
     {
         return new class($definitions) implements ContainerInterface {
-            private array $definitions = [];
+            private array $definitions;
             public function __construct(array $definitions = [])
             {
                 $this->definitions = $definitions;
