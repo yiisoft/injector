@@ -202,7 +202,7 @@ final class Injector
                 if (!is_int($key)) {
                     continue;
                 }
-                if (is_object($item) and $className === null || $item instanceof $className) {
+                if (is_object($item) && ($className === null || $item instanceof $className)) {
                     $found = true;
                     $resolvedArguments[] = &$arguments[$key];
                     unset($arguments[$key]);
@@ -236,7 +236,7 @@ final class Injector
         }
 
         if (!$parameter->isOptional()) {
-            if ($parameter->allowsNull() && $hasType) {
+            if ($hasType && $parameter->allowsNull()) {
                 $argument = null;
                 $resolvedArguments[] = &$argument;
                 return true;
