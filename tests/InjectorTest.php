@@ -619,7 +619,8 @@ class InjectorTest extends TestCase
         (new Injector($container))->make(\SplFileObject::class, [
             'file_name' => __FILE__,
             // second parameter skipped
-            'use_include_path' => false,
+            // third parameter skipped
+            'context' => null,
             'other-parameter' => true,
         ]);
     }
