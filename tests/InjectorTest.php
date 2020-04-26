@@ -251,7 +251,7 @@ class InjectorTest extends TestCase
         $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
 
         $getEngineName = static function (EngineInterface $engine, string $two) {
-            return $engine->getName();
+            return $engine->getName() . $two;
         };
 
         $injector = new Injector($container);
@@ -265,7 +265,7 @@ class InjectorTest extends TestCase
         $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
 
         $getEngineName = static function (EngineInterface $engine, $two) {
-            return $engine->getName();
+            return $engine->getName() . $two;
         };
         $injector = new Injector($container);
 
@@ -279,7 +279,7 @@ class InjectorTest extends TestCase
         $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
 
         $getEngineName = static function (EngineInterface $engine, ColorInterface $color) {
-            return $engine->getName();
+            return $engine->getName() . $color->getColor();
         };
 
         $injector = new Injector($container);
@@ -373,7 +373,12 @@ class InjectorTest extends TestCase
     {
         $container = $this->getContainer();
 
-        $callable = fn (?EngineInterface $engine, $id = 'test') => func_num_args();
+        $callable = static function (
+            /** @scrutinizer ignore-unused */ ?EngineInterface $engine,
+            /** @scrutinizer ignore-unused */ $id = 'test'
+        ) {
+            return func_num_args();
+        };
 
         $result = (new Injector($container))->invoke($callable, [
             new DateTimeImmutable(),
@@ -594,12 +599,14 @@ class InjectorTest extends TestCase
 
     public function testMakeInvalidClass(): void
     {
+        $undefinedClass = '\\undefinedNameSpace\\UndefinedClassThatShouldNotBeDefined';
         $container = $this->getContainer();
 
+        $this->assertFalse(class_exists($undefinedClass, true));
         $this->expectException(\ReflectionException::class);
         $this->expectExceptionMessageMatches('/does not exist/');
 
-        (new Injector($container))->make(UndefinedClassThatShouldNotBeDefined::class);
+        (new Injector($container))->make($undefinedClass);
     }
 
     public function testMakeInternalClass(): void
