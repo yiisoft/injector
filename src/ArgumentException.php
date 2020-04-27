@@ -41,7 +41,7 @@ abstract class ArgumentException extends \InvalidArgumentException
             $parameterString = '';
             if ($parameter->isArray()) {
                 $parameterString .= 'array ';
-            } else if ($parameter->getClass()) {
+            } elseif ($parameter->getClass()) {
                 $parameterString .= $parameter->getClass()->name . ' ';
             }
             if ($parameter->isPassedByReference()) {
