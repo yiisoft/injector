@@ -374,9 +374,9 @@ class InjectorTest extends TestCase
         $container = $this->getContainer();
 
         $callable = static function (
-            /** @scrutinizer ignore-unused */ 
+            /** @scrutinizer ignore-unused */
             ?EngineInterface $engine,
-            /** @scrutinizer ignore-unused */ 
+            /** @scrutinizer ignore-unused */
             $id = 'test'
         ) {
             return func_num_args();

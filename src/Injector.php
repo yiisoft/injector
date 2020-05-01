@@ -8,6 +8,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
+use ReflectionFunctionAbstract;
 use ReflectionParameter;
 
 /**
@@ -109,14 +110,14 @@ final class Injector
      * Resolve dependencies for the given function reflection object and a list of concrete arguments
      * and return array of arguments to call the function with.
      *
-     * @param \ReflectionFunctionAbstract $reflection function reflection.
+     * @param ReflectionFunctionAbstract $reflection function reflection.
      * @param array $arguments concrete arguments.
      * @return array resolved arguments.
      * @throws ContainerExceptionInterface
      * @throws MissingRequiredArgumentException|InvalidArgumentException
      * @throws ReflectionException
      */
-    private function resolveDependencies(\ReflectionFunctionAbstract $reflection, array $arguments = []): array
+    private function resolveDependencies(ReflectionFunctionAbstract $reflection, array $arguments = []): array
     {
         $resolvedArguments = [];
         $pushUnusedArguments = true;
@@ -147,17 +148,11 @@ final class Injector
             }
         }
 
-        foreach ($arguments as $key => $value) {
-            if (is_int($key)) {
-                if (!is_object($value)) {
-                    throw new InvalidArgumentException($reflection, (string)$key);
-                }
-                if ($pushUnusedArguments) {
-                    $resolvedArguments[] = $value;
-                }
-            }
-        }
-        return $resolvedArguments;
+        $this->checkNumericKeyArguments($reflection, $arguments);
+
+        return $pushUnusedArguments
+            ? [...$resolvedArguments, ...array_filter($arguments, 'is_int', ARRAY_FILTER_USE_KEY)]
+            : $resolvedArguments;
     }
 
     /**
@@ -258,5 +253,19 @@ final class Injector
         // Internal function with optional params
         $pushUnusedArguments = false;
         return null;
+    }
+
+    /**
+     * @param ReflectionFunctionAbstract $reflection
+     * @param array $arguments
+     * @throws InvalidArgumentException
+     */
+    private function checkNumericKeyArguments(ReflectionFunctionAbstract $reflection, array &$arguments): void
+    {
+        foreach ($arguments as $key => $value) {
+            if (is_int($key) && !is_object($value)) {
+                throw new InvalidArgumentException($reflection, (string)$key);
+            }
+        }
     }
 }
