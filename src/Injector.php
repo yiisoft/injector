@@ -178,6 +178,7 @@ final class Injector
         if (array_key_exists($name, $arguments)) {
             if ($isVariadic && is_array($arguments[$name])) {
                 $resolvedArguments = array_merge($resolvedArguments, array_values($arguments[$name]));
+                $pushUnusedArguments = false;
             } else {
                 $resolvedArguments[] = &$arguments[$name];
             }
