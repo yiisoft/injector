@@ -7,6 +7,7 @@ namespace Yiisoft\Injector;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionClass;
 use ReflectionException;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
@@ -93,7 +94,7 @@ final class Injector
      */
     public function make(string $class, array $arguments = [])
     {
-        $classReflection = new \ReflectionClass($class);
+        $classReflection = new ReflectionClass($class);
         if (!$classReflection->isInstantiable()) {
             throw new \InvalidArgumentException("Class $class is not instantiable.");
         }
@@ -173,12 +174,13 @@ final class Injector
     ): ?bool {
         $name = $parameter->getName();
         $isVariadic = $parameter->isVariadic();
+        $hasType = $parameter->hasType();
+        $pushUnusedArguments = $pushUnusedArguments && (!$isVariadic || !$hasType);
 
         // Get argument by name
         if (array_key_exists($name, $arguments)) {
             if ($isVariadic && is_array($arguments[$name])) {
                 $resolvedArguments = array_merge($resolvedArguments, array_values($arguments[$name]));
-                $pushUnusedArguments = false;
             } else {
                 $resolvedArguments[] = &$arguments[$name];
             }
@@ -186,43 +188,16 @@ final class Injector
             return true;
         }
 
-        $class = $parameter->getClass();
-        $hasType = $parameter->hasType();
-        $type = $hasType ? $parameter->getType()->getName() : null;
         $error = null;
-        if ($class !== null || $type === 'object') {
-            // Unnamed arguments
-            $className = $class !== null ? $class->getName() : null;
-            $found = false;
-            foreach ($arguments as $key => $item) {
-                if (!is_int($key)) {
-                    continue;
-                }
-                if (is_object($item) && ($className === null || $item instanceof $className)) {
-                    $found = true;
-                    $resolvedArguments[] = &$arguments[$key];
-                    unset($arguments[$key]);
-                    if (!$isVariadic) {
-                        return true;
-                    }
-                }
-            }
-            if ($found) {
-                // Only for variadic arguments
-                $pushUnusedArguments = false;
+        $class = $parameter->getClass();
+        $type = $hasType ? $parameter->getType()->getName() : null;
+        $isClass = $class !== null || $type === 'object';
+        try {
+            if ($isClass && $this->resolveObjectParameter($class, $resolvedArguments, $arguments, $isVariadic)) {
                 return true;
             }
-
-            if ($className !== null) {
-                // If the argument is optional we catch not instantiable exceptions
-                try {
-                    $argument = $this->container->get($className);
-                    $resolvedArguments[] = &$argument;
-                    return true;
-                } catch (NotFoundExceptionInterface $e) {
-                    $error = $e;
-                }
-            }
+        } catch (NotFoundExceptionInterface $e) {
+            $error = $e;
         }
 
         if ($parameter->isDefaultValueAvailable()) {
@@ -247,7 +222,6 @@ final class Injector
         }
 
         if ($isVariadic) {
-            $pushUnusedArguments = !$hasType && $pushUnusedArguments;
             return true;
         }
 
@@ -268,5 +242,44 @@ final class Injector
                 throw new InvalidArgumentException($reflection, (string)$key);
             }
         }
+    }
+
+    /**
+     * @param null|ReflectionClass $class
+     * @param array $resolvedArguments
+     * @param array $arguments
+     * @param bool $isVariadic
+     * @return bool True if argument resolved
+     * @throws ContainerExceptionInterface
+     */
+    private function resolveObjectParameter(
+        ?ReflectionClass $class,
+        array &$resolvedArguments,
+        array &$arguments,
+        bool $isVariadic
+    ): bool {
+        // Unnamed arguments
+        $className = $class !== null ? $class->getName() : null;
+        $found = false;
+        foreach ($arguments as $key => $item) {
+            if (is_int($key) && is_object($item) && ($className === null || $item instanceof $className)) {
+                $resolvedArguments[] = &$arguments[$key];
+                unset($arguments[$key]);
+                if (!$isVariadic) {
+                    return true;
+                }
+                $found = true;
+            }
+        }
+        if ($found) {
+            return true;
+        }
+
+        if ($className !== null) {
+            $argument = $this->container->get($className);
+            $resolvedArguments[] = &$argument;
+            return true;
+        }
+        return false;
     }
 }
