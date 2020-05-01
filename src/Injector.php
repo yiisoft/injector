@@ -119,6 +119,8 @@ final class Injector
      */
     private function resolveDependencies(ReflectionFunctionAbstract $reflection, array $arguments = []): array
     {
+        $this->checkNumericKeyArguments($reflection, $arguments);
+
         $resolvedArguments = [];
         $pushUnusedArguments = true;
         $isInternalOptional = false;
@@ -147,8 +149,6 @@ final class Injector
                 break;
             }
         }
-
-        $this->checkNumericKeyArguments($reflection, $arguments);
 
         return $pushUnusedArguments
             ? [...$resolvedArguments, ...array_filter($arguments, 'is_int', ARRAY_FILTER_USE_KEY)]

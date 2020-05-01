@@ -6,5 +6,6 @@ namespace Yiisoft\Injector;
 
 final class InvalidArgumentException extends ArgumentException
 {
-    protected const EXCEPTION_MESSAGE = 'Invalid argument on key "%s" when calling "%s"%s.';
+    protected const EXCEPTION_MESSAGE = 'Invalid argument "%s" when calling "%s"%s. Non-interface argument should be'
+    . ' named explicitly when passed.';
 }
