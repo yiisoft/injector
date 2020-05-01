@@ -15,7 +15,7 @@ abstract class ArgumentException extends \InvalidArgumentException
 
         if ($class === null) {
             $method = $function;
-            if ($method === '{closure}') {
+            if (substr($method, -9) === '{closure}') {
                 $method = $this->getClosureSignature($reflection);
             }
         } else {
@@ -27,7 +27,7 @@ abstract class ArgumentException extends \InvalidArgumentException
 
         $fileAndLine = '';
         if (!empty($fileName) && !empty($line)) {
-            $fileAndLine = " in \"$fileName\" at line \"$line\"";
+            $fileAndLine = " in \"$fileName\" at line $line";
         }
 
         parent::__construct(sprintf(static::EXCEPTION_MESSAGE, $parameter, $method, $fileAndLine));
@@ -39,16 +39,20 @@ abstract class ArgumentException extends \InvalidArgumentException
         $closureParameters = [];
         foreach ($reflection->getParameters() as $parameter) {
             $parameterString = '';
-            if ($parameter->isArray()) {
-                $parameterString .= 'array ';
-            } elseif ($parameter->getClass()) {
-                $parameterString .= $parameter->getClass()->name . ' ';
+            if ($parameter->getType() instanceof \ReflectionNamedType) {
+                $parameterString .= $parameter->getType()->getName() . ' ';
+            }
+            if ($parameterString !== '' && $parameter->allowsNull()) {
+                $parameterString = '?' . $parameterString;
             }
             if ($parameter->isPassedByReference()) {
                 $parameterString .= '&';
             }
+            if ($parameter->isVariadic()) {
+                $parameterString .= '...';
+            }
             $parameterString .= '$' . $parameter->name;
-            if ($parameter->isOptional()) {
+            if ($parameter->isDefaultValueAvailable()) {
                 $parameterString .= ' = ' . var_export($parameter->getDefaultValue(), true);
             }
             $closureParameters[] = $parameterString;

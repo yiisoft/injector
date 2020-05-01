@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Yiisoft\Injector\Tests;
 
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use Yiisoft\Injector\ArgumentException;
+use Yiisoft\Injector\Tests\Support\ColorInterface;
 use Yiisoft\Injector\Tests\Support\EngineVAZ2101;
 use Yiisoft\Injector\Tests\Support\MakeEngineMatherWithParam;
 
@@ -37,14 +39,44 @@ abstract class ArgumentExceptionTest extends TestCase
         $this->assertStringContainsString("{$class}::{$method}", $exception->getMessage());
         $this->assertStringContainsString('index', $exception->getMessage());
     }
-    public function testClosureReflection(): void
+    public function testSimpleClosureReflection(): void
     {
-        // $callable = \Closure::fromCallable($callable);
+        $functionLine = __LINE__ + 1;
         $reflection = new \ReflectionFunction(fn (bool $toInverse) => !$toInverse);
         $exception = $this->createException($reflection, 'toInverse');
 
-        $this->assertStringContainsString(__NAMESPACE__ . '\\{closure}', $exception->getMessage());
+        $this->assertStringContainsString(__FILE__, $exception->getMessage());
+        $this->assertStringContainsString(' at line ' . $functionLine, $exception->getMessage());
         $this->assertStringContainsString('toInverse', $exception->getMessage());
+    }
+    public function testRichClosureReflection(): void
+    {
+        $reflection = new \ReflectionFunction(static function (
+            callable $callable,
+            object $object,
+            ColorInterface $class,
+            bool $boolean = false,
+            int $int = 10,
+            float $float = 0.0,
+            array $array = [0],
+            ?stdClass $nullable = null,
+            &...$variadic
+        ): void {
+            array_map(null, func_get_args());
+        });
+        $exception = $this->createException($reflection, 'toInverse');
+
+        $this->assertStringContainsString('function ('
+            . 'callable $callable,'
+            . ' object $object,'
+            . ' Yiisoft\Injector\Tests\Support\ColorInterface $class,'
+            . ' bool $boolean = false,'
+            . ' int $int = 10,'
+            . ' float $float = 0.0,'
+            . " array \$array = array (\n  0 => 0,\n),"
+            . ' ?stdClass $nullable = NULL,'
+            . ' &...$variadic'
+        . ')', $exception->getMessage());
     }
     public function testInternalStaticCallableReflection(): void
     {
