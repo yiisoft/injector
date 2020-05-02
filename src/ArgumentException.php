@@ -15,7 +15,7 @@ abstract class ArgumentException extends \InvalidArgumentException
 
         if ($class === null) {
             $method = $function;
-            if ($method === '{closure}') {
+            if (substr($method, -9) === '{closure}') {
                 $method = $this->getClosureSignature($reflection);
             }
         } else {
@@ -27,7 +27,7 @@ abstract class ArgumentException extends \InvalidArgumentException
 
         $fileAndLine = '';
         if (!empty($fileName) && !empty($line)) {
-            $fileAndLine = " in \"$fileName\" at line \"$line\"";
+            $fileAndLine = " in \"$fileName\" at line $line";
         }
 
         parent::__construct(sprintf(static::EXCEPTION_MESSAGE, $parameter, $method, $fileAndLine));
@@ -35,26 +35,26 @@ abstract class ArgumentException extends \InvalidArgumentException
 
     private function getClosureSignature(\ReflectionFunctionAbstract $reflection): string
     {
-        $result = 'function (';
         $closureParameters = [];
+        $append = static function (bool $condition, string $postfix) use (&$parameterString): void {
+            if ($condition) {
+                $parameterString .= $postfix;
+            }
+        };
         foreach ($reflection->getParameters() as $parameter) {
             $parameterString = '';
-            if ($parameter->isArray()) {
-                $parameterString .= 'array ';
-            } elseif ($parameter->getClass()) {
-                $parameterString .= $parameter->getClass()->name . ' ';
+            if ($parameter->hasType()) {
+                $append($parameter->allowsNull(), '?');
+                $parameterString .= $parameter->getType()->getName() . ' ';
             }
-            if ($parameter->isPassedByReference()) {
-                $parameterString .= '&';
-            }
+            $append($parameter->isPassedByReference(), '&');
+            $append($parameter->isVariadic(), '...');
             $parameterString .= '$' . $parameter->name;
-            if ($parameter->isOptional()) {
+            if ($parameter->isDefaultValueAvailable()) {
                 $parameterString .= ' = ' . var_export($parameter->getDefaultValue(), true);
             }
             $closureParameters[] = $parameterString;
         }
-        $result .= implode(', ', $closureParameters);
-        $result .= ')';
-        return $result;
+        return 'function (' . implode(', ', $closureParameters) . ')';
     }
 }

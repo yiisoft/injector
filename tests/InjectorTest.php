@@ -295,9 +295,9 @@ class InjectorTest extends TestCase
     {
         $container = $this->getContainer();
 
-        $callable = fn (...$var) => array_sum($var);
+        $callable = fn (int ...$var) => array_sum($var);
 
-        $result = (new Injector($container))->invoke($callable, ['var' => [1, 2, 3]]);
+        $result = (new Injector($container))->invoke($callable, ['var' => [1, 2, 3], new stdClass()]);
 
         $this->assertSame(6, $result);
     }
@@ -374,9 +374,9 @@ class InjectorTest extends TestCase
         $container = $this->getContainer();
 
         $callable = static function (
-            /** @scrutinizer ignore-unused */ 
+            /** @scrutinizer ignore-unused */
             ?EngineInterface $engine,
-            /** @scrutinizer ignore-unused */ 
+            /** @scrutinizer ignore-unused */
             $id = 'test'
         ) {
             return func_num_args();
@@ -517,7 +517,7 @@ class InjectorTest extends TestCase
 
         $callable = fn (array $arg) => $arg;
 
-        $this->expectException(MissingRequiredArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         (new Injector($container))->invoke($callable, [['test']]);
     }
@@ -656,8 +656,7 @@ class InjectorTest extends TestCase
 
         $object = (new Injector($container))->make(MakeEngineCollector::class, []);
 
-        $this->assertCount(1, $object->engines);
-        $this->assertSame([$container->get(EngineInterface::class)], $object->engines);
+        $this->assertCount(0, $object->engines);
     }
 
     public function testMakeWithVariadicFromArguments(): void
