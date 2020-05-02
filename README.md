@@ -17,7 +17,7 @@ via autowiring.
 
 ## Features
 
-- Invoke callable or create and object of a given class.
+- Invoke callable or create an object of a given class.
 - Resolve dependencies by parameter types using the given [PSR-11](http://www.php-fig.org/psr/psr-11/) container.
 - Pass concrete dependency instances by type.
 - Pass arguments by name.
