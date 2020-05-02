@@ -41,9 +41,9 @@ abstract class ArgumentException extends \InvalidArgumentException
             $parameterString = '';
             if ($parameter->getType() instanceof \ReflectionNamedType) {
                 $parameterString .= $parameter->getType()->getName() . ' ';
-            }
-            if ($parameterString !== '' && $parameter->allowsNull()) {
-                $parameterString = '?' . $parameterString;
+                if ($parameter->allowsNull()) {
+                    $parameterString = '?' . $parameterString;
+                }
             }
             if ($parameter->isPassedByReference()) {
                 $parameterString .= '&';
