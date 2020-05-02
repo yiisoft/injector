@@ -35,29 +35,26 @@ abstract class ArgumentException extends \InvalidArgumentException
 
     private function getClosureSignature(\ReflectionFunctionAbstract $reflection): string
     {
-        $result = 'function (';
         $closureParameters = [];
-        $concat = static function ($condition, $string) use (&$parameterString) {
+        $append = static function (bool $condition, string $postfix) use (&$parameterString): void {
             if ($condition) {
-                $parameterString .= $string;
+                $parameterString .= $postfix;
             }
         };
         foreach ($reflection->getParameters() as $parameter) {
             $parameterString = '';
             if ($parameter->hasType()) {
-                $concat($parameter->allowsNull(), '?');
+                $append($parameter->allowsNull(), '?');
                 $parameterString .= $parameter->getType()->getName() . ' ';
             }
-            $concat($parameter->isPassedByReference(), '&');
-            $concat($parameter->isVariadic(), '...');
+            $append($parameter->isPassedByReference(), '&');
+            $append($parameter->isVariadic(), '...');
             $parameterString .= '$' . $parameter->name;
             if ($parameter->isDefaultValueAvailable()) {
                 $parameterString .= ' = ' . var_export($parameter->getDefaultValue(), true);
             }
             $closureParameters[] = $parameterString;
         }
-        $result .= implode(', ', $closureParameters);
-        $result .= ')';
-        return $result;
+        return 'function (' . implode(', ', $closureParameters) . ')';
     }
 }
