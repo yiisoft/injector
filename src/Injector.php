@@ -271,8 +271,8 @@ final class Injector
                 $found = true;
             }
         }
-        if ($found) {
-            return true;
+        if ($isVariadic) {
+            return $found;
         }
 
         if ($className !== null) {

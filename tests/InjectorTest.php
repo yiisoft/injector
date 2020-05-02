@@ -656,8 +656,7 @@ class InjectorTest extends TestCase
 
         $object = (new Injector($container))->make(MakeEngineCollector::class, []);
 
-        $this->assertCount(1, $object->engines);
-        $this->assertSame([$container->get(EngineInterface::class)], $object->engines);
+        $this->assertCount(0, $object->engines);
     }
 
     public function testMakeWithVariadicFromArguments(): void
