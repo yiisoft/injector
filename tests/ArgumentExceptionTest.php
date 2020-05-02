@@ -59,6 +59,7 @@ abstract class ArgumentExceptionTest extends TestCase
             int $int = 10,
             float $float = 0.0,
             array $array = [0],
+            ?string $string = '',
             ?stdClass $nullable = null,
             &...$variadic
         ): void {
@@ -74,6 +75,7 @@ abstract class ArgumentExceptionTest extends TestCase
             . ' int $int = 10,'
             . ' float $float = 0.0,'
             . " array \$array = array (\n  0 => 0,\n),"
+            . ' ?string $string = \'\','
             . ' ?stdClass $nullable = NULL,'
             . ' &...$variadic'
         . ')', $exception->getMessage());
