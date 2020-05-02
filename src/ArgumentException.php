@@ -37,20 +37,19 @@ abstract class ArgumentException extends \InvalidArgumentException
     {
         $result = 'function (';
         $closureParameters = [];
+        $concat = static function ($condition, $string) use (&$parameterString) {
+            if ($condition) {
+                $parameterString .= $string;
+            }
+        };
         foreach ($reflection->getParameters() as $parameter) {
             $parameterString = '';
-            if ($parameter->getType() instanceof \ReflectionNamedType) {
+            if ($parameter->hasType()) {
+                $concat($parameter->allowsNull(), '?');
                 $parameterString .= $parameter->getType()->getName() . ' ';
-                if ($parameter->allowsNull()) {
-                    $parameterString = '?' . $parameterString;
-                }
             }
-            if ($parameter->isPassedByReference()) {
-                $parameterString .= '&';
-            }
-            if ($parameter->isVariadic()) {
-                $parameterString .= '...';
-            }
+            $concat($parameter->isPassedByReference(), '&');
+            $concat($parameter->isVariadic(), '...');
             $parameterString .= '$' . $parameter->name;
             if ($parameter->isDefaultValueAvailable()) {
                 $parameterString .= ' = ' . var_export($parameter->getDefaultValue(), true);
