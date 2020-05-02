@@ -146,9 +146,6 @@ final class Injector
             // Internal function. Parameter not resolved
             $isInternalOptional = true;
             $internalParameter = $parameter->getName();
-            if (count($arguments) === 0) {
-                break;
-            }
         }
 
         return $pushUnusedArguments
@@ -258,28 +255,43 @@ final class Injector
         array &$arguments,
         bool $isVariadic
     ): bool {
-        // Unnamed arguments
         $className = $class !== null ? $class->getName() : null;
-        $found = false;
-        foreach ($arguments as $key => $item) {
-            if (is_int($key) && is_object($item) && ($className === null || $item instanceof $className)) {
-                $resolvedArguments[] = &$arguments[$key];
-                unset($arguments[$key]);
-                if (!$isVariadic) {
-                    return true;
-                }
-                $found = true;
-            }
-        }
-        if ($isVariadic) {
+        $found = $this->findObjectArguments($className, $resolvedArguments, $arguments, $isVariadic);
+        if ($found || $isVariadic) {
             return $found;
         }
-
         if ($className !== null) {
             $argument = $this->container->get($className);
             $resolvedArguments[] = &$argument;
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param null|string $className Null value means objects of any class
+     * @param array $resolvedArguments
+     * @param array $arguments
+     * @param bool $multiple
+     * @return bool True if arguments are found
+     */
+    private function findObjectArguments(
+        ?string $className,
+        array &$resolvedArguments,
+        array &$arguments,
+        bool $multiple
+    ): bool {
+        $found = false;
+        foreach ($arguments as $key => $item) {
+            if (is_int($key) && is_object($item) && ($className === null || $item instanceof $className)) {
+                $resolvedArguments[] = &$arguments[$key];
+                unset($arguments[$key]);
+                if (!$multiple) {
+                    return true;
+                }
+                $found = true;
+            }
+        }
+        return $found;
     }
 }
