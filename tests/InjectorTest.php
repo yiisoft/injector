@@ -620,6 +620,10 @@ class InjectorTest extends TestCase
 
     public function testMakeInternalClassWithOptionalMiddleArgumentSkipped(): void
     {
+        if (PHP_VERSION_ID >= 80000) {
+            $this->markTestSkipped('Internal argument information is available in PHP 8.');
+        }
+
         $container = $this->getContainer();
 
         $this->expectException(MissingInternalArgumentException::class);
