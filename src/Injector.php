@@ -186,8 +186,19 @@ final class Injector
         }
 
         $error = null;
-        $class = $parameter->getClass();
-        $type = $hasType ? $parameter->getType()->getName() : null;
+
+
+        $type = null;
+        $class = null;
+
+        if ($hasType) {
+            $reflectionType = $parameter->getType();
+            $type = $reflectionType->getName();
+            if (!$reflectionType->isBuiltin()) {
+                $class = $type;
+            }
+        }
+
         $isClass = $class !== null || $type === 'object';
         try {
             if ($isClass && $this->resolveObjectParameter($class, $resolvedArguments, $arguments, $isVariadic)) {
@@ -250,18 +261,17 @@ final class Injector
      * @throws ContainerExceptionInterface
      */
     private function resolveObjectParameter(
-        ?ReflectionClass $class,
+        ?string $class,
         array &$resolvedArguments,
         array &$arguments,
         bool $isVariadic
     ): bool {
-        $className = $class !== null ? $class->getName() : null;
-        $found = $this->findObjectArguments($className, $resolvedArguments, $arguments, $isVariadic);
+        $found = $this->findObjectArguments($class, $resolvedArguments, $arguments, $isVariadic);
         if ($found || $isVariadic) {
             return $found;
         }
-        if ($className !== null) {
-            $argument = $this->container->get($className);
+        if ($class !== null) {
+            $argument = $this->container->get($class);
             $resolvedArguments[] = &$argument;
             return true;
         }
