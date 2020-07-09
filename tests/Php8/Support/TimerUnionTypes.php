@@ -15,6 +15,6 @@ class TimerUnionTypes
     }
     public function getTime(): string|DateTimeInterface
     {
-        return $time;
+        return $this->time;
     }
 }

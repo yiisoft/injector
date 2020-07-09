@@ -10,6 +10,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunctionAbstract;
+use ReflectionNamedType;
 use ReflectionParameter;
 
 /**
@@ -187,25 +188,19 @@ final class Injector
 
         $error = null;
 
-
-        $type = null;
-        $class = null;
-
         if ($hasType) {
             $reflectionType = $parameter->getType();
-            $type = $reflectionType->getName();
-            if (!$reflectionType->isBuiltin()) {
-                $class = $type;
-            }
-        }
 
-        $isClass = $class !== null || $type === 'object';
-        try {
-            if ($isClass && $this->resolveObjectParameter($class, $resolvedArguments, $arguments, $isVariadic)) {
-                return true;
+            $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
+            foreach ($types as $namedType) {
+                try {
+                    if ($this->resolveNamedType($namedType, $resolvedArguments, $arguments, $isVariadic)) {
+                        return true;
+                    }
+                } catch (NotFoundExceptionInterface $e) {
+                    $error = $e;
+                }
             }
-        } catch (NotFoundExceptionInterface $e) {
-            $error = $e;
         }
 
         if ($parameter->isDefaultValueAvailable()) {
@@ -236,6 +231,22 @@ final class Injector
         // Internal function with optional params
         $pushUnusedArguments = false;
         return null;
+    }
+
+    private function resolveNamedType(
+        ReflectionNamedType $reflection,
+        array &$resolvedArguments,
+        array &$arguments,
+        bool $isVariadic
+    ): bool {
+        $type = $reflection->getName();
+        $class = $reflection->isBuiltin() ? null : $type;
+
+        $isClass = $class !== null || $type === 'object';
+        if ($isClass && $this->resolveObjectParameter($class, $resolvedArguments, $arguments, $isVariadic)) {
+            return true;
+        }
+        return false;
     }
 
     /**
