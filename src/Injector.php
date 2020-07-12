@@ -233,6 +233,13 @@ final class Injector
         return null;
     }
 
+    /**
+     * @param ReflectionNamedType $reflection
+     * @param array $resolvedArguments
+     * @param array $arguments
+     * @param bool $isVariadic
+     * @return bool True if argument resolved
+     */
     private function resolveNamedType(
         ReflectionNamedType $reflection,
         array &$resolvedArguments,
@@ -264,7 +271,7 @@ final class Injector
     }
 
     /**
-     * @param null|ReflectionClass $class
+     * @param null|string $class
      * @param array $resolvedArguments
      * @param array $arguments
      * @param bool $isVariadic
