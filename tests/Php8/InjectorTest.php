@@ -7,17 +7,9 @@ namespace Yiisoft\Injector\Tests\Php8;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Yiisoft\Injector\Injector;
-use Yiisoft\Injector\MissingInternalArgumentException;
 use Yiisoft\Injector\Tests\Common\BaseInjectorTest;
-use Yiisoft\Injector\Tests\Common\Support\EngineInterface;
-use Yiisoft\Injector\Tests\Common\Support\EngineMarkTwo;
-use Yiisoft\Injector\Tests\Common\Support\EngineVAZ2101;
-use Yiisoft\Injector\Tests\Common\Support\MakeEngineMatherWithParam;
 use Yiisoft\Injector\Tests\Php8\Support\TimerUnionTypes;
 
-/**
- * @requires PHP 8
- */
 class InjectorTest extends BaseInjectorTest
 {
     public function testMakeInternalClass(): void
