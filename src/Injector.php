@@ -238,7 +238,7 @@ final class Injector
      * @param array $resolvedArguments
      * @param array $arguments
      * @param bool $isVariadic
-     * @return bool True if argument resolved
+     * @return bool True if argument was resolved
      */
     private function resolveNamedType(
         ReflectionNamedType $reflection,
@@ -250,10 +250,7 @@ final class Injector
         $class = $reflection->isBuiltin() ? null : $type;
 
         $isClass = $class !== null || $type === 'object';
-        if ($isClass && $this->resolveObjectParameter($class, $resolvedArguments, $arguments, $isVariadic)) {
-            return true;
-        }
-        return false;
+        return $isClass && $this->resolveObjectParameter($class, $resolvedArguments, $arguments, $isVariadic);
     }
 
     /**
@@ -261,7 +258,7 @@ final class Injector
      * @param array $arguments
      * @throws InvalidArgumentException
      */
-    private function checkNumericKeyArguments(ReflectionFunctionAbstract $reflection, array &$arguments): void
+    private function checkNumericKeyArguments(ReflectionFunctionAbstract $reflection, array $arguments): void
     {
         foreach ($arguments as $key => $value) {
             if (is_int($key) && !is_object($value)) {
@@ -301,7 +298,7 @@ final class Injector
      * @param array $resolvedArguments
      * @param array $arguments
      * @param bool $multiple
-     * @return bool True if arguments are found
+     * @return bool True if arguments were found
      */
     private function findObjectArguments(
         ?string $className,
