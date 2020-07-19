@@ -1,6 +1,8 @@
 # Injector Change Log
 
-## 1.0.2 under development
+## 1.1.0 under development
+
+- Support PHP 8 Union Types (roxblnfk)
 
 ## 1.0.1 May 17, 2020
 
