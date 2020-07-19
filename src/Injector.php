@@ -10,6 +10,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunctionAbstract;
+use ReflectionNamedType;
 use ReflectionParameter;
 
 /**
@@ -187,25 +188,19 @@ final class Injector
 
         $error = null;
 
-
-        $type = null;
-        $class = null;
-
         if ($hasType) {
             $reflectionType = $parameter->getType();
-            $type = $reflectionType->getName();
-            if (!$reflectionType->isBuiltin()) {
-                $class = $type;
-            }
-        }
 
-        $isClass = $class !== null || $type === 'object';
-        try {
-            if ($isClass && $this->resolveObjectParameter($class, $resolvedArguments, $arguments, $isVariadic)) {
-                return true;
+            $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
+            foreach ($types as $namedType) {
+                try {
+                    if ($this->resolveNamedType($namedType, $resolvedArguments, $arguments, $isVariadic)) {
+                        return true;
+                    }
+                } catch (NotFoundExceptionInterface $e) {
+                    $error = $e;
+                }
             }
-        } catch (NotFoundExceptionInterface $e) {
-            $error = $e;
         }
 
         if ($parameter->isDefaultValueAvailable()) {
@@ -239,11 +234,31 @@ final class Injector
     }
 
     /**
+     * @param ReflectionNamedType $reflection
+     * @param array $resolvedArguments
+     * @param array $arguments
+     * @param bool $isVariadic
+     * @return bool True if argument was resolved
+     */
+    private function resolveNamedType(
+        ReflectionNamedType $reflection,
+        array &$resolvedArguments,
+        array &$arguments,
+        bool $isVariadic
+    ): bool {
+        $type = $reflection->getName();
+        $class = $reflection->isBuiltin() ? null : $type;
+
+        $isClass = $class !== null || $type === 'object';
+        return $isClass && $this->resolveObjectParameter($class, $resolvedArguments, $arguments, $isVariadic);
+    }
+
+    /**
      * @param ReflectionFunctionAbstract $reflection
      * @param array $arguments
      * @throws InvalidArgumentException
      */
-    private function checkNumericKeyArguments(ReflectionFunctionAbstract $reflection, array &$arguments): void
+    private function checkNumericKeyArguments(ReflectionFunctionAbstract $reflection, array $arguments): void
     {
         foreach ($arguments as $key => $value) {
             if (is_int($key) && !is_object($value)) {
@@ -253,7 +268,7 @@ final class Injector
     }
 
     /**
-     * @param null|ReflectionClass $class
+     * @param null|string $class
      * @param array $resolvedArguments
      * @param array $arguments
      * @param bool $isVariadic
@@ -283,7 +298,7 @@ final class Injector
      * @param array $resolvedArguments
      * @param array $arguments
      * @param bool $multiple
-     * @return bool True if arguments are found
+     * @return bool True if arguments were found
      */
     private function findObjectArguments(
         ?string $className,

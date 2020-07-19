@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Injector\Tests;
+namespace Yiisoft\Injector\Tests\Common;
 
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Yiisoft\Injector\ArgumentException;
-use Yiisoft\Injector\Tests\Support\ColorInterface;
-use Yiisoft\Injector\Tests\Support\EngineVAZ2101;
-use Yiisoft\Injector\Tests\Support\MakeEngineMatherWithParam;
+use Yiisoft\Injector\Tests\Common\Support\ColorInterface;
+use Yiisoft\Injector\Tests\Common\Support\EngineVAZ2101;
+use Yiisoft\Injector\Tests\Common\Support\MakeEngineMatherWithParam;
 
 function testFunction(): void
 {
@@ -70,7 +70,7 @@ abstract class ArgumentExceptionTest extends TestCase
         $this->assertStringContainsString('function ('
             . 'callable $callable,'
             . ' object $object,'
-            . ' Yiisoft\Injector\Tests\Support\ColorInterface $class,'
+            . ' Yiisoft\Injector\Tests\Common\Support\ColorInterface $class,'
             . ' bool $boolean = false,'
             . ' int $int = 10,'
             . ' float $float = 0.0,'

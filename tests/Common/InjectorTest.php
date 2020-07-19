@@ -2,33 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Injector\Tests;
+namespace Yiisoft\Injector\Tests\Common;
 
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
-use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use stdClass;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\InvalidArgumentException;
-use Yiisoft\Injector\MissingInternalArgumentException;
 use Yiisoft\Injector\MissingRequiredArgumentException;
-use Yiisoft\Injector\Tests\Support\ColorInterface;
-use Yiisoft\Injector\Tests\Support\EngineInterface;
-use Yiisoft\Injector\Tests\Support\EngineMarkTwo;
-use Yiisoft\Injector\Tests\Support\EngineZIL130;
-use Yiisoft\Injector\Tests\Support\EngineVAZ2101;
-use Yiisoft\Injector\Tests\Support\Invokeable;
-use Yiisoft\Injector\Tests\Support\LightEngine;
-use Yiisoft\Injector\Tests\Support\MakeEmptyConstructor;
-use Yiisoft\Injector\Tests\Support\MakeEngineCollector;
-use Yiisoft\Injector\Tests\Support\MakeEngineMatherWithParam;
-use Yiisoft\Injector\Tests\Support\MakeNoConstructor;
-use Yiisoft\Injector\Tests\Support\MakePrivateConstructor;
+use Yiisoft\Injector\Tests\Common\Support\ColorInterface;
+use Yiisoft\Injector\Tests\Common\Support\EngineInterface;
+use Yiisoft\Injector\Tests\Common\Support\EngineMarkTwo;
+use Yiisoft\Injector\Tests\Common\Support\EngineZIL130;
+use Yiisoft\Injector\Tests\Common\Support\EngineVAZ2101;
+use Yiisoft\Injector\Tests\Common\Support\Invokeable;
+use Yiisoft\Injector\Tests\Common\Support\LightEngine;
+use Yiisoft\Injector\Tests\Common\Support\MakeEmptyConstructor;
+use Yiisoft\Injector\Tests\Common\Support\MakeEngineCollector;
+use Yiisoft\Injector\Tests\Common\Support\MakeEngineMatherWithParam;
+use Yiisoft\Injector\Tests\Common\Support\MakeNoConstructor;
+use Yiisoft\Injector\Tests\Common\Support\MakePrivateConstructor;
 
-class InjectorTest extends TestCase
+class InjectorTest extends BaseInjectorTest
 {
     /**
      * Injector should be able to invoke closure.
@@ -618,26 +615,6 @@ class InjectorTest extends TestCase
         $this->assertInstanceOf(DateTimeImmutable::class, $object);
     }
 
-    public function testMakeInternalClassWithOptionalMiddleArgumentSkipped(): void
-    {
-        if (PHP_VERSION_ID >= 80000) {
-            $this->markTestSkipped('Internal argument information is available in PHP 8.');
-        }
-
-        $container = $this->getContainer();
-
-        $this->expectException(MissingInternalArgumentException::class);
-        $this->expectExceptionMessageMatches('/PHP internal/');
-
-        (new Injector($container))->make(\SplFileObject::class, [
-            'file_name' => __FILE__,
-            // second parameter skipped
-            // third parameter skipped
-            'context' => null,
-            'other-parameter' => true,
-        ]);
-    }
-
     public function testMakeAbstractClass(): void
     {
         $container = $this->getContainer();
@@ -693,28 +670,5 @@ class InjectorTest extends TestCase
         $this->expectException(\TypeError::class);
 
         (new Injector($container))->make(MakeEngineMatherWithParam::class, ['parameter' => 100500]);
-    }
-
-    private function getContainer(array $definitions = []): ContainerInterface
-    {
-        return new class($definitions) implements ContainerInterface {
-            private array $definitions;
-            public function __construct(array $definitions = [])
-            {
-                $this->definitions = $definitions;
-            }
-            public function get($id)
-            {
-                if (!$this->has($id)) {
-                    throw new class() extends \Exception implements NotFoundExceptionInterface {
-                    };
-                }
-                return $this->definitions[$id];
-            }
-            public function has($id)
-            {
-                return array_key_exists($id, $this->definitions);
-            }
-        };
     }
 }

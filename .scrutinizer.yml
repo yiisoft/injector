@@ -13,5 +13,5 @@ tools:
     external_code_coverage:
         timeout: 600
 filter:
-    dependency_paths:
-        - .phpstorm.meta.php
+    paths:
+        - "src/*"
