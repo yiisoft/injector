@@ -1,6 +1,16 @@
 build:
   nodes:
-    analysis:
+    analysis-php-74:
+      environment:
+        php:
+          version: 7.4
+      tests:
+        override:
+          - php-scrutinizer-run
+    analysis-php-80:
+      environment:
+        php:
+          version: 8.0
       tests:
         override:
           - php-scrutinizer-run
