@@ -26,7 +26,7 @@ abstract class ArgumentException extends \InvalidArgumentException
         $line = $reflection->getStartLine();
 
         $fileAndLine = '';
-        if (!empty($fileName) && !empty($line)) {
+        if (!empty($fileName)) {
             $fileAndLine = " in \"$fileName\" at line $line";
         }
 
