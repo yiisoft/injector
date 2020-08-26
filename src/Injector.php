@@ -124,7 +124,7 @@ final class Injector
         $this->checkNumericKeyArguments($reflection, $arguments);
 
         $resolvedArguments = [];
-        $pushUnusedArguments = true;
+        $pushUnusedArguments = !$reflection->isInternal();
         $isInternalOptional = false;
         $internalParameter = '';
         foreach ($reflection->getParameters() as $parameter) {
