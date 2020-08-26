@@ -288,7 +288,7 @@ class InjectorTest extends BaseInjectorTest
     /**
      * A values collection for a variadic argument can be passed as an array in a named parameter.
      */
-    public function testAloneScalarVariadicArgumentAnsNamedParam(): void
+    public function testAloneScalarVariadicParameterAndNamedArrayArgument(): void
     {
         $container = $this->getContainer();
 
@@ -297,6 +297,17 @@ class InjectorTest extends BaseInjectorTest
         $result = (new Injector($container))->invoke($callable, ['var' => [1, 2, 3], new stdClass()]);
 
         $this->assertSame(6, $result);
+    }
+
+    public function testAloneScalarVariadicParameterAndNamedScalarArgument(): void
+    {
+        $container = $this->getContainer();
+
+        $callable = fn (int ...$var) => array_sum($var);
+
+        $result = (new Injector($container))->invoke($callable, ['var' => 42, new stdClass()]);
+
+        $this->assertSame(42, $result);
     }
 
     /**
