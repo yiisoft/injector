@@ -382,7 +382,8 @@ class InjectorTest extends BaseInjectorTest
         $result = (new Injector($container))->invoke($callable, [
             new DateTimeImmutable(),
             new DateTimeImmutable(),
-            new EngineMarkTwo()
+            new EngineMarkTwo(),
+            'named' => new EngineVAZ2101()
         ]);
 
         $this->assertSame(4, $result);
