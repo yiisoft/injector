@@ -639,6 +639,15 @@ class InjectorTest extends BaseInjectorTest
         $this->assertInstanceOf(DateTimeImmutable::class, $object);
     }
 
+    public function testMakeInternalClassWithUnusedArguments(): void
+    {
+        $container = $this->getContainer();
+        $object = (new Injector($container))
+            ->make(DateTimeImmutable::class, ['named_param' => null, new EngineVAZ2101()]);
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $object);
+    }
+
     public function testMakeAbstractClass(): void
     {
         $container = $this->getContainer();
