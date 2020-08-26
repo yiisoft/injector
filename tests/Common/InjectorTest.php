@@ -299,6 +299,18 @@ class InjectorTest extends BaseInjectorTest
         $this->assertSame(6, $result);
     }
 
+    public function testAloneScalarVariadicParameterAndNamedAssocArrayArgument(): void
+    {
+        $container = $this->getContainer();
+
+        $callable = fn (string $foo, string ...$bar) => $foo . '--' . implode('-', $bar);
+
+        $result = (new Injector($container))
+            ->invoke($callable, ['foo' => 'foo', 'bar' => ['foo' => 'baz', '0' => 'fiz']]);
+
+        $this->assertSame('foo--baz-fiz', $result);
+    }
+
     public function testAloneScalarVariadicParameterAndNamedScalarArgument(): void
     {
         $container = $this->getContainer();

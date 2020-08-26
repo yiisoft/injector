@@ -178,7 +178,7 @@ final class Injector
         // Get argument by name
         if (array_key_exists($name, $arguments)) {
             if ($isVariadic && is_array($arguments[$name])) {
-                $resolvedArguments = array_merge($resolvedArguments, array_values($arguments[$name]));
+                $resolvedArguments = [...$resolvedArguments, ...array_values($arguments[$name])];
             } else {
                 $resolvedArguments[] = &$arguments[$name];
             }
