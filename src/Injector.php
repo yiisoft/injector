@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector;
 
+use Closure;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionFunction;
 use ReflectionFunctionAbstract;
 use ReflectionNamedType;
 use ReflectionParameter;
@@ -56,8 +58,8 @@ final class Injector
      */
     public function invoke(callable $callable, array $arguments = [])
     {
-        $callable = \Closure::fromCallable($callable);
-        $reflection = new \ReflectionFunction($callable);
+        $callable = Closure::fromCallable($callable);
+        $reflection = new ReflectionFunction($callable);
         return $reflection->invokeArgs($this->resolveDependencies($reflection, $arguments));
     }
 
@@ -192,7 +194,7 @@ final class Injector
             $reflectionType = $parameter->getType();
 
             // $reflectionType may be instance of ReflectionUnionType (php8)
-             /** @phan-suppress-next-line PhanUndeclaredMethod */
+            /** @phan-suppress-next-line PhanUndeclaredMethod */
             $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
             foreach ($types as $namedType) {
                 try {
