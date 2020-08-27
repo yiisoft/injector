@@ -47,6 +47,11 @@ abstract class ArgumentException extends \InvalidArgumentException
             if ($type instanceof \ReflectionNamedType) {
                 $append($parameter->allowsNull(), '?');
                 $parameterString .= $type->getName() . ' ';
+            } elseif ($type instanceof \ReflectionUnionType) {
+                $parameterString .= implode('|', array_map(
+                    fn (\ReflectionNamedType $r) => $r->getName(),
+                    $type->getTypes() // @phan-suppress-current-line PhanUndeclaredMethod
+                )) . ' ';
             }
             $append($parameter->isPassedByReference(), '&');
             $append($parameter->isVariadic(), '...');
