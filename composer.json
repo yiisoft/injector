@@ -38,7 +38,11 @@
         }
     },
     "scripts": {
-        "test": "phpunit --colors=always"
+        "test": [
+            "phpunit --colors=always",
+            "infection --no-progress",
+            "phan --no-progress-bar"
+        ]
     },
     "config": {
         "sort-packages": true
