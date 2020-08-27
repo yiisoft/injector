@@ -43,7 +43,7 @@ abstract class ArgumentException extends \InvalidArgumentException
         };
         foreach ($reflection->getParameters() as $parameter) {
             $parameterString = '';
-            $type = $parameter->hasType() ? $parameter->getType() : null;
+            $type = $parameter->getType();
             if ($type instanceof \ReflectionNamedType) {
                 $append($parameter->allowsNull(), '?');
                 $parameterString .= $type->getName() . ' ';
