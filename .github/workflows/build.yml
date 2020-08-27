@@ -8,7 +8,7 @@ jobs:
   tests:
     name: PHP ${{ matrix.php-version }}-${{ matrix.os }}
     env:
-      extensions: curl, mbstring, dom, intl
+      extensions: curl, mbstring, dom, intl, json, libxml, xml, xmlwriter
       key: cache-v1
 
     runs-on: ${{ matrix.os }}
@@ -49,6 +49,7 @@ jobs:
           extensions: ${{ env.extensions }}
           ini-values: date.timezone='UTC'
           coverage: pcov
+          tools: composer:v2
 
       - name: Determine composer cache directory on Linux
         if: matrix.os == 'ubuntu-latest'
@@ -59,12 +60,12 @@ jobs:
         run: ECHO "::set-env name=COMPOSER_CACHE_DIR::~\AppData\Local\Composer"
 
       - name: Cache dependencies installed with composer
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ${{ env.COMPOSER_CACHE_DIR }}
-          key: php${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-${{ hashFiles('**/composer.json') }}
+          key: php${{ matrix.php-version }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: |
-            php${{ matrix.php-version }}-composer-${{ matrix.dependencies }}-
+            php${{ matrix.php-version }}-composer-
 
       - name: Install dependencies with composer php 7.4
         if: matrix.php-version == '7.4'
@@ -74,11 +75,20 @@ jobs:
         if: matrix.php-version == '8.0'
         run: composer update --ignore-platform-reqs --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
-      - name: Run tests with phpunit
+      - name: Run tests with phpunit and coverage on Linux php 7.4
+        if: matrix.os == 'ubuntu-latest' && matrix.php-version == '7.4'
         run: vendor/bin/phpunit --coverage-clover=coverage.clover
 
-      - name: Code coverage
-        if: matrix.os == 'ubuntu-latest'
+      - name: Run tests with phpunit without coverage on Linux php 8.0
+        if: matrix.os == 'ubuntu-latest' && matrix.php-version == '8.0'
+        run: vendor/bin/phpunit
+
+      - name: Run tests with phpunit without coverage on Windows
+        if: matrix.os == 'windows-latest'
+        run: vendor/bin/phpunit
+
+      - name: Upload code coverage scrutinizer on Linux php 7.4
+        if: matrix.os == 'ubuntu-latest' && matrix.php-version == '7.4'
         run: |
           wget https://scrutinizer-ci.com/ocular.phar
           php ocular.phar code-coverage:upload --format=php-clover coverage.clover
