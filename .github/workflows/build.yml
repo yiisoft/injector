@@ -79,12 +79,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && matrix.php-version == '7.4'
         run: vendor/bin/phpunit --coverage-clover=coverage.clover
 
-      - name: Run tests with phpunit without coverage on Linux php 8.0
-        if: matrix.os == 'ubuntu-latest' && matrix.php-version == '8.0'
-        run: vendor/bin/phpunit
-
-      - name: Run tests with phpunit without coverage on Windows
-        if: matrix.os == 'windows-latest'
+      - name: Run tests with phpunit without coverage
         run: vendor/bin/phpunit
 
       - name: Upload code coverage scrutinizer on Linux php 7.4
