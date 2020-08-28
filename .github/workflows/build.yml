@@ -83,8 +83,8 @@ jobs:
         if: matrix.os != 'ubuntu-latest' || matrix.php-version != '8.0'
         run: vendor/bin/phpunit
 
-      - name: Upload code coverage scrutinizer on Linux php 8.0
-        if: matrix.os == 'ubuntu-latest' && matrix.php-version == '8.0'
+      - name: Upload code coverage scrutinizer on Linux php 7.4
+        if: matrix.os == 'ubuntu-latest' && matrix.php-version == '7.4'
         run: |
           wget https://scrutinizer-ci.com/ocular.phar
           php ocular.phar code-coverage:upload --format=php-clover coverage.clover
