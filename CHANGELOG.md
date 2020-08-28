@@ -2,13 +2,13 @@
 
 ## 1.0.2 August 28, 2020
 
-- PR #19: Fix PHP 8 compatibility in ArgumentException (roxblnfk)
-- PR #19: Remove unneeded passing PHP 8 internal classes as trailing arguments (roxblnfk)
-- Fix #17: Support PHP 8 Union Types (roxblnfk)
+- Bug #19: Fix PHP 8 compatibility in ArgumentException (roxblnfk)
+- Bug #19: Remove unneeded passing PHP 8 internal classes as trailing arguments (roxblnfk)
+- Enh #17: Support PHP 8 Union Types (roxblnfk)
 
 ## 1.0.1 May 17, 2020
 
-- Fix #15: Support PHP 8 (samdark)
+- Enh #15: Support PHP 8 (samdark)
 
 ## 1.0.0 May 03, 2020
 
