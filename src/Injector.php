@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector;
 
+use Closure;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionFunction;
 use ReflectionFunctionAbstract;
 use ReflectionNamedType;
 use ReflectionParameter;
@@ -56,8 +58,8 @@ final class Injector
      */
     public function invoke(callable $callable, array $arguments = [])
     {
-        $callable = \Closure::fromCallable($callable);
-        $reflection = new \ReflectionFunction($callable);
+        $callable = Closure::fromCallable($callable);
+        $reflection = new ReflectionFunction($callable);
         return $reflection->invokeArgs($this->resolveDependencies($reflection, $arguments));
     }
 
@@ -124,7 +126,7 @@ final class Injector
         $this->checkNumericKeyArguments($reflection, $arguments);
 
         $resolvedArguments = [];
-        $pushUnusedArguments = true;
+        $pushUnusedArguments = !$reflection->isInternal();
         $isInternalOptional = false;
         $internalParameter = '';
         foreach ($reflection->getParameters() as $parameter) {
@@ -178,7 +180,7 @@ final class Injector
         // Get argument by name
         if (array_key_exists($name, $arguments)) {
             if ($isVariadic && is_array($arguments[$name])) {
-                $resolvedArguments = array_merge($resolvedArguments, array_values($arguments[$name]));
+                $resolvedArguments = [...$resolvedArguments, ...array_values($arguments[$name])];
             } else {
                 $resolvedArguments[] = &$arguments[$name];
             }
@@ -191,6 +193,8 @@ final class Injector
         if ($hasType) {
             $reflectionType = $parameter->getType();
 
+            // $reflectionType may be instance of ReflectionUnionType (php8)
+            /** @phan-suppress-next-line PhanUndeclaredMethod */
             $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
             foreach ($types as $namedType) {
                 try {

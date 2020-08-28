@@ -288,7 +288,7 @@ class InjectorTest extends BaseInjectorTest
     /**
      * A values collection for a variadic argument can be passed as an array in a named parameter.
      */
-    public function testAloneScalarVariadicArgumentAnsNamedParam(): void
+    public function testAloneScalarVariadicParameterAndNamedArrayArgument(): void
     {
         $container = $this->getContainer();
 
@@ -297,6 +297,29 @@ class InjectorTest extends BaseInjectorTest
         $result = (new Injector($container))->invoke($callable, ['var' => [1, 2, 3], new stdClass()]);
 
         $this->assertSame(6, $result);
+    }
+
+    public function testAloneScalarVariadicParameterAndNamedAssocArrayArgument(): void
+    {
+        $container = $this->getContainer();
+
+        $callable = fn (string $foo, string ...$bar) => $foo . '--' . implode('-', $bar);
+
+        $result = (new Injector($container))
+            ->invoke($callable, ['foo' => 'foo', 'bar' => ['foo' => 'baz', '0' => 'fiz']]);
+
+        $this->assertSame('foo--baz-fiz', $result);
+    }
+
+    public function testAloneScalarVariadicParameterAndNamedScalarArgument(): void
+    {
+        $container = $this->getContainer();
+
+        $callable = fn (int ...$var) => array_sum($var);
+
+        $result = (new Injector($container))->invoke($callable, ['var' => 42, new stdClass()]);
+
+        $this->assertSame(42, $result);
     }
 
     /**
@@ -382,7 +405,8 @@ class InjectorTest extends BaseInjectorTest
         $result = (new Injector($container))->invoke($callable, [
             new DateTimeImmutable(),
             new DateTimeImmutable(),
-            new EngineMarkTwo()
+            new EngineMarkTwo(),
+            'named' => new EngineVAZ2101()
         ]);
 
         $this->assertSame(4, $result);
@@ -612,6 +636,15 @@ class InjectorTest extends BaseInjectorTest
     {
         $container = $this->getContainer();
         $object = (new Injector($container))->make(DateTimeImmutable::class);
+        $this->assertInstanceOf(DateTimeImmutable::class, $object);
+    }
+
+    public function testMakeInternalClassWithUnusedArguments(): void
+    {
+        $container = $this->getContainer();
+        $object = (new Injector($container))
+            ->make(DateTimeImmutable::class, ['named_param' => null, new EngineVAZ2101()]);
+
         $this->assertInstanceOf(DateTimeImmutable::class, $object);
     }
 

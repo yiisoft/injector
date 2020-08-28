@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector;
 
+use ReflectionNamedType;
+use ReflectionUnionType;
+
 abstract class ArgumentException extends \InvalidArgumentException
 {
     protected const EXCEPTION_MESSAGE = 'Something is wrong with argument "%s" when calling "%s"%s.';
@@ -26,13 +29,16 @@ abstract class ArgumentException extends \InvalidArgumentException
         $line = $reflection->getStartLine();
 
         $fileAndLine = '';
-        if (!empty($fileName) && !empty($line)) {
+        if (!empty($fileName)) {
             $fileAndLine = " in \"$fileName\" at line $line";
         }
 
         parent::__construct(sprintf(static::EXCEPTION_MESSAGE, $parameter, $method, $fileAndLine));
     }
 
+    /**
+     * @phan-suppress PhanUndeclaredClassInstanceof, PhanUndeclaredClassMethod
+     */
     private function getClosureSignature(\ReflectionFunctionAbstract $reflection): string
     {
         $closureParameters = [];
@@ -43,9 +49,15 @@ abstract class ArgumentException extends \InvalidArgumentException
         };
         foreach ($reflection->getParameters() as $parameter) {
             $parameterString = '';
-            if ($parameter->hasType()) {
+            $type = $parameter->getType();
+            if ($type instanceof ReflectionNamedType) {
                 $append($parameter->allowsNull(), '?');
-                $parameterString .= $parameter->getType()->getName() . ' ';
+                $parameterString .= $type->getName() . ' ';
+            } elseif ($type instanceof ReflectionUnionType) {
+                $parameterString .= implode('|', array_map(
+                    fn (ReflectionNamedType $r) => $r->getName(),
+                    $type->getTypes()
+                )) . ' ';
             }
             $append($parameter->isPassedByReference(), '&');
             $append($parameter->isVariadic(), '...');
