@@ -16,8 +16,8 @@ use ReflectionNamedType;
 use ReflectionParameter;
 
 /**
- * Injector is able to analyze callable dependencies based on
- * type hinting and inject them from any PSR-11 compatible container.
+ * Injector is able to analyze callable dependencies based on type hinting and
+ * inject them from any PSR-11 compatible container.
  */
 final class Injector
 {
