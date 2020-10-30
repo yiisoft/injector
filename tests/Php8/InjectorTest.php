@@ -17,7 +17,7 @@ class InjectorTest extends BaseInjectorTest
         $container = $this->getContainer();
 
         $object = (new Injector($container))->make(\SplFileObject::class, [
-            'file_name' => __FILE__,
+            'filename' => __FILE__,
             // second parameter skipped
             // third parameter skipped
             'context' => null,

@@ -184,7 +184,6 @@ final class Injector
             } else {
                 $resolvedArguments[] = &$arguments[$name];
             }
-            unset($arguments[$name]);
             return true;
         }
 
