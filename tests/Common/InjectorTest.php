@@ -483,6 +483,30 @@ class InjectorTest extends BaseInjectorTest
         $this->assertFalse($baz);
     }
 
+    public function testInvokeReferencedAndRemovedArguments(): void
+    {
+        $container = $this->getContainer();
+        $foo = new stdClass();
+        $bar = new stdClass();
+        $baz = new DateTimeImmutable();
+        $fiz = new DateTime();
+        $kus = new DateTime();
+        $callable = static fn (
+            stdClass &$foo,
+            object &$bar,
+            ?ColorInterface $null,
+            DateTimeInterface &...$dates
+        ) => func_num_args();
+
+        $args = [&$foo, &$baz, &$fiz, &$kus, 'bar' => &$bar];
+        unset($foo, $baz, $biz, $fiz, $kus, $bar);
+
+        $result = (new Injector($container))
+            ->invoke($callable, $args);
+
+        $this->assertSame(6, $result);
+    }
+
     public function testInvokeReferencedArgumentNamedVariadic(): void
     {
         $container = $this->getContainer();
@@ -494,14 +518,17 @@ class InjectorTest extends BaseInjectorTest
         };
         $foo = new DateTimeImmutable();
         $bar = new DateTimeImmutable();
+        $baz = new DateTimeImmutable();
         $result = (new Injector($container))
             ->invoke($callable, [
                 $foo,
                 &$bar,
+                &$baz,
                 new DateTime(),
             ]);
+        unset($baz);
 
-        $this->assertSame(3, $result);
+        $this->assertSame(4, $result);
         $this->assertInstanceOf(DateTimeImmutable::class, $foo);
         $this->assertFalse($bar);
     }
