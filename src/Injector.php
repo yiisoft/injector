@@ -160,7 +160,8 @@ final class Injector
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
-    private function resolveParameter(ReflectionParameter $parameter, ResolvingState $state): ?bool {
+    private function resolveParameter(ReflectionParameter $parameter, ResolvingState $state): ?bool
+    {
         $name = $parameter->getName();
         $isVariadic = $parameter->isVariadic();
         $hasType = $parameter->hasType();
