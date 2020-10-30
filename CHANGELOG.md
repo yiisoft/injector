@@ -1,5 +1,9 @@
 # Injector Change Log
 
+## 1.0.3 October 30, 2020
+
+- Bug #27: Fix PHP 8 compatibility when passing arguments by reference (roxblnfk)
+
 ## 1.0.2 August 28, 2020
 
 - Bug #19: Fix PHP 8 compatibility in ArgumentException (roxblnfk)
