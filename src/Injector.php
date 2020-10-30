@@ -123,7 +123,6 @@ final class Injector
      */
     private function resolveDependencies(ReflectionFunctionAbstract $reflection, array $arguments = []): array
     {
-        $this->checkNumericKeyArguments($reflection, $arguments);
         $state = new ResolvingState($reflection, $arguments);
 
         $isInternalOptional = false;
@@ -131,8 +130,8 @@ final class Injector
         foreach ($reflection->getParameters() as $parameter) {
             if ($isInternalOptional) {
                 // Check custom parameter definition for an internal function
-                if (array_key_exists($parameter->getName(), $state->arguments)) {
-                    throw new MissingInternalArgumentException($state->reflection, $internalParameter);
+                if ($state->hasNamedArgument($parameter->getName())) {
+                    throw new MissingInternalArgumentException($reflection, $internalParameter);
                 }
                 continue;
             }
@@ -143,14 +142,14 @@ final class Injector
             }
 
             if ($resolved === false) {
-                throw new MissingRequiredArgumentException($state->reflection, $parameter->getName());
+                throw new MissingRequiredArgumentException($reflection, $parameter->getName());
             }
             // Internal function. Parameter not resolved
             $isInternalOptional = true;
             $internalParameter = $parameter->getName();
         }
 
-        return $state->getValues();
+        return $state->getResolvedValues();
     }
 
     /**
@@ -167,13 +166,8 @@ final class Injector
         $hasType = $parameter->hasType();
         $state->disableTrailedArguments($isVariadic && $hasType);
 
-        // Get argument by name
-        if (array_key_exists($name, $state->arguments)) {
-            if ($isVariadic && is_array($state->arguments[$name])) {
-                array_walk($state->arguments[$name], [$state, 'addValue']);
-            } else {
-                $state->addValue($state->arguments[$name]);
-            }
+        // Try to resolve argument by name
+        if ($state->resolveParamByName($name, $isVariadic)) {
             return true;
         }
 
@@ -198,14 +192,14 @@ final class Injector
 
         if ($parameter->isDefaultValueAvailable()) {
             $argument = $parameter->getDefaultValue();
-            $state->addValue($argument);
+            $state->addResolvedValue($argument);
             return true;
         }
 
         if (!$parameter->isOptional()) {
             if ($hasType && $parameter->allowsNull()) {
                 $argument = null;
-                $state->addValue($argument);
+                $state->addResolvedValue($argument);
                 return true;
             }
 
@@ -241,20 +235,6 @@ final class Injector
     }
 
     /**
-     * @param ReflectionFunctionAbstract $reflection
-     * @param array $arguments
-     * @throws InvalidArgumentException
-     */
-    private function checkNumericKeyArguments(ReflectionFunctionAbstract $reflection, array $arguments): void
-    {
-        foreach ($arguments as $key => $value) {
-            if (is_int($key) && !is_object($value)) {
-                throw new InvalidArgumentException($reflection, (string)$key);
-            }
-        }
-    }
-
-    /**
      * @param ResolvingState $state
      * @param null|string $class
      * @param bool $isVariadic
@@ -263,37 +243,15 @@ final class Injector
      */
     private function resolveObjectParameter(ResolvingState $state, ?string $class, bool $isVariadic): bool
     {
-        $found = $this->findObjectArguments($state, $class, $isVariadic);
+        $found = $state->resolveParamByClass($class, $isVariadic);
         if ($found || $isVariadic) {
             return $found;
         }
         if ($class !== null) {
             $argument = $this->container->get($class);
-            $state->addValue($argument);
+            $state->addResolvedValue($argument);
             return true;
         }
         return false;
-    }
-
-    /**
-     * @param ResolvingState $state
-     * @param null|string $className Null value means objects of any class
-     * @param bool $multiple
-     * @return bool True if arguments were found
-     */
-    private function findObjectArguments(ResolvingState $state, ?string $className, bool $multiple): bool
-    {
-        $found = false;
-        foreach ($state->arguments as $key => $item) {
-            if (is_int($key) && is_object($item) && ($className === null || $item instanceof $className)) {
-                $state->addValue($state->arguments[$key]);
-                unset($state->arguments[$key]);
-                if (!$multiple) {
-                    return true;
-                }
-                $found = true;
-            }
-        }
-        return $found;
     }
 }
