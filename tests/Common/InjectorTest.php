@@ -691,6 +691,10 @@ class InjectorTest extends BaseInjectorTest
         (new Injector($container))->make(EngineInterface::class);
     }
 
+    /**
+     * If type of a variadic argument is a class and its value is not passed in parameters, then no arguments will be
+     * passed, despite the fact that the container has a corresponding value.
+     */
     public function testMakeWithVariadicFromContainer(): void
     {
         $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);

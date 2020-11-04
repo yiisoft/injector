@@ -83,7 +83,7 @@ final class ResolvingState
 
     /**
      * @param null|string $className
-     * @return Generator<int, object>
+     * @return Generator<void, object>
      */
     private function &pullNumericArg(?string $className): Generator
     {
