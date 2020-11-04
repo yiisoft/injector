@@ -95,7 +95,6 @@ final class ResolvingState
         }
     }
     /**
-     * @param ReflectionFunctionAbstract $reflection
      * @param array $arguments
      * @throws InvalidArgumentException
      */
