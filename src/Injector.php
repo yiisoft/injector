@@ -215,9 +215,6 @@ final class Injector
         if ($isVariadic) {
             return true;
         }
-
-        // Internal function with optional params
-        $state->disableTrailedArguments(true);
         return null;
     }
 
