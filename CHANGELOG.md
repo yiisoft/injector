@@ -1,9 +1,12 @@
 # Injector Change Log
 
-## 1.0.3 under development
+## 1.0.3 November 05, 2020
 
-- Bug #28: Fix injecting referenced arguments that were unset, internal refactoring (roxblnfk)
+
 - Bug #27: Fix PHP 8 compatibility when passing arguments by reference (roxblnfk)
+- Bug #28: Fix injecting referenced arguments that were unset, internal refactoring (roxblnfk)
+
+
 
 ## 1.0.2 August 28, 2020
 
