@@ -165,10 +165,10 @@ final class Injector
         $name = $parameter->getName();
         $isVariadic = $parameter->isVariadic();
         $hasType = $parameter->hasType();
-        $state->disableTrailedArguments($isVariadic && $hasType);
+        $state->disablePushTrailingArguments($isVariadic && $hasType);
 
-        // Try to resolve argument by name
-        if ($state->resolveParamByName($name, $isVariadic)) {
+        // Try to resolve parameter by name
+        if ($state->resolveParameterByName($name, $isVariadic)) {
             return true;
         }
 
@@ -241,7 +241,7 @@ final class Injector
      */
     private function resolveObjectParameter(ResolvingState $state, ?string $class, bool $isVariadic): bool
     {
-        $found = $state->resolveParamByClass($class, $isVariadic);
+        $found = $state->resolveParameterByClass($class, $isVariadic);
         if ($found || $isVariadic) {
             return $found;
         }

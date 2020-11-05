@@ -7,59 +7,63 @@ namespace Yiisoft\Injector;
 use Generator;
 use ReflectionFunctionAbstract;
 
+/**
+ * Intermediate arguments resolving data to pass around until resolving is finished.
+ * @internal
+ */
 final class ResolvingState
 {
     private ReflectionFunctionAbstract $reflection;
     /** @var array<int, object> */
-    private array $numericArgs = [];
+    private array $numericArguments = [];
     /** @var array<string, mixed> */
-    private array $namedArgs = [];
-    private bool $isPushTrailedArguments;
+    private array $namedArguments = [];
+    private bool $shouldPushTrailingArguments;
     private array $resolvedValues = [];
 
     /**
-     * @param ReflectionFunctionAbstract $reflection function reflection.
-     * @param array $arguments user arguments.
+     * @param ReflectionFunctionAbstract $reflection Function reflection.
+     * @param array $arguments User arguments.
      */
     public function __construct(ReflectionFunctionAbstract $reflection, array $arguments)
     {
         $this->reflection = $reflection;
-        $this->isPushTrailedArguments = !$reflection->isInternal();
+        $this->shouldPushTrailingArguments = !$reflection->isInternal();
         $this->sortArguments($arguments);
     }
 
     public function hasNamedArgument(string $name): bool
     {
-        return array_key_exists($name, $this->namedArgs);
+        return array_key_exists($name, $this->namedArguments);
     }
 
     /**
-     * @param bool $condition If true then trailed arguments will not be passed
+     * @param bool $condition If true then trailing arguments will not be passed.
      */
-    public function disableTrailedArguments(bool $condition): void
+    public function disablePushTrailingArguments(bool $condition): void
     {
-        $this->isPushTrailedArguments = $this->isPushTrailedArguments && !$condition;
+        $this->shouldPushTrailingArguments = $this->shouldPushTrailingArguments && !$condition;
     }
 
     public function addResolvedValue(&$value): void
     {
         $this->resolvedValues[] = &$value;
     }
-    public function resolveParamByName(string $name, bool $variadic): bool
+    public function resolveParameterByName(string $name, bool $variadic): bool
     {
-        if (!array_key_exists($name, $this->namedArgs)) {
+        if (!array_key_exists($name, $this->namedArguments)) {
             return false;
         }
-        if ($variadic && is_array($this->namedArgs[$name])) {
-            array_walk($this->namedArgs[$name], [$this, 'addResolvedValue']);
+        if ($variadic && is_array($this->namedArguments[$name])) {
+            array_walk($this->namedArguments[$name], [$this, 'addResolvedValue']);
         } else {
-            $this->addResolvedValue($this->namedArgs[$name]);
+            $this->addResolvedValue($this->namedArguments[$name]);
         }
         return true;
     }
-    public function resolveParamByClass(?string $className, bool $variadic): bool
+    public function resolveParameterByClass(?string $className, bool $variadic): bool
     {
-        $generator = $this->pullNumericArg($className);
+        $generator = $this->pullNumericArgument($className);
         if (!$variadic) {
             if (!$generator->valid()) {
                 return false;
@@ -76,8 +80,8 @@ final class ResolvingState
 
     public function getResolvedValues(): array
     {
-        return $this->isPushTrailedArguments
-            ? [...$this->resolvedValues, ...$this->numericArgs]
+        return $this->shouldPushTrailingArguments
+            ? [...$this->resolvedValues, ...$this->numericArguments]
             : $this->resolvedValues;
     }
 
@@ -85,11 +89,11 @@ final class ResolvingState
      * @param null|string $className
      * @return Generator<void, object>
      */
-    private function &pullNumericArg(?string $className): Generator
+    private function &pullNumericArgument(?string $className): Generator
     {
-        foreach ($this->numericArgs as $key => &$value) {
+        foreach ($this->numericArguments as $key => &$value) {
             if ($className === null || $value instanceof $className) {
-                unset($this->numericArgs[$key]);
+                unset($this->numericArguments[$key]);
                 yield $value;
             }
         }
@@ -105,9 +109,9 @@ final class ResolvingState
                 if (!is_object($value)) {
                     throw new InvalidArgumentException($this->reflection, (string)$key);
                 }
-                $this->numericArgs[] = &$value;
+                $this->numericArguments[] = &$value;
             } else {
-                $this->namedArgs[$key] = &$value;
+                $this->namedArguments[$key] = &$value;
             }
         }
     }
