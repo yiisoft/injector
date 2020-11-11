@@ -22,10 +22,12 @@ use ReflectionParameter;
 final class Injector
 {
     private ContainerInterface $container;
+    private bool $contextual;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, bool $contextual = true)
     {
         $this->container = $container;
+        $this->contextual = $contextual;
     }
 
     /**
@@ -110,6 +112,17 @@ final class Injector
         return new $class(...$this->resolveDependencies($reflection, $arguments));
     }
 
+    public function withContextual(bool $contextual): self
+    {
+        if ($contextual === $this->contextual) {
+            return $this;
+        }
+
+        $new = clone $this;
+        $new->contextual = $contextual;
+        return $this;
+    }
+
     /**
      * Resolve dependencies for the given function reflection object and a list of concrete arguments
      * and return array of arguments to call the function with.
@@ -182,7 +195,7 @@ final class Injector
             $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
             foreach ($types as $namedType) {
                 try {
-                    if ($this->resolveNamedType($state, $namedType, $isVariadic)) {
+                    if ($this->resolveNamedType($state, $namedType, $isVariadic, $name)) {
                         return true;
                     }
                 } catch (NotFoundExceptionInterface $e) {
@@ -222,31 +235,41 @@ final class Injector
      * @param ResolvingState $state
      * @param ReflectionNamedType $parameter
      * @param bool $isVariadic
+     * @param string $name
      * @return bool True if argument was resolved
      */
-    private function resolveNamedType(ResolvingState $state, ReflectionNamedType $parameter, bool $isVariadic): bool
+    private function resolveNamedType(ResolvingState $state, ReflectionNamedType $parameter, bool $isVariadic, string $name): bool
     {
         $type = $parameter->getName();
         $class = $parameter->isBuiltin() ? null : $type;
         $isClass = $class !== null || $type === 'object';
-        return $isClass && $this->resolveObjectParameter($state, $class, $isVariadic);
+        return $isClass && $this->resolveObjectParameter($state, $class, $isVariadic, $name);
     }
 
     /**
      * @param ResolvingState $state
      * @param null|string $class
      * @param bool $isVariadic
+     * @param string $name
      * @return bool True if argument resolved
      * @throws ContainerExceptionInterface
      */
-    private function resolveObjectParameter(ResolvingState $state, ?string $class, bool $isVariadic): bool
+    private function resolveObjectParameter(ResolvingState $state, ?string $class, bool $isVariadic, string $name): bool
     {
         $found = $state->resolveParameterByClass($class, $isVariadic);
         if ($found || $isVariadic) {
             return $found;
         }
         if ($class !== null) {
-            $argument = $this->container->get($class);
+            if ($this->contextual && $class !== ContainerInterface::class && $class !== Injector::class) {
+                try {
+                    $argument = $this->container->get("$class\$$name");
+                } catch (NotFoundExceptionInterface $e) {
+                    $argument = $this->container->get($class);
+                }
+            } else {
+                $argument = $this->container->get($class);
+            }
             $state->addResolvedValue($argument);
             return true;
         }
