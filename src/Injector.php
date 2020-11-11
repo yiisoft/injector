@@ -21,20 +21,30 @@ use ReflectionParameter;
  */
 final class Injector
 {
-    public const ID_TEMPLATE_PARAM_CLASS = '{paramClass}';
-    public const ID_TEMPLATE_PARAM_NAME = '{paramName}';
+    public const TEMPLATE_PARAM_CLASS = '{paramClass}';
+    public const TEMPLATE_PARAM_NAME = '{paramName}';
+    public const TEMPLATE_PARAM_POS = '{paramPos}';
+    public const TEMPLATE_CLASS = '{class}';
+    public const TEMPLATE_METHOD = '{functionName}';
+    public const TEMPLATE_NAMESPACE = '{namespace}';
 
     private ContainerInterface $container;
     /** @var string[] */
-    private array $idTemplates = [self::ID_TEMPLATE_PARAM_CLASS];
+    private array $idTemplates = [self::TEMPLATE_PARAM_CLASS];
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
+    /**
+     * todo comment
+     */
     public function withIdTemplates(string ...$templates): self
     {
+        if (count($templates) === 0) {
+            throw new \InvalidArgumentException('Template list cannot be empty.');
+        }
         $new = clone $this;
         $new->idTemplates = $templates;
         return $new;
@@ -194,7 +204,7 @@ final class Injector
             $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
             foreach ($types as $namedType) {
                 try {
-                    if ($this->resolveNamedType($state, $parameter, $namedType, $isVariadic)) {
+                    if ($this->resolveNamedType($state, $parameter, $namedType)) {
                         return true;
                     }
                 } catch (NotFoundExceptionInterface $e) {
@@ -232,44 +242,40 @@ final class Injector
 
     /**
      * @param ResolvingState $state
-     * @param ReflectionParameter $parametqer
+     * @param ReflectionParameter $parameter
      * @param ReflectionNamedType $namedType
      * @param bool $isVariadic
      * @return bool True if argument was resolved
      */
     private function resolveNamedType(
         ResolvingState $state,
-        ReflectionParameter $parametqer,
-        ReflectionNamedType $namedType,
-        bool $isVariadic
+        ReflectionParameter $parameter,
+        ReflectionNamedType $namedType
     ): bool {
         $type = $namedType->getName();
         $class = $namedType->isBuiltin() ? null : $type;
         $isClass = $class !== null || $type === 'object';
-        return $isClass && $this->resolveObjectParameter($state, $parametqer, $class, $isVariadic);
+        return $isClass && $this->resolveObjectParameter($state, $parameter, $class);
     }
 
     /**
      * @param ResolvingState $state
-     * @param ReflectionNamedType $parameter
+     * @param ReflectionParameter $parameter
      * @param null|string $class
-     * @param bool $isVariadic
      * @return bool True if argument resolved
      */
-    private function resolveObjectParameter(
-        ResolvingState $state,
-        ReflectionParameter $parameter,
-        ?string $class,
-        bool $isVariadic
-    ): bool {
+    private function resolveObjectParameter(ResolvingState $state, ReflectionParameter $parameter, ?string $class): bool
+    {
+        $isVariadic = $parameter->isVariadic();
         $found = $state->resolveParameterByClass($class, $isVariadic);
         if ($found || $isVariadic) {
             return $found;
         }
         if ($class !== null) {
-            $toReplace = [
-                self::ID_TEMPLATE_PARAM_NAME => $parameter->getName(),
-                self::ID_TEMPLATE_PARAM_CLASS => $class,
+            $toReplace = $state->getDataToTemplate() + [
+                self::TEMPLATE_PARAM_CLASS => $class,
+                self::TEMPLATE_PARAM_NAME => $parameter->getName(),
+                self::TEMPLATE_PARAM_POS => (string) $parameter->getPosition(),
             ];
             $left = count($this->idTemplates);
             foreach ($this->idTemplates as $template) {

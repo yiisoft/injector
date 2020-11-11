@@ -741,7 +741,7 @@ class InjectorTest extends BaseInjectorTest
         $container = $this->getContainer([]);
         $injector1 = new Injector($container);
 
-        $injector2 = $injector1->withIdTemplates(Injector::ID_TEMPLATE_PARAM_CLASS . '$');
+        $injector2 = $injector1->withIdTemplates(Injector::TEMPLATE_PARAM_CLASS . '$');
 
         $this->assertNotSame($injector1, $injector2);
     }
@@ -755,7 +755,7 @@ class InjectorTest extends BaseInjectorTest
             'param1' => $object1,
             'param2' => $object2,
         ]);
-        $injector = (new Injector($container))->withIdTemplates(Injector::ID_TEMPLATE_PARAM_NAME);
+        $injector = (new Injector($container))->withIdTemplates(Injector::TEMPLATE_PARAM_NAME);
 
         $result = $injector->invoke(fn (DateTimeInterface $param1, DateTimeInterface $param2) => [$param1, $param2]);
 
@@ -773,7 +773,7 @@ class InjectorTest extends BaseInjectorTest
             'DateTimeInterface$param2' => $object2,
         ]);
         $injector = (new Injector($container))
-            ->withIdTemplates(Injector::ID_TEMPLATE_PARAM_CLASS . '$' . Injector::ID_TEMPLATE_PARAM_NAME);
+            ->withIdTemplates(Injector::TEMPLATE_PARAM_CLASS . '$' . Injector::TEMPLATE_PARAM_NAME);
 
         $result = $injector->invoke(fn (DateTimeInterface $param1, DateTimeInterface $param2) => [$param1, $param2]);
 
@@ -792,8 +792,8 @@ class InjectorTest extends BaseInjectorTest
         ]);
         $injector = (new Injector($container))
             ->withIdTemplates(
-                Injector::ID_TEMPLATE_PARAM_CLASS . '$' . Injector::ID_TEMPLATE_PARAM_NAME,
-                Injector::ID_TEMPLATE_PARAM_CLASS,
+                Injector::TEMPLATE_PARAM_CLASS . '$' . Injector::TEMPLATE_PARAM_NAME,
+                Injector::TEMPLATE_PARAM_CLASS,
             );
 
         $result = $injector->invoke(fn (DateTimeInterface $param1, DateTimeInterface $param2) => [$param1, $param2]);
