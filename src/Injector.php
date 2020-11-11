@@ -276,6 +276,7 @@ final class Injector
                 try {
                     --$left;
                     $argument = $this->container->get(strtr($template, $toReplace));
+                    break;
                 } catch (NotFoundExceptionInterface $e) {
                     if ($left === 0) {
                         throw $e;

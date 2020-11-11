@@ -780,4 +780,25 @@ class InjectorTest extends BaseInjectorTest
         $this->assertSame($object1, $result[0]);
         $this->assertSame($object2, $result[1]);
     }
+
+    public function testIdTemplatesOrder(): void
+    {
+        $object1 = new DateTimeImmutable();
+        $object2 = new DateTimeImmutable();
+
+        $container = $this->getContainer([
+            'DateTimeInterface' => $object1,
+            'DateTimeInterface$param2' => $object2,
+        ]);
+        $injector = (new Injector($container))
+            ->withIdTemplates(
+                Injector::ID_TEMPLATE_PARAM_CLASS . '$' . Injector::ID_TEMPLATE_PARAM_NAME,
+                Injector::ID_TEMPLATE_PARAM_CLASS,
+            );
+
+        $result = $injector->invoke(fn (DateTimeInterface $param1, DateTimeInterface $param2) => [$param1, $param2]);
+
+        $this->assertSame($object1, $result[0]);
+        $this->assertSame($object2, $result[1]);
+    }
 }
