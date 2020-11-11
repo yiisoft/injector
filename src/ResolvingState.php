@@ -86,6 +86,17 @@ final class ResolvingState
             ? [...$this->resolvedValues, ...$this->numericArguments]
             : $this->resolvedValues;
     }
+    /**
+     * @return array<string, string>
+     * @phan-suppress PhanPossiblyNullTypeReturn
+     */
+    public function getDataToTemplate(): array
+    {
+        if ($this->templateData === null) {
+            $this->prepareDataToTemplate();
+        }
+        return $this->templateData;
+    }
 
     /**
      * @param null|string $className
@@ -117,23 +128,12 @@ final class ResolvingState
             }
         }
     }
-
-    /**
-     * @return array<string, string>
-     */
-    public function getDataToTemplate(): array
-    {
-        if ($this->templateData === null) {
-            $this->prepareDataToTemplate();
-        }
-        return $this->templateData;
-    }
-
     private function prepareDataToTemplate(): void
     {
         $class = $this->reflection instanceof \ReflectionMethod
             ? $this->reflection->getDeclaringClass()
             : $this->reflection->getClosureScopeClass();
+
         $this->templateData = [
             Injector::TEMPLATE_METHOD => $this->reflection->getShortName(),
             Injector::TEMPLATE_CLASS => $class === null
