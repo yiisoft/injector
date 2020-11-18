@@ -20,6 +20,8 @@ final class ResolvingState
     private array $namedArguments = [];
     private bool $shouldPushTrailingArguments;
     private array $resolvedValues = [];
+    /** @var null|array<string, string> */
+    private ?array $templateData = null;
 
     /**
      * @param ReflectionFunctionAbstract $reflection Function reflection.
@@ -84,6 +86,17 @@ final class ResolvingState
             ? [...$this->resolvedValues, ...$this->numericArguments]
             : $this->resolvedValues;
     }
+    /**
+     * @return array<string, string>
+     * @phan-suppress PhanPossiblyNullTypeReturn
+     */
+    public function getDataToTemplate(): array
+    {
+        if ($this->templateData === null) {
+            $this->prepareDataToTemplate();
+        }
+        return $this->templateData;
+    }
 
     /**
      * @param null|string $className
@@ -114,5 +127,21 @@ final class ResolvingState
                 $this->namedArguments[$key] = &$value;
             }
         }
+    }
+    private function prepareDataToTemplate(): void
+    {
+        $class = $this->reflection instanceof \ReflectionMethod
+            ? $this->reflection->getDeclaringClass()
+            : $this->reflection->getClosureScopeClass();
+
+        $this->templateData = [
+            Injector::TEMPLATE_METHOD => $this->reflection->getShortName(),
+            Injector::TEMPLATE_CLASS => $class === null
+                ? ''
+                : $class->getName(),
+            Injector::TEMPLATE_NAMESPACE => $class === null
+                ? $this->reflection->getNamespaceName()
+                : $class->getNamespaceName(),
+        ];
     }
 }

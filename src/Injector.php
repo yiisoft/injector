@@ -21,11 +21,33 @@ use ReflectionParameter;
  */
 final class Injector
 {
+    public const TEMPLATE_PARAM_CLASS = '{paramClass}';
+    public const TEMPLATE_PARAM_NAME = '{paramName}';
+    public const TEMPLATE_PARAM_POS = '{paramPos}';
+    public const TEMPLATE_CLASS = '{class}';
+    public const TEMPLATE_METHOD = '{functionName}';
+    public const TEMPLATE_NAMESPACE = '{namespace}';
+
     private ContainerInterface $container;
+    /** @var string[] */
+    private array $idTemplates = [self::TEMPLATE_PARAM_CLASS];
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+    }
+
+    /**
+     * todo comment
+     */
+    public function withIdTemplates(string ...$templates): self
+    {
+        if (count($templates) === 0) {
+            throw new \InvalidArgumentException('Template list cannot be empty.');
+        }
+        $new = clone $this;
+        $new->idTemplates = $templates;
+        return $new;
     }
 
     /**
@@ -182,7 +204,7 @@ final class Injector
             $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
             foreach ($types as $namedType) {
                 try {
-                    if ($this->resolveNamedType($state, $namedType, $isVariadic)) {
+                    if ($this->resolveNamedType($state, $parameter, $namedType)) {
                         return true;
                     }
                 } catch (NotFoundExceptionInterface $e) {
@@ -220,35 +242,68 @@ final class Injector
 
     /**
      * @param ResolvingState $state
-     * @param ReflectionNamedType $parameter
-     * @param bool $isVariadic
+     * @param ReflectionParameter $parameter
+     * @param ReflectionNamedType $namedType
      * @return bool True if argument was resolved
+     * @throws NotFoundExceptionInterface
      */
-    private function resolveNamedType(ResolvingState $state, ReflectionNamedType $parameter, bool $isVariadic): bool
-    {
-        $type = $parameter->getName();
-        $class = $parameter->isBuiltin() ? null : $type;
+    private function resolveNamedType(
+        ResolvingState $state,
+        ReflectionParameter $parameter,
+        ReflectionNamedType $namedType
+    ): bool {
+        $type = $namedType->getName();
+        $class = $namedType->isBuiltin() ? null : $type;
         $isClass = $class !== null || $type === 'object';
-        return $isClass && $this->resolveObjectParameter($state, $class, $isVariadic);
+        return $isClass && $this->resolveObjectParameter($state, $parameter, $class);
     }
 
     /**
      * @param ResolvingState $state
+     * @param ReflectionParameter $parameter
      * @param null|string $class
-     * @param bool $isVariadic
      * @return bool True if argument resolved
-     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    private function resolveObjectParameter(ResolvingState $state, ?string $class, bool $isVariadic): bool
+    private function resolveObjectParameter(ResolvingState $state, ReflectionParameter $parameter, ?string $class): bool
     {
-        $found = $state->resolveParameterByClass($class, $isVariadic);
-        if ($found || $isVariadic) {
+        $found = $state->resolveParameterByClass($class, $parameter->isVariadic());
+        if ($found || $parameter->isVariadic()) {
             return $found;
         }
+
+        // Getting from container
         if ($class !== null) {
-            $argument = $this->container->get($class);
-            $state->addResolvedValue($argument);
-            return true;
+            // Prepare marker values
+            $markerData = $state->getDataToTemplate() + [
+                self::TEMPLATE_PARAM_CLASS => $class,
+                self::TEMPLATE_PARAM_NAME => $parameter->getName(),
+                self::TEMPLATE_PARAM_POS => (string) $parameter->getPosition(),
+            ];
+            return $this->getFromContainer($state, $markerData);
+        }
+        return false;
+    }
+
+    /**
+     * @param ResolvingState $state
+     * @param array<string, string> $markerData
+     * @return bool True if argument resolved
+     * @throws NotFoundExceptionInterface
+     */
+    private function getFromContainer(ResolvingState $state, array $markerData): bool
+    {
+        $left = count($this->idTemplates);
+        foreach ($this->idTemplates as $template) {
+            try {
+                $argument = $this->container->get(strtr($template, $markerData));
+                $state->addResolvedValue($argument);
+                return true;
+            } catch (NotFoundExceptionInterface $e) {
+                if (--$left === 0) {
+                    throw $e;
+                }
+            }
         }
         return false;
     }

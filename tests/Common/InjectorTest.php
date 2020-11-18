@@ -735,4 +735,70 @@ class InjectorTest extends BaseInjectorTest
 
         (new Injector($container))->make(MakeEngineMatherWithParam::class, ['parameter' => 100500]);
     }
+
+    public function testWithIdTemplateImmutability(): void
+    {
+        $container = $this->getContainer([]);
+        $injector1 = new Injector($container);
+
+        $injector2 = $injector1->withIdTemplates(Injector::TEMPLATE_PARAM_CLASS . '$');
+
+        $this->assertNotSame($injector1, $injector2);
+    }
+
+    public function testIdTemplateParamName(): void
+    {
+        $object1 = new DateTimeImmutable();
+        $object2 = new DateTimeImmutable();
+
+        $container = $this->getContainer([
+            'param1' => $object1,
+            'param2' => $object2,
+        ]);
+        $injector = (new Injector($container))->withIdTemplates(Injector::TEMPLATE_PARAM_NAME);
+
+        $result = $injector->invoke(fn (DateTimeInterface $param1, DateTimeInterface $param2) => [$param1, $param2]);
+
+        $this->assertSame($object1, $result[0]);
+        $this->assertSame($object2, $result[1]);
+    }
+
+    public function testIdTemplateParamCassAndName(): void
+    {
+        $object1 = new DateTimeImmutable();
+        $object2 = new DateTimeImmutable();
+
+        $container = $this->getContainer([
+            'DateTimeInterface$param1' => $object1,
+            'DateTimeInterface$param2' => $object2,
+        ]);
+        $injector = (new Injector($container))
+            ->withIdTemplates(Injector::TEMPLATE_PARAM_CLASS . '$' . Injector::TEMPLATE_PARAM_NAME);
+
+        $result = $injector->invoke(fn (DateTimeInterface $param1, DateTimeInterface $param2) => [$param1, $param2]);
+
+        $this->assertSame($object1, $result[0]);
+        $this->assertSame($object2, $result[1]);
+    }
+
+    public function testIdTemplatesOrder(): void
+    {
+        $object1 = new DateTimeImmutable();
+        $object2 = new DateTimeImmutable();
+
+        $container = $this->getContainer([
+            'DateTimeInterface' => $object1,
+            'DateTimeInterface$param2' => $object2,
+        ]);
+        $injector = (new Injector($container))
+            ->withIdTemplates(
+                Injector::TEMPLATE_PARAM_CLASS . '$' . Injector::TEMPLATE_PARAM_NAME,
+                Injector::TEMPLATE_PARAM_CLASS,
+            );
+
+        $result = $injector->invoke(fn (DateTimeInterface $param1, DateTimeInterface $param2) => [$param1, $param2]);
+
+        $this->assertSame($object1, $result[0]);
+        $this->assertSame($object2, $result[1]);
+    }
 }
