@@ -36,9 +36,6 @@ abstract class ArgumentException extends \InvalidArgumentException
         parent::__construct(sprintf(static::EXCEPTION_MESSAGE, $parameter, $method, $fileAndLine));
     }
 
-    /**
-     * @phan-suppress PhanUndeclaredClassInstanceof, PhanUndeclaredClassMethod
-     */
     private function getClosureSignature(\ReflectionFunctionAbstract $reflection): string
     {
         $closureParameters = [];

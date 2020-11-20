@@ -182,7 +182,6 @@ final class Injector
             $reflectionType = $parameter->getType();
 
             // $reflectionType may be instance of ReflectionUnionType (php8)
-            /** @phan-suppress-next-line PhanUndeclaredMethod */
             $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
             foreach ($types as $namedType) {
                 try {
