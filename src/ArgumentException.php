@@ -50,6 +50,7 @@ abstract class ArgumentException extends \InvalidArgumentException
         foreach ($reflection->getParameters() as $parameter) {
             $parameterString = '';
             $type = $parameter->getType();
+            /** @psalm-suppress UndefinedClass */
             if ($type instanceof ReflectionNamedType) {
                 $append($parameter->allowsNull(), '?');
                 $parameterString .= $type->getName() . ' ';

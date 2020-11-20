@@ -52,6 +52,7 @@ final class Injector
      * @param array $arguments The array of the function arguments.
      * This can be either a list of arguments, or an associative array where keys are argument names.
      * @return mixed the callable return value.
+     * @psalm-suppress InvalidThrow
      * @throws MissingRequiredArgumentException if required argument is missing.
      * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
      * @throws ReflectionException
@@ -91,6 +92,7 @@ final class Injector
      * @param array $arguments The array of the function arguments.
      * This can be either a list of arguments, or an associative array where keys are argument names.
      * @return mixed object of the given class.
+     * @psalm-suppress InvalidThrow
      * @throws ContainerExceptionInterface
      * @throws MissingRequiredArgumentException|InvalidArgumentException
      * @throws ReflectionException
@@ -117,6 +119,7 @@ final class Injector
      * @param ReflectionFunctionAbstract $reflection function reflection.
      * @param array $arguments concrete arguments.
      * @return array resolved arguments.
+     * @psalm-suppress InvalidThrow
      * @throws ContainerExceptionInterface
      * @throws MissingRequiredArgumentException|InvalidArgumentException
      * @throws ReflectionException
@@ -157,6 +160,7 @@ final class Injector
      * @param ResolvingState $state
      * @return null|bool True if argument resolved; False if not resolved; Null if parameter is optional but without
      * default value in a Reflection object. This is possible for internal functions.
+     * @psalm-suppress InvalidThrow
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      */
@@ -237,6 +241,7 @@ final class Injector
      * @param null|string $class
      * @param bool $isVariadic
      * @return bool True if argument resolved
+     * @psalm-suppress InvalidThrow
      * @throws ContainerExceptionInterface
      */
     private function resolveObjectParameter(ResolvingState $state, ?string $class, bool $isVariadic): bool
