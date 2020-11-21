@@ -9,6 +9,7 @@ class MakeEngineMatherWithParam
     public EngineInterface $engine1;
     public EngineInterface $engine2;
     public string $parameter;
+
     public function __construct(string $parameter, EngineInterface $engine1, EngineInterface $engine2)
     {
         $this->engine1 = $engine1;

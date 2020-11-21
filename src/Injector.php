@@ -51,11 +51,13 @@ final class Injector
      * @param callable $callable callable to be invoked.
      * @param array $arguments The array of the function arguments.
      * This can be either a list of arguments, or an associative array where keys are argument names.
-     * @return mixed the callable return value.
-     * @psalm-suppress InvalidThrow
+     *
      * @throws MissingRequiredArgumentException if required argument is missing.
      * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
      * @throws ReflectionException
+     *
+     * @return mixed the callable return value.
+     * @psalm-suppress InvalidThrow
      */
     public function invoke(callable $callable, array $arguments = [])
     {
@@ -91,11 +93,13 @@ final class Injector
      * @param string $class name of the class to be created.
      * @param array $arguments The array of the function arguments.
      * This can be either a list of arguments, or an associative array where keys are argument names.
+     *
+     * @throws ContainerExceptionInterface
+     * @throws InvalidArgumentException|MissingRequiredArgumentException
+     * @throws ReflectionException
+     *
      * @return mixed object of the given class.
      * @psalm-suppress InvalidThrow
-     * @throws ContainerExceptionInterface
-     * @throws MissingRequiredArgumentException|InvalidArgumentException
-     * @throws ReflectionException
      */
     public function make(string $class, array $arguments = [])
     {
@@ -118,11 +122,13 @@ final class Injector
      *
      * @param ReflectionFunctionAbstract $reflection function reflection.
      * @param array $arguments concrete arguments.
+     *
+     * @throws ContainerExceptionInterface
+     * @throws InvalidArgumentException|MissingRequiredArgumentException
+     * @throws ReflectionException
+     *
      * @return array resolved arguments.
      * @psalm-suppress InvalidThrow
-     * @throws ContainerExceptionInterface
-     * @throws MissingRequiredArgumentException|InvalidArgumentException
-     * @throws ReflectionException
      */
     private function resolveDependencies(ReflectionFunctionAbstract $reflection, array $arguments = []): array
     {
@@ -158,11 +164,13 @@ final class Injector
     /**
      * @param ReflectionParameter $parameter
      * @param ResolvingState $state
-     * @return null|bool True if argument resolved; False if not resolved; Null if parameter is optional but without
-     * default value in a Reflection object. This is possible for internal functions.
-     * @psalm-suppress InvalidThrow
+     *
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
+     *
+     * @return bool|null True if argument resolved; False if not resolved; Null if parameter is optional but without
+     * default value in a Reflection object. This is possible for internal functions.
+     * @psalm-suppress InvalidThrow
      */
     private function resolveParameter(ReflectionParameter $parameter, ResolvingState $state): ?bool
     {
@@ -225,6 +233,7 @@ final class Injector
      * @param ResolvingState $state
      * @param ReflectionNamedType $parameter
      * @param bool $isVariadic
+     *
      * @return bool True if argument was resolved
      */
     private function resolveNamedType(ResolvingState $state, ReflectionNamedType $parameter, bool $isVariadic): bool
@@ -237,11 +246,13 @@ final class Injector
 
     /**
      * @param ResolvingState $state
-     * @param null|string $class
+     * @param string|null $class
      * @param bool $isVariadic
+     *
+     * @throws ContainerExceptionInterface
+     *
      * @return bool True if argument resolved
      * @psalm-suppress InvalidThrow
-     * @throws ContainerExceptionInterface
      */
     private function resolveObjectParameter(ResolvingState $state, ?string $class, bool $isVariadic): bool
     {

@@ -15,8 +15,8 @@ use Yiisoft\Injector\MissingRequiredArgumentException;
 use Yiisoft\Injector\Tests\Common\Support\ColorInterface;
 use Yiisoft\Injector\Tests\Common\Support\EngineInterface;
 use Yiisoft\Injector\Tests\Common\Support\EngineMarkTwo;
-use Yiisoft\Injector\Tests\Common\Support\EngineZIL130;
 use Yiisoft\Injector\Tests\Common\Support\EngineVAZ2101;
+use Yiisoft\Injector\Tests\Common\Support\EngineZIL130;
 use Yiisoft\Injector\Tests\Common\Support\Invokeable;
 use Yiisoft\Injector\Tests\Common\Support\LightEngine;
 use Yiisoft\Injector\Tests\Common\Support\MakeEmptyConstructor;
@@ -75,6 +75,7 @@ class InjectorTest extends BaseInjectorTest
         $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
         $class = new class() {
             public EngineInterface $engine;
+
             public function setEngine(EngineInterface $engine): void
             {
                 $this->engine = $engine;
@@ -406,7 +407,7 @@ class InjectorTest extends BaseInjectorTest
             new DateTimeImmutable(),
             new DateTimeImmutable(),
             new EngineMarkTwo(),
-            'named' => new EngineVAZ2101()
+            'named' => new EngineVAZ2101(),
         ]);
 
         $this->assertSame(4, $result);

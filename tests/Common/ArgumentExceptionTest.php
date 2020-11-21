@@ -13,7 +13,6 @@ use Yiisoft\Injector\Tests\Common\Support\MakeEngineMatherWithParam;
 
 function testFunction(): void
 {
-    return;
 }
 
 abstract class ArgumentExceptionTest extends TestCase
@@ -28,6 +27,7 @@ abstract class ArgumentExceptionTest extends TestCase
 
         $this->assertStringContainsString("{$class}::__construct", $exception->getMessage());
     }
+
     public function testMethodReflection(): void
     {
         $class = EngineVAZ2101::class;
@@ -39,6 +39,7 @@ abstract class ArgumentExceptionTest extends TestCase
         $this->assertStringContainsString("{$class}::{$method}", $exception->getMessage());
         $this->assertStringContainsString('index', $exception->getMessage());
     }
+
     public function testSimpleClosureReflection(): void
     {
         $functionLine = __LINE__ + 1;
@@ -49,6 +50,7 @@ abstract class ArgumentExceptionTest extends TestCase
         $this->assertStringContainsString(' at line ' . $functionLine, $exception->getMessage());
         $this->assertStringContainsString('toInverse', $exception->getMessage());
     }
+
     public function testRichClosureReflection(): void
     {
         $reflection = new \ReflectionFunction(static function (
@@ -80,6 +82,7 @@ abstract class ArgumentExceptionTest extends TestCase
             . ' &...$variadic'
         . ')', $exception->getMessage());
     }
+
     public function testInternalStaticCallableReflection(): void
     {
         $callable = \Closure::fromCallable('\DateTimeImmutable::createFromMutable');
@@ -89,6 +92,7 @@ abstract class ArgumentExceptionTest extends TestCase
         $this->assertStringContainsString('createFromMutable', $exception->getMessage());
         $this->assertStringContainsString('anyParameter', $exception->getMessage());
     }
+
     public function testInternalFunctionReflection(): void
     {
         $reflection = new \ReflectionFunction('\\array_map');
@@ -98,6 +102,7 @@ abstract class ArgumentExceptionTest extends TestCase
         $this->assertStringNotContainsString('\\array_map', $exception->getMessage());
         $this->assertStringContainsString('anyParameter', $exception->getMessage());
     }
+
     public function testUserFunctionInNameSpaceReflection(): void
     {
         $reflection = new \ReflectionFunction(__NAMESPACE__ . '\\testFunction');

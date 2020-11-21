@@ -9,6 +9,7 @@ use ReflectionFunctionAbstract;
 
 /**
  * Intermediate arguments resolving data to pass around until resolving is finished.
+ *
  * @internal
  */
 final class ResolvingState
@@ -49,6 +50,7 @@ final class ResolvingState
     {
         $this->resolvedValues[] = &$value;
     }
+
     public function resolveParameterByName(string $name, bool $variadic): bool
     {
         if (!array_key_exists($name, $this->namedArguments)) {
@@ -61,6 +63,7 @@ final class ResolvingState
         }
         return true;
     }
+
     public function resolveParameterByClass(?string $className, bool $variadic): bool
     {
         $generator = $this->pullNumericArgument($className);
@@ -86,7 +89,8 @@ final class ResolvingState
     }
 
     /**
-     * @param null|string $className
+     * @param string|null $className
+     *
      * @return Generator<void, object>
      */
     private function &pullNumericArgument(?string $className): Generator
@@ -98,8 +102,10 @@ final class ResolvingState
             }
         }
     }
+
     /**
      * @param array $arguments
+     *
      * @throws InvalidArgumentException
      */
     private function sortArguments(array $arguments): void

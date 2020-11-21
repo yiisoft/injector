@@ -14,10 +14,12 @@ abstract class BaseInjectorTest extends TestCase
     {
         return new class($definitions) implements ContainerInterface {
             private array $definitions;
+
             public function __construct(array $definitions = [])
             {
                 $this->definitions = $definitions;
             }
+
             public function get($id)
             {
                 if (!$this->has($id)) {
@@ -26,6 +28,7 @@ abstract class BaseInjectorTest extends TestCase
                 }
                 return $this->definitions[$id];
             }
+
             public function has($id)
             {
                 return array_key_exists($id, $this->definitions);
