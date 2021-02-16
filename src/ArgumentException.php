@@ -53,7 +53,7 @@ abstract class ArgumentException extends \InvalidArgumentException
                 $parameterString .= $type->getName() . ' ';
             } elseif ($type instanceof ReflectionUnionType) {
                 $parameterString .= implode('|', array_map(
-                    fn (ReflectionNamedType $r) => $r->getName(),
+                    static fn (ReflectionNamedType $r) => $r->getName(),
                     $type->getTypes()
                 )) . ' ';
             }
