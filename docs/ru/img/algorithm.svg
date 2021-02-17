@@ -100,7 +100,7 @@
     </g>
     <g text-rendering="geometricPrecision" stroke-miterlimit="1.45" shape-rendering="geometricPrecision" font-family="sans-serif" transform="matrix(1,0,0,1,-292,19)" stroke-linecap="butt">
       <text x="647.0264" xml:space="preserve" y="139.3633" clip-path="url(#clipPath2)" stroke="none">Ключ $arguments</text>
-      <text x="619.458" xml:space="preserve" y="154.0645" clip-path="url(#clipPath2)" stroke="none">содержим имя параметра?</text>
+      <text x="619.458" xml:space="preserve" y="154.0645" clip-path="url(#clipPath2)" stroke="none">содержит имя параметра?</text>
     </g>
     <g fill="url(#linearGradient3)" text-rendering="geometricPrecision" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,-292,19)" stroke="url(#linearGradient3)">
       <path d="M695 363 L788.5 402 L695 441 L601.5 402 Z" stroke="none" clip-path="url(#clipPath2)"/>
