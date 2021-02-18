@@ -46,6 +46,9 @@ final class ResolvingState
         $this->shouldPushTrailingArguments = $this->shouldPushTrailingArguments && !$condition;
     }
 
+    /**
+     * @param mixed $value
+     */
     public function addResolvedValue(&$value): void
     {
         $this->resolvedValues[] = &$value;
