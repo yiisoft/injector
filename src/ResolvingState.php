@@ -67,6 +67,9 @@ final class ResolvingState
         return true;
     }
 
+    /**
+     * @psalm-param class-string|null $className
+     */
     public function resolveParameterByClass(?string $className, bool $variadic): bool
     {
         $generator = $this->pullNumericArgument($className);
@@ -92,9 +95,9 @@ final class ResolvingState
     }
 
     /**
-     * @param string|null $className
+     * @psalm-param class-string|null $className
      *
-     * @return Generator<int, object, mixed, void>
+     * @psalm-return Generator<int, object, mixed, void>
      */
     private function &pullNumericArgument(?string $className): Generator
     {

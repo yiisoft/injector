@@ -245,15 +245,14 @@ final class Injector
     private function resolveNamedType(ResolvingState $state, ReflectionNamedType $parameter, bool $isVariadic): bool
     {
         $type = $parameter->getName();
+        /** @psalm-var class-string|null $class */
         $class = $parameter->isBuiltin() ? null : $type;
         $isClass = $class !== null || $type === 'object';
         return $isClass && $this->resolveObjectParameter($state, $class, $isVariadic);
     }
 
     /**
-     * @param ResolvingState $state
-     * @param string|null $class
-     * @param bool $isVariadic
+     * @psalm-param class-string|null $class
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
