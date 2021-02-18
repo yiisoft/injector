@@ -193,7 +193,11 @@ final class Injector
             $reflectionType = $parameter->getType();
 
             // $reflectionType may be instance of ReflectionUnionType (php8)
-            $types = $reflectionType instanceof ReflectionUnionType ? $reflectionType->getTypes() : [$reflectionType];
+            /**
+             * @psalm-suppress UndefinedMethod
+             * @psalm-suppress PossiblyNullReference
+             */
+            $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
             foreach ($types as $namedType) {
                 try {
                     if ($this->resolveNamedType($state, $namedType, $isVariadic)) {
