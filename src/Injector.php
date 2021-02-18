@@ -161,9 +161,6 @@ final class Injector
     }
 
     /**
-     * @param ReflectionParameter $parameter
-     * @param ResolvingState $state
-     *
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      *
@@ -233,10 +230,6 @@ final class Injector
     }
 
     /**
-     * @param ResolvingState $state
-     * @param ReflectionNamedType $parameter
-     * @param bool $isVariadic
-     *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      *
