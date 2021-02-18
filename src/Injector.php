@@ -14,6 +14,7 @@ use ReflectionFunction;
 use ReflectionFunctionAbstract;
 use ReflectionNamedType;
 use ReflectionParameter;
+use ReflectionUnionType;
 
 /**
  * Injector is able to analyze callable dependencies based on type hinting and
@@ -192,13 +193,8 @@ final class Injector
             $reflectionType = $parameter->getType();
 
             // $reflectionType may be instance of ReflectionUnionType (php8)
-            /**
-             * @psalm-suppress UndefinedMethod
-             * @psalm-suppress PossiblyNullReference
-             */
-            $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
+            $types = $reflectionType instanceof ReflectionUnionType ? $reflectionType->getTypes() : [$reflectionType];
             foreach ($types as $namedType) {
-                /** @psalm-suppress InvalidCatch */
                 try {
                     if ($this->resolveNamedType($state, $namedType, $isVariadic)) {
                         return true;
@@ -241,6 +237,9 @@ final class Injector
      * @param ReflectionNamedType $parameter
      * @param bool $isVariadic
      *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     *
      * @return bool True if argument was resolved
      */
     private function resolveNamedType(ResolvingState $state, ReflectionNamedType $parameter, bool $isVariadic): bool
@@ -257,9 +256,9 @@ final class Injector
      * @param bool $isVariadic
      *
      * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      *
      * @return bool True if argument resolved
-     * @psalm-suppress InvalidThrow
      */
     private function resolveObjectParameter(ResolvingState $state, ?string $class, bool $isVariadic): bool
     {
