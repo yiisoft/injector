@@ -46,11 +46,8 @@ abstract class ArgumentException extends \InvalidArgumentException
         };
         foreach ($reflection->getParameters() as $parameter) {
             $parameterString = '';
+            /** @var ReflectionNamedType|ReflectionUnionType|null $type */
             $type = $parameter->getType();
-            /**
-             * @psalm-suppress TypeDoesNotContainType
-             * @psalm-suppress UndefinedClass
-             */
             if ($type instanceof ReflectionNamedType) {
                 $append($parameter->allowsNull(), '?');
                 $parameterString .= $type->getName() . ' ';

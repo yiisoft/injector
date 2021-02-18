@@ -25,5 +25,15 @@
                 <referencedClass name="Psr\Container\NotFoundExceptionInterface" />
             </errorLevel>
         </InvalidCatch>
+        <UndefinedClass>
+            <errorLevel type="suppress">
+                <referencedClass name="ReflectionUnionType" />
+            </errorLevel>
+        </UndefinedClass>
+        <UndefinedDocblockClass>
+            <errorLevel type="suppress">
+                <referencedClass name="ReflectionUnionType" />
+            </errorLevel>
+        </UndefinedDocblockClass>
     </issueHandlers>
 </psalm>

@@ -14,6 +14,7 @@ use ReflectionFunction;
 use ReflectionFunctionAbstract;
 use ReflectionNamedType;
 use ReflectionParameter;
+use ReflectionUnionType;
 
 /**
  * Injector is able to analyze callable dependencies based on type hinting and
@@ -182,14 +183,10 @@ final class Injector
         $error = null;
 
         if ($hasType) {
+            /** @var ReflectionNamedType|ReflectionUnionType|null $reflectionType */
             $reflectionType = $parameter->getType();
 
-            /**
-             * $reflectionType may be instance of ReflectionUnionType (php8)
-             *
-             * @psalm-suppress UndefinedMethod
-             * @psalm-suppress PossiblyNullReference
-             */
+            /** @psalm-suppress PossiblyNullReference */
             $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
             foreach ($types as $namedType) {
                 try {
