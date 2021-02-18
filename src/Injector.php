@@ -57,7 +57,6 @@ final class Injector
      * @throws ReflectionException
      *
      * @return mixed the callable return value.
-     * @psalm-suppress InvalidThrow
      */
     public function invoke(callable $callable, array $arguments = [])
     {
@@ -101,7 +100,6 @@ final class Injector
      * @throws ReflectionException
      *
      * @return mixed object of the given class.
-     * @psalm-suppress InvalidThrow
      */
     public function make(string $class, array $arguments = [])
     {
@@ -130,7 +128,6 @@ final class Injector
      * @throws ReflectionException
      *
      * @return array resolved arguments.
-     * @psalm-suppress InvalidThrow
      */
     private function resolveDependencies(ReflectionFunctionAbstract $reflection, array $arguments = []): array
     {
@@ -172,7 +169,6 @@ final class Injector
      *
      * @return bool|null True if argument resolved; False if not resolved; Null if parameter is optional but without
      * default value in a Reflection object. This is possible for internal functions.
-     * @psalm-suppress InvalidThrow
      */
     private function resolveParameter(ReflectionParameter $parameter, ResolvingState $state): ?bool
     {
@@ -191,8 +187,9 @@ final class Injector
         if ($hasType) {
             $reflectionType = $parameter->getType();
 
-            // $reflectionType may be instance of ReflectionUnionType (php8)
             /**
+             * $reflectionType may be instance of ReflectionUnionType (php8)
+             *
              * @psalm-suppress UndefinedMethod
              * @psalm-suppress PossiblyNullReference
              */
@@ -225,7 +222,7 @@ final class Injector
                 return false;
             }
 
-            // Throw container exception
+            // Throw NotFoundExceptionInterface
             throw $error;
         }
 
