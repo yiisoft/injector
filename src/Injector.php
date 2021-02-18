@@ -92,6 +92,7 @@ final class Injector
      *
      * @param string $class name of the class to be created.
      * @psalm-param class-string $class
+     *
      * @param array $arguments The array of the function arguments.
      * This can be either a list of arguments, or an associative array where keys are argument names.
      *
