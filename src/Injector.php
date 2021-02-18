@@ -91,6 +91,7 @@ final class Injector
      * by the DI container as the second argument.
      *
      * @param string $class name of the class to be created.
+     * @psalm-param class-string $class
      * @param array $arguments The array of the function arguments.
      * This can be either a list of arguments, or an associative array where keys are argument names.
      *
@@ -190,8 +191,13 @@ final class Injector
             $reflectionType = $parameter->getType();
 
             // $reflectionType may be instance of ReflectionUnionType (php8)
+            /**
+             * @psalm-suppress UndefinedMethod
+             * @psalm-suppress PossiblyNullReference
+             */
             $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
             foreach ($types as $namedType) {
+                /** @psalm-suppress InvalidCatch */
                 try {
                     if ($this->resolveNamedType($state, $namedType, $isVariadic)) {
                         return true;
