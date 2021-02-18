@@ -14,7 +14,6 @@ use ReflectionFunction;
 use ReflectionFunctionAbstract;
 use ReflectionNamedType;
 use ReflectionParameter;
-use ReflectionUnionType;
 
 /**
  * Injector is able to analyze callable dependencies based on type hinting and
