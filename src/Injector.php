@@ -101,6 +101,8 @@ final class Injector
      * @throws ReflectionException
      *
      * @return mixed object of the given class.
+     *
+     * @psalm-suppress MixedMethodCall
      */
     public function make(string $class, array $arguments = [])
     {
@@ -111,11 +113,9 @@ final class Injector
         $reflection = $classReflection->getConstructor();
         if ($reflection === null) {
             // Method __construct() does not exist
-            /** @psalm-suppress MixedMethodCall */
             return new $class();
         }
 
-        /** @psalm-suppress MixedMethodCall */
         return new $class(...$this->resolveDependencies($reflection, $arguments));
     }
 
@@ -263,7 +263,7 @@ final class Injector
             return $found;
         }
         if ($class !== null) {
-            /** @var object $argument */
+            /** @var mixed $argument */
             $argument = $this->container->get($class);
             $state->addResolvedValue($argument);
             return true;
