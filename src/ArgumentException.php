@@ -14,6 +14,7 @@ abstract class ArgumentException extends \InvalidArgumentException
     public function __construct(\ReflectionFunctionAbstract $reflection, string $parameter)
     {
         $function = $reflection->getName();
+        /** @psalm-var class-string|null $class */
         $class = $reflection->class ?? null;
 
         if ($class === null) {
@@ -41,6 +42,7 @@ abstract class ArgumentException extends \InvalidArgumentException
         $closureParameters = [];
         $append = static function (bool $condition, string $postfix) use (&$parameterString): void {
             if ($condition) {
+                /** @var string $parameterString */
                 $parameterString .= $postfix;
             }
         };
@@ -50,15 +52,19 @@ abstract class ArgumentException extends \InvalidArgumentException
             $type = $parameter->getType();
             if ($type instanceof ReflectionNamedType) {
                 $append($parameter->allowsNull(), '?');
+                /** @var string $parameterString */
                 $parameterString .= $type->getName() . ' ';
             } elseif ($type instanceof ReflectionUnionType) {
+                /** @var ReflectionNamedType[] */
+                $types = $type->getTypes();
                 $parameterString .= implode('|', array_map(
                     static fn (ReflectionNamedType $r) => $r->getName(),
-                    $type->getTypes()
+                    $types
                 )) . ' ';
             }
             $append($parameter->isPassedByReference(), '&');
             $append($parameter->isVariadic(), '...');
+            /** @var string $parameterString */
             $parameterString .= '$' . $parameter->name;
             if ($parameter->isDefaultValueAvailable()) {
                 $parameterString .= ' = ' . var_export($parameter->getDefaultValue(), true);

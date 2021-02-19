@@ -111,9 +111,11 @@ final class Injector
         $reflection = $classReflection->getConstructor();
         if ($reflection === null) {
             // Method __construct() does not exist
+            /** @psalm-suppress MixedMethodCall */
             return new $class();
         }
 
+        /** @psalm-suppress MixedMethodCall */
         return new $class(...$this->resolveDependencies($reflection, $arguments));
     }
 
@@ -186,7 +188,10 @@ final class Injector
             /** @var ReflectionNamedType|ReflectionUnionType|null $reflectionType */
             $reflectionType = $parameter->getType();
 
-            /** @psalm-suppress PossiblyNullReference */
+            /**
+             * @psalm-suppress PossiblyNullReference
+             * @var ReflectionNamedType[] $types
+             */
             $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
             foreach ($types as $namedType) {
                 try {
@@ -200,6 +205,7 @@ final class Injector
         }
 
         if ($parameter->isDefaultValueAvailable()) {
+            /** @var mixed $argument */
             $argument = $parameter->getDefaultValue();
             $state->addResolvedValue($argument);
             return true;
@@ -256,6 +262,7 @@ final class Injector
             return $found;
         }
         if ($class !== null) {
+            /** @var object $argument */
             $argument = $this->container->get($class);
             $state->addResolvedValue($argument);
             return true;
