@@ -190,6 +190,7 @@ final class Injector
 
             /**
              * @psalm-suppress PossiblyNullReference
+             *
              * @var ReflectionNamedType[] $types
              */
             $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
