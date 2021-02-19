@@ -14,6 +14,7 @@ abstract class ArgumentException extends \InvalidArgumentException
     public function __construct(\ReflectionFunctionAbstract $reflection, string $parameter)
     {
         $function = $reflection->getName();
+        /** @psalm-var class-string|null $class */
         $class = $reflection->class ?? null;
 
         if ($class === null) {
@@ -33,32 +34,34 @@ abstract class ArgumentException extends \InvalidArgumentException
             $fileAndLine = " in \"$fileName\" at line $line";
         }
 
-        parent::__construct(sprintf(static::EXCEPTION_MESSAGE, $parameter, $method, $fileAndLine));
+        parent::__construct(sprintf((string)static::EXCEPTION_MESSAGE, $parameter, $method, $fileAndLine));
     }
 
     private function getClosureSignature(\ReflectionFunctionAbstract $reflection): string
     {
         $closureParameters = [];
-        $append = static function (bool $condition, string $postfix) use (&$parameterString): void {
+        $append = static function (string &$parameterString, bool $condition, string $postfix): void {
             if ($condition) {
                 $parameterString .= $postfix;
             }
         };
         foreach ($reflection->getParameters() as $parameter) {
             $parameterString = '';
+            /** @var ReflectionNamedType|ReflectionUnionType|null $type */
             $type = $parameter->getType();
-            /** @psalm-suppress UndefinedClass */
             if ($type instanceof ReflectionNamedType) {
-                $append($parameter->allowsNull(), '?');
+                $append($parameterString, $parameter->allowsNull(), '?');
                 $parameterString .= $type->getName() . ' ';
             } elseif ($type instanceof ReflectionUnionType) {
+                /** @var ReflectionNamedType[] $types */
+                $types = $type->getTypes();
                 $parameterString .= implode('|', array_map(
                     static fn (ReflectionNamedType $r) => $r->getName(),
-                    $type->getTypes()
+                    $types
                 )) . ' ';
             }
-            $append($parameter->isPassedByReference(), '&');
-            $append($parameter->isVariadic(), '...');
+            $append($parameterString, $parameter->isPassedByReference(), '&');
+            $append($parameterString, $parameter->isVariadic(), '...');
             $parameterString .= '$' . $parameter->name;
             if ($parameter->isDefaultValueAvailable()) {
                 $parameterString .= ' = ' . var_export($parameter->getDefaultValue(), true);

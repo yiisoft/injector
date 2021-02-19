@@ -14,6 +14,7 @@ use ReflectionFunction;
 use ReflectionFunctionAbstract;
 use ReflectionNamedType;
 use ReflectionParameter;
+use ReflectionUnionType;
 
 /**
  * Injector is able to analyze callable dependencies based on type hinting and
@@ -57,7 +58,6 @@ final class Injector
      * @throws ReflectionException
      *
      * @return mixed the callable return value.
-     * @psalm-suppress InvalidThrow
      */
     public function invoke(callable $callable, array $arguments = [])
     {
@@ -91,6 +91,8 @@ final class Injector
      * by the DI container as the second argument.
      *
      * @param string $class name of the class to be created.
+     * @psalm-param class-string $class
+     *
      * @param array $arguments The array of the function arguments.
      * This can be either a list of arguments, or an associative array where keys are argument names.
      *
@@ -99,7 +101,8 @@ final class Injector
      * @throws ReflectionException
      *
      * @return mixed object of the given class.
-     * @psalm-suppress InvalidThrow
+     *
+     * @psalm-suppress MixedMethodCall
      */
     public function make(string $class, array $arguments = [])
     {
@@ -128,7 +131,6 @@ final class Injector
      * @throws ReflectionException
      *
      * @return array resolved arguments.
-     * @psalm-suppress InvalidThrow
      */
     private function resolveDependencies(ReflectionFunctionAbstract $reflection, array $arguments = []): array
     {
@@ -162,15 +164,11 @@ final class Injector
     }
 
     /**
-     * @param ReflectionParameter $parameter
-     * @param ResolvingState $state
-     *
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      *
      * @return bool|null True if argument resolved; False if not resolved; Null if parameter is optional but without
      * default value in a Reflection object. This is possible for internal functions.
-     * @psalm-suppress InvalidThrow
      */
     private function resolveParameter(ReflectionParameter $parameter, ResolvingState $state): ?bool
     {
@@ -187,9 +185,14 @@ final class Injector
         $error = null;
 
         if ($hasType) {
+            /** @var ReflectionNamedType|ReflectionUnionType|null $reflectionType */
             $reflectionType = $parameter->getType();
 
-            // $reflectionType may be instance of ReflectionUnionType (php8)
+            /**
+             * @psalm-suppress PossiblyNullReference
+             *
+             * @var ReflectionNamedType[] $types
+             */
             $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
             foreach ($types as $namedType) {
                 try {
@@ -203,6 +206,7 @@ final class Injector
         }
 
         if ($parameter->isDefaultValueAvailable()) {
+            /** @var mixed $argument */
             $argument = $parameter->getDefaultValue();
             $state->addResolvedValue($argument);
             return true;
@@ -219,7 +223,7 @@ final class Injector
                 return false;
             }
 
-            // Throw container exception
+            // Throw NotFoundExceptionInterface
             throw $error;
         }
 
@@ -230,29 +234,27 @@ final class Injector
     }
 
     /**
-     * @param ResolvingState $state
-     * @param ReflectionNamedType $parameter
-     * @param bool $isVariadic
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      *
      * @return bool True if argument was resolved
      */
     private function resolveNamedType(ResolvingState $state, ReflectionNamedType $parameter, bool $isVariadic): bool
     {
         $type = $parameter->getName();
+        /** @psalm-var class-string|null $class */
         $class = $parameter->isBuiltin() ? null : $type;
         $isClass = $class !== null || $type === 'object';
         return $isClass && $this->resolveObjectParameter($state, $class, $isVariadic);
     }
 
     /**
-     * @param ResolvingState $state
-     * @param string|null $class
-     * @param bool $isVariadic
+     * @psalm-param class-string|null $class
      *
      * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      *
      * @return bool True if argument resolved
-     * @psalm-suppress InvalidThrow
      */
     private function resolveObjectParameter(ResolvingState $state, ?string $class, bool $isVariadic): bool
     {
@@ -261,6 +263,7 @@ final class Injector
             return $found;
         }
         if ($class !== null) {
+            /** @var mixed $argument */
             $argument = $this->container->get($class);
             $state->addResolvedValue($argument);
             return true;

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <psalm
-    errorLevel="7"
+    errorLevel="1"
     resolveFromConfigFile="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
@@ -12,4 +12,28 @@
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
+    <issueHandlers>
+        <InvalidThrow>
+            <errorLevel type="suppress">
+                <referencedClass name="Psr\Container\ContainerExceptionInterface" />
+                <referencedClass name="Psr\Container\NotFoundExceptionInterface" />
+            </errorLevel>
+        </InvalidThrow>
+        <InvalidCatch>
+            <errorLevel type="suppress">
+                <referencedClass name="Psr\Container\ContainerExceptionInterface" />
+                <referencedClass name="Psr\Container\NotFoundExceptionInterface" />
+            </errorLevel>
+        </InvalidCatch>
+        <UndefinedClass>
+            <errorLevel type="suppress">
+                <referencedClass name="ReflectionUnionType" />
+            </errorLevel>
+        </UndefinedClass>
+        <UndefinedDocblockClass>
+            <errorLevel type="suppress">
+                <referencedClass name="ReflectionUnionType" />
+            </errorLevel>
+        </UndefinedDocblockClass>
+    </issueHandlers>
 </psalm>
