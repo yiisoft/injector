@@ -29,7 +29,7 @@ abstract class BaseInjectorTest extends TestCase
                 return $this->definitions[$id];
             }
 
-            public function has($id)
+            public function has($id): bool
             {
                 return array_key_exists($id, $this->definitions);
             }
