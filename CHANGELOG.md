@@ -1,7 +1,7 @@
 # Injector Change Log
 
 
-## 1.0.4 March 05, 2021
+## 1.0.4 under development
 
 - Enh #46: Support PSR Container v1.1 and v2.0 (roxblnfk)
 
