@@ -23,6 +23,7 @@ use ReflectionUnionType;
 final class Injector
 {
     private ContainerInterface $container;
+    private array $reflectionsCache = [];
 
     public function __construct(ContainerInterface $container)
     {
@@ -106,7 +107,7 @@ final class Injector
      */
     public function make(string $class, array $arguments = [])
     {
-        $classReflection = new ReflectionClass($class);
+        $classReflection = $this->reflectionsCache[$class] ??= new ReflectionClass($class);
         if (!$classReflection->isInstantiable()) {
             throw new \InvalidArgumentException("Class $class is not instantiable.");
         }
