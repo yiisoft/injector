@@ -15,11 +15,22 @@ use ReflectionFunctionAbstract;
 final class ResolvingState
 {
     private ReflectionFunctionAbstract $reflection;
-    /** @var array<int, object> */
+
+    /**
+     * @psalm-var array<int, object>
+     */
     private array $numericArguments = [];
-    /** @var array<string, mixed> */
+
+    /**
+     * @psalm-var array<string, mixed>
+     */
     private array $namedArguments = [];
+
     private bool $shouldPushTrailingArguments;
+
+    /**
+     * @psalm-var list<mixed>
+     */
     private array $resolvedValues = [];
 
     /**
