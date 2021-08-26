@@ -23,6 +23,7 @@
         "psr/container": "^1.0|^2.0"
     },
     "require-dev": {
+        "phpbench/phpbench": "^1.1",
         "phpunit/phpunit": "^9.5",
         "roave/infection-static-analysis-plugin": "^1.7",
         "spatie/phpunit-watcher": "^1.23",
