@@ -73,7 +73,7 @@ class InjectorTest extends BaseInjectorTest
     public function testInvokeAnonymousClass(): void
     {
         $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
-        $class = new class() {
+        $class = new class () {
             public EngineInterface $engine;
 
             public function setEngine(EngineInterface $engine): void
