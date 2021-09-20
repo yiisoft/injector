@@ -91,7 +91,6 @@ final class Injector
      * by the DI container as the second argument.
      *
      * @param string $class name of the class to be created.
-     *
      * @param array $arguments The array of the function arguments.
      * This can be either a list of arguments, or an associative array where keys are argument names.
      *
