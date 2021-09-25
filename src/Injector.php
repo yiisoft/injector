@@ -91,8 +91,6 @@ final class Injector
      * by the DI container as the second argument.
      *
      * @param string $class name of the class to be created.
-     * @psalm-param class-string $class
-     *
      * @param array $arguments The array of the function arguments.
      * This can be either a list of arguments, or an associative array where keys are argument names.
      *
@@ -100,11 +98,15 @@ final class Injector
      * @throws InvalidArgumentException|MissingRequiredArgumentException
      * @throws ReflectionException
      *
-     * @return mixed object of the given class.
+     * @return object The object of the given class.
      *
      * @psalm-suppress MixedMethodCall
+     *
+     * @psalm-template T
+     * @psalm-param class-string<T> $class
+     * @psalm-return T
      */
-    public function make(string $class, array $arguments = [])
+    public function make(string $class, array $arguments = []): object
     {
         $classReflection = new ReflectionClass($class);
         if (!$classReflection->isInstantiable()) {

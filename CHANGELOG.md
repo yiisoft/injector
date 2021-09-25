@@ -2,7 +2,7 @@
 
 ## 1.0.5 under development
 
-- no changes in this release.
+- Enh #56: Declare return value in `Injector::make()` and improve psalm annotations (vjik)
 
 ## 1.0.4 March 10, 2021
 
