@@ -12,6 +12,7 @@ use stdClass;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\InvalidArgumentException;
 use Yiisoft\Injector\MissingRequiredArgumentException;
+use Yiisoft\Injector\Tests\Common\Support\CallStaticObject;
 use Yiisoft\Injector\Tests\Common\Support\ColorInterface;
 use Yiisoft\Injector\Tests\Common\Support\EngineInterface;
 use Yiisoft\Injector\Tests\Common\Support\EngineMarkTwo;
@@ -65,6 +66,15 @@ class InjectorTest extends BaseInjectorTest
         $result = (new Injector($container))->invoke([EngineVAZ2101::class, 'isWroomWroom']);
 
         $this->assertIsBool($result);
+    }
+
+    public function testInvokeCallStatic(): void
+    {
+        $container = $this->getContainer();
+
+        $result = (new Injector($container))->invoke([CallStaticObject::class, 'foo']);
+
+        $this->assertSame('bar', $result);
     }
 
     /**
