@@ -98,7 +98,7 @@ class InjectorTest extends BaseInjectorTest
     {
         if (
             $className === CallStaticWithStaticObject::class
-            && version_compare(PHP_VERSION, '8.1.0', '<')
+            && version_compare(PHP_VERSION, '8.1-dev', '<')
         ) {
             /** @link https://bugs.php.net/bug.php?id=81626 */
             $this->markTestSkipped('Bug in PHP version below 8.1. See https://bugs.php.net/bug.php?id=81626');
