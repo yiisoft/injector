@@ -84,7 +84,6 @@ class InjectorTest extends BaseInjectorTest
     public function dataInvokeStaticWithStaticCalls(): array
     {
         return [
-            [CallStaticWithStaticObject::class],
             [CallStaticWithSelfObject::class],
             [StaticWithStaticObject::class],
             [StaticWithSelfObject::class],
@@ -101,6 +100,18 @@ class InjectorTest extends BaseInjectorTest
         $result = (new Injector($container))->invoke([$className, 'foo']);
 
         $this->assertSame('bar', $result);
+    }
+
+    /**
+     * @link https://bugs.php.net/bug.php?id=81626
+     */
+    public function testInvokeStaticWithStaticCallsBug(): void
+    {
+        $container = $this->getContainer();
+
+        $this->expectError();
+        $this->expectErrorMessage('Cannot access "static" when no class scope is active');
+        (new Injector($container))->invoke([CallStaticWithStaticObject::class, 'foo']);
     }
 
     /**
