@@ -11,6 +11,7 @@ finder:
     - views
     - public
     - templates
+    - tests/Common/Support
   not-name:
     - UnionCar.php
     - TimerUnionTypes.php

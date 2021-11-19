@@ -12,6 +12,9 @@ use stdClass;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\InvalidArgumentException;
 use Yiisoft\Injector\MissingRequiredArgumentException;
+use Yiisoft\Injector\Tests\Common\Support\CallStaticObject;
+use Yiisoft\Injector\Tests\Common\Support\CallStaticWithSelfObject;
+use Yiisoft\Injector\Tests\Common\Support\CallStaticWithStaticObject;
 use Yiisoft\Injector\Tests\Common\Support\ColorInterface;
 use Yiisoft\Injector\Tests\Common\Support\EngineInterface;
 use Yiisoft\Injector\Tests\Common\Support\EngineMarkTwo;
@@ -24,6 +27,8 @@ use Yiisoft\Injector\Tests\Common\Support\MakeEngineCollector;
 use Yiisoft\Injector\Tests\Common\Support\MakeEngineMatherWithParam;
 use Yiisoft\Injector\Tests\Common\Support\MakeNoConstructor;
 use Yiisoft\Injector\Tests\Common\Support\MakePrivateConstructor;
+use Yiisoft\Injector\Tests\Common\Support\StaticWithSelfObject;
+use Yiisoft\Injector\Tests\Common\Support\StaticWithStaticObject;
 
 class InjectorTest extends BaseInjectorTest
 {
@@ -65,6 +70,44 @@ class InjectorTest extends BaseInjectorTest
         $result = (new Injector($container))->invoke([EngineVAZ2101::class, 'isWroomWroom']);
 
         $this->assertIsBool($result);
+    }
+
+    public function testInvokeCallStatic(): void
+    {
+        $container = $this->getContainer();
+
+        $result = (new Injector($container))->invoke([CallStaticObject::class, 'foo']);
+
+        $this->assertSame('bar', $result);
+    }
+
+    public function dataInvokeStaticWithStaticCalls(): array
+    {
+        return [
+            [CallStaticWithStaticObject::class],
+            [CallStaticWithSelfObject::class],
+            [StaticWithStaticObject::class],
+            [StaticWithSelfObject::class],
+        ];
+    }
+
+    /**
+     * @dataProvider dataInvokeStaticWithStaticCalls
+     */
+    public function testInvokeStaticWithStaticCalls(string $className): void
+    {
+        if (
+            $className === CallStaticWithStaticObject::class
+            && version_compare(PHP_VERSION, '8.1-dev', '<')
+        ) {
+            /** @link https://bugs.php.net/bug.php?id=81626 */
+            $this->markTestSkipped('Bug in PHP version below 8.1. See https://bugs.php.net/bug.php?id=81626');
+        }
+        $container = $this->getContainer();
+
+        $result = (new Injector($container))->invoke([$className, 'foo']);
+
+        $this->assertSame('bar', $result);
     }
 
     /**
