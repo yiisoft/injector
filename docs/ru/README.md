@@ -4,11 +4,15 @@
 
 ```php
 use Yiisoft\Di\Container;
+use Yiisoft\Di\ContainerConfig;
 use Yiisoft\Injector\Injector;
 
-$container = new Container([
-    EngineInterface::class => EngineMarkTwo::class,
-]);
+$config = ContainerConfig::create()
+    ->withDefinitions([
+        EngineInterface::class => EngineMarkTwo::class,
+    ]);
+
+$container = new Container($config);
 
 $getEngineName = static function (EngineInterface $engine) {
     return $engine->getName();
