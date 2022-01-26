@@ -9,13 +9,14 @@
         "reflection",
         "injector"
     ],
-    "homepage": "http://www.yiiframework.com/",
+    "homepage": "https://www.yiiframework.com/",
     "license": "BSD-3-Clause",
     "support": {
         "issues": "https://github.com/yiisoft/injector/issues?state=open",
-        "forum": "http://www.yiiframework.com/forum/",
-        "wiki": "http://www.yiiframework.com/wiki/",
+        "forum": "https://www.yiiframework.com/forum/",
+        "wiki": "https://www.yiiframework.com/wiki/",
         "irc": "irc://irc.freenode.net/yii",
+        "chat": "https://t.me/yii3en",
         "source": "https://github.com/yiisoft/injector"
     },
     "require": {
@@ -25,9 +26,9 @@
     "require-dev": {
         "phpbench/phpbench": "^1.1",
         "phpunit/phpunit": "^9.5",
-        "roave/infection-static-analysis-plugin": "^1.14",
+        "roave/infection-static-analysis-plugin": "^1.16",
         "spatie/phpunit-watcher": "^1.23",
-        "vimeo/psalm": "^4.6",
+        "vimeo/psalm": "^4.18",
         "yiisoft/test-support": "^1.2"
     },
     "autoload": {
