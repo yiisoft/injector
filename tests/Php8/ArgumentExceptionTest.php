@@ -31,10 +31,13 @@ abstract class ArgumentExceptionTest extends TestCase
         );
     }
 
+    /**
+     * @requires PHP >= 8.1
+     */
     public function testRenderStaticClosure(): void
     {
         $reflection = new \ReflectionFunction(
-            function (string|int $datetime): void {
+            static function (string|int $datetime): void {
                 array_map(null, func_get_args());
             }
         );
