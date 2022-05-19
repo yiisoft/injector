@@ -20,7 +20,7 @@ abstract class ArgumentException extends \InvalidArgumentException
         if ($class === null) {
             $method = $function;
             if (substr($method, -9) === '{closure}') {
-                $method = $this->getClosureSignature($reflection);
+                $method = $this->renderClosureSignature($reflection);
             }
         } else {
             $method = "{$class}::{$function}";
@@ -37,37 +37,38 @@ abstract class ArgumentException extends \InvalidArgumentException
         parent::__construct(sprintf((string)static::EXCEPTION_MESSAGE, $parameter, $method, $fileAndLine));
     }
 
-    private function getClosureSignature(\ReflectionFunctionAbstract $reflection): string
+    private function renderClosureSignature(\ReflectionFunctionAbstract $reflection): string
     {
         $closureParameters = [];
-        $append = static function (string &$parameterString, bool $condition, string $postfix): void {
-            if ($condition) {
-                $parameterString .= $postfix;
-            }
-        };
+
         foreach ($reflection->getParameters() as $parameter) {
-            $parameterString = '';
             /** @var ReflectionNamedType|ReflectionUnionType|null $type */
             $type = $parameter->getType();
-            if ($type instanceof ReflectionNamedType) {
-                $append($parameterString, $parameter->allowsNull(), '?');
-                $parameterString .= $type->getName() . ' ';
-            } elseif ($type instanceof ReflectionUnionType) {
-                /** @var ReflectionNamedType[] $types */
-                $types = $type->getTypes();
-                $parameterString .= implode('|', array_map(
-                    static fn (ReflectionNamedType $r) => $r->getName(),
-                    $types
-                )) . ' ';
-            }
-            $append($parameterString, $parameter->isPassedByReference(), '&');
-            $append($parameterString, $parameter->isVariadic(), '...');
-            $parameterString .= '$' . $parameter->name;
+            $parameterString = \sprintf(
+                '%s %s%s$%s',
+                // type
+                $type,
+                // reference
+                $parameter->isPassedByReference() ? '&' : '',
+                // variadic
+                $parameter->isVariadic() ? '...' : '',
+                $parameter->name,
+            );
             if ($parameter->isDefaultValueAvailable()) {
-                $parameterString .= ' = ' . var_export($parameter->getDefaultValue(), true);
+                $default = $parameter->getDefaultValue();
+                $parameterString .= ' = ';
+                if (\is_object($default)) {
+                    $parameterString .= 'new ' . \get_class($default) . '(...)';
+                } elseif ($parameter->isDefaultValueConstant()) {
+                    $parameterString .= $parameter->getDefaultValueConstantName();
+                } else {
+                    $parameterString .= \var_export($default, true);
+                }
             }
-            $closureParameters[] = $parameterString;
+            $closureParameters[] = \ltrim($parameterString);
         }
-        return 'function (' . implode(', ', $closureParameters) . ')';
+
+        $static = \method_exists($reflection, 'isStatic') && $reflection->isStatic() ? 'static ' : '';
+        return $static . 'function (' . implode(', ', $closureParameters) . ')';
     }
 }
