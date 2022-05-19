@@ -15,19 +15,23 @@ abstract class ArgumentExceptionTest extends TestCase
     public function testRichClosureReflectionUnionTypes(): void
     {
         $reflection = new \ReflectionFunction(
-            static function (\DateTimeImmutable|\DateTime|string|int $datetime): void {
+            function (\DateTimeImmutable|\DateTime|string|int $datetime): void {
                 array_map(null, func_get_args());
             }
         );
         $exception = $this->createException($reflection, 'datetime');
 
         $this->assertStringContainsString(
-            'static function (DateTimeImmutable|DateTime|string|int $datetime)',
+            'function (DateTimeImmutable|DateTime|string|int $datetime)',
+            $exception->getMessage()
+        );
+        $this->assertStringNotContainsString(
+            'static',
             $exception->getMessage()
         );
     }
 
-    public function testRenderNotStaticClosure(): void
+    public function testRenderStaticClosure(): void
     {
         $reflection = new \ReflectionFunction(
             function (string|int $datetime): void {
@@ -37,11 +41,7 @@ abstract class ArgumentExceptionTest extends TestCase
         $exception = $this->createException($reflection, 'datetime');
 
         $this->assertStringContainsString(
-            'function (string|int $datetime)',
-            $exception->getMessage()
-        );
-        $this->assertStringNotContainsString(
-            'static',
+            'static function (string|int $datetime)',
             $exception->getMessage()
         );
     }
