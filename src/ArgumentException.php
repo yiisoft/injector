@@ -52,7 +52,7 @@ abstract class ArgumentException extends \InvalidArgumentException
                 $parameter->isPassedByReference() ? '&' : '',
                 // variadic
                 $parameter->isVariadic() ? '...' : '',
-                $parameter->name,
+                $parameter->getName(),
             );
             if ($parameter->isDefaultValueAvailable()) {
                 $default = $parameter->getDefaultValue();
