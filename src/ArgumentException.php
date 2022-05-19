@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector;
 
+use ReflectionFunctionAbstract;
+use ReflectionIntersectionType;
 use ReflectionNamedType;
+use ReflectionParameter;
 use ReflectionUnionType;
 
 abstract class ArgumentException extends \InvalidArgumentException
 {
     protected const EXCEPTION_MESSAGE = 'Something is wrong with argument "%s" when calling "%s"%s.';
 
-    public function __construct(\ReflectionFunctionAbstract $reflection, string $parameter)
+    public function __construct(ReflectionFunctionAbstract $reflection, string $parameter)
     {
         $function = $reflection->getName();
         /** @psalm-var class-string|null $class */
@@ -37,7 +40,7 @@ abstract class ArgumentException extends \InvalidArgumentException
         parent::__construct(sprintf((string)static::EXCEPTION_MESSAGE, $parameter, $method, $fileAndLine));
     }
 
-    private function renderClosureSignature(\ReflectionFunctionAbstract $reflection): string
+    private function renderClosureSignature(ReflectionFunctionAbstract $reflection): string
     {
         $closureParameters = [];
 
@@ -53,11 +56,13 @@ abstract class ArgumentException extends \InvalidArgumentException
                 $parameter->getName(),
             );
             if ($parameter->isDefaultValueAvailable()) {
+                /** @var mixed $default */
                 $default = $parameter->getDefaultValue();
                 $parameterString .= ' = ';
                 if (\is_object($default)) {
                     $parameterString .= 'new ' . \get_class($default) . '(...)';
                 } elseif ($parameter->isDefaultValueConstant()) {
+                    /** @psalm-suppress PossiblyNullOperand */
                     $parameterString .= $parameter->getDefaultValueConstantName();
                 } else {
                     $parameterString .= \var_export($default, true);
@@ -70,9 +75,9 @@ abstract class ArgumentException extends \InvalidArgumentException
         return $static . 'function (' . implode(', ', $closureParameters) . ')';
     }
 
-    private function renderParameterType(\ReflectionParameter $parameter)
+    private function renderParameterType(ReflectionParameter $parameter): string
     {
-        /** @var ReflectionNamedType|ReflectionUnionType|null $type */
+        /** @var ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType|null $type */
         $type = $parameter->getType();
         if ($type instanceof ReflectionNamedType) {
             return sprintf(
@@ -89,7 +94,7 @@ abstract class ArgumentException extends \InvalidArgumentException
                 $types
             )) . ' ';
         }
-        if ($type instanceof \ReflectionIntersectionType) {
+        if ($type instanceof ReflectionIntersectionType) {
             /** @var ReflectionNamedType[] $types */
             $types = $type->getTypes();
             return \implode('&', \array_map(
