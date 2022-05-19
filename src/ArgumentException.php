@@ -4,17 +4,11 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector;
 
-use ReflectionFunctionAbstract;
-use ReflectionIntersectionType;
-use ReflectionNamedType;
-use ReflectionParameter;
-use ReflectionUnionType;
-
 abstract class ArgumentException extends \InvalidArgumentException
 {
     protected const EXCEPTION_MESSAGE = 'Something is wrong with argument "%s" when calling "%s"%s.';
 
-    public function __construct(ReflectionFunctionAbstract $reflection, string $parameter)
+    public function __construct(\ReflectionFunctionAbstract $reflection, string $parameter)
     {
         $function = $reflection->getName();
         /** @psalm-var class-string|null $class */
@@ -40,7 +34,7 @@ abstract class ArgumentException extends \InvalidArgumentException
         parent::__construct(sprintf((string)static::EXCEPTION_MESSAGE, $parameter, $method, $fileAndLine));
     }
 
-    private function renderClosureSignature(ReflectionFunctionAbstract $reflection): string
+    private function renderClosureSignature(\ReflectionFunctionAbstract $reflection): string
     {
         $closureParameters = [];
 
@@ -75,30 +69,30 @@ abstract class ArgumentException extends \InvalidArgumentException
         return $static . 'function (' . implode(', ', $closureParameters) . ')';
     }
 
-    private function renderParameterType(ReflectionParameter $parameter): string
+    private function renderParameterType(\ReflectionParameter $parameter): string
     {
-        /** @var ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType|null $type */
+        /** @var \ReflectionNamedType|\ReflectionUnionType|\ReflectionIntersectionType|null $type */
         $type = $parameter->getType();
-        if ($type instanceof ReflectionNamedType) {
+        if ($type instanceof \ReflectionNamedType) {
             return sprintf(
                 '%s%s ',
                 $parameter->allowsNull() ? '?' : '',
                 $type->getName()
             );
         }
-        if ($type instanceof ReflectionUnionType) {
-            /** @var ReflectionNamedType[] $types */
+        if ($type instanceof \ReflectionUnionType) {
+            /** @var \ReflectionNamedType[] $types */
             $types = $type->getTypes();
             return \implode('|', \array_map(
-                static fn (ReflectionNamedType $r) => $r->getName(),
+                static fn (\ReflectionNamedType $r) => $r->getName(),
                 $types
             )) . ' ';
         }
-        if ($type instanceof ReflectionIntersectionType) {
-            /** @var ReflectionNamedType[] $types */
+        if ($type instanceof \ReflectionIntersectionType) {
+            /** @var \ReflectionNamedType[] $types */
             $types = $type->getTypes();
             return \implode('&', \array_map(
-                static fn (ReflectionNamedType $r) => $r->getName(),
+                static fn (\ReflectionNamedType $r) => $r->getName(),
                 $types
             )) . ' ';
         }
