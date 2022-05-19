@@ -85,17 +85,17 @@ abstract class ArgumentException extends \InvalidArgumentException
             /** @var ReflectionNamedType[] $types */
             $types = $type->getTypes();
             return \implode('|', \array_map(
-                    static fn (ReflectionNamedType $r) => $r->getName(),
-                    $types
-                )) . ' ';
+                static fn (ReflectionNamedType $r) => $r->getName(),
+                $types
+            )) . ' ';
         }
         if ($type instanceof \ReflectionIntersectionType) {
             /** @var ReflectionNamedType[] $types */
             $types = $type->getTypes();
             return \implode('&', \array_map(
-                    static fn (ReflectionNamedType $r) => $r->getName(),
-                    $types
-                )) . ' ';
+                static fn (ReflectionNamedType $r) => $r->getName(),
+                $types
+            )) . ' ';
         }
         return '';
     }
