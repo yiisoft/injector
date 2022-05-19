@@ -42,12 +42,10 @@ abstract class ArgumentException extends \InvalidArgumentException
         $closureParameters = [];
 
         foreach ($reflection->getParameters() as $parameter) {
-            /** @var ReflectionNamedType|ReflectionUnionType|null $type */
-            $type = $parameter->getType();
             $parameterString = \sprintf(
-                '%s %s%s$%s',
+                '%s%s%s$%s',
                 // type
-                $type,
+                $this->renderParameterType($parameter),
                 // reference
                 $parameter->isPassedByReference() ? '&' : '',
                 // variadic
@@ -70,5 +68,35 @@ abstract class ArgumentException extends \InvalidArgumentException
 
         $static = \method_exists($reflection, 'isStatic') && $reflection->isStatic() ? 'static ' : '';
         return $static . 'function (' . implode(', ', $closureParameters) . ')';
+    }
+
+    private function renderParameterType(\ReflectionParameter $parameter)
+    {
+        /** @var ReflectionNamedType|ReflectionUnionType|null $type */
+        $type = $parameter->getType();
+        if ($type instanceof ReflectionNamedType) {
+            return sprintf(
+                '%s%s ',
+                $parameter->allowsNull() ? '?' : '',
+                $type->getName()
+            );
+        }
+        if ($type instanceof ReflectionUnionType) {
+            /** @var ReflectionNamedType[] $types */
+            $types = $type->getTypes();
+            return \implode('|', \array_map(
+                    static fn (ReflectionNamedType $r) => $r->getName(),
+                    $types
+                )) . ' ';
+        }
+        if ($type instanceof \ReflectionIntersectionType) {
+            /** @var ReflectionNamedType[] $types */
+            $types = $type->getTypes();
+            return \implode('&', \array_map(
+                    static fn (ReflectionNamedType $r) => $r->getName(),
+                    $types
+                )) . ' ';
+        }
+        return '';
     }
 }
