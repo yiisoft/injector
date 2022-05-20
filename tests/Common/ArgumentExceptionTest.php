@@ -51,6 +51,14 @@ abstract class ArgumentExceptionTest extends TestCase
         $this->assertStringContainsString('toInverse', $exception->getMessage());
     }
 
+    public function testRenderClosureWithConstantDefaultValue(): void
+    {
+        $reflection = new \ReflectionFunction(fn (int $filter = \FILTER_CALLBACK) => $filter);
+        $exception = $this->createException($reflection, 'notInt');
+
+        $this->assertStringContainsString('function (int $filter = FILTER_CALLBACK)', $exception->getMessage());
+    }
+
     public function testRichClosureReflection(): void
     {
         $reflection = new \ReflectionFunction(static function (
