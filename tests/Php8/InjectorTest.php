@@ -37,15 +37,4 @@ class InjectorTest extends BaseInjectorTest
 
         $this->assertSame($object->getTime(), $time);
     }
-
-    // public function testInvokeUnionTypes(): void
-    // {
-    //     $time = new DateTimeImmutable();
-    //     $container = $this->getContainer([DateTimeInterface::class => $time]);
-    //
-    //     $object = (new Injector($container))
-    //         ->make(TimerUnionTypes::class);
-    //
-    //     $this->assertSame($object->getTime(), $time);
-    // }
 }
