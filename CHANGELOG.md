@@ -3,7 +3,7 @@
 ## 1.0.5 under development
 
 - Enh #56: Declare return value in `Injector::make()` and improve psalm annotations (vjik)
-- Enh #63: Support for PHP 8.1 features for when rendering closures in exceptions (roxblnfk)
+- Enh #63: Support for PHP 8.1 features when rendering closures in exceptions (roxblnfk)
 
 ## 1.0.4 March 10, 2021
 
