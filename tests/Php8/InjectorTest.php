@@ -9,9 +9,9 @@ use ArrayIterator;
 use Countable;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Exception;
 use stdClass;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Injector\MissingRequiredArgumentException;
 use Yiisoft\Injector\Tests\Common\BaseInjectorTest;
 use Yiisoft\Injector\Tests\Php8\Support\TimerUnionTypes;
 use Yiisoft\Injector\Tests\Php8\Support\TypesIntersection;
@@ -56,7 +56,7 @@ class InjectorTest extends BaseInjectorTest
         $object = (new Injector($container))
             ->make(TypesIntersection::class, [$argument]);
 
-        self::assertSame($argument, $object->collection);
+        $this->assertSame($argument, $object->collection);
     }
 
     /**
@@ -72,7 +72,7 @@ class InjectorTest extends BaseInjectorTest
             ->make(TypesIntersectionReferencedConstructor::class, [&$obj1]);
         $object->collection = $obj2;
 
-        self::assertSame($obj1, $obj2);
+        $this->assertSame($obj1, $obj2);
     }
 
     /**
@@ -99,7 +99,37 @@ class InjectorTest extends BaseInjectorTest
                 new stdClass(),
             ]);
 
-        self::assertSame([$obj1, $obj2, $obj3, $obj4], $result);
+        $this->assertSame([$obj1, $obj2, $obj3, $obj4], $result);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testResolveMultiple(): void
+    {
+        $obj1 = new ArrayIterator();
+        $obj2 = new ArrayIterator();
+        $obj3 = new ArrayIterator();
+        $obj4 = new ArrayIterator();
+        $container = $this->getContainer();
+
+        $result = (new Injector($container))
+            ->invoke([new TypesIntersection($obj1), 'getMultiple'], [
+                new stdClass(),
+                $obj1,
+                new stdClass(),
+                $obj2,
+                new stdClass(),
+                $obj3,
+                new stdClass(),
+                $obj4,
+                new stdClass(),
+            ]);
+
+        $this->assertSame($obj1, $result[0]);
+        $this->assertSame($obj2, $result[1]);
+        $this->assertSame($obj3, $result[2]);
+        $this->assertSame($obj4, $result[3]);
     }
 
     /**
@@ -113,9 +143,21 @@ class InjectorTest extends BaseInjectorTest
             Countable::class => $collection,
         ]);
 
-        $this->expectException(Exception::class);
+        $this->expectException(MissingRequiredArgumentException::class);
 
         (new Injector($container))
             ->make(TypesIntersection::class);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testTypeIntersectionNotResolved(): void
+    {
+        $container = $this->getContainer();
+
+        $this->expectException(MissingRequiredArgumentException::class);
+
+        (new Injector($container))->make(TypesIntersection::class);
     }
 }

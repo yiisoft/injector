@@ -30,4 +30,13 @@ class TypesIntersection
     {
         return $variadic;
     }
+
+    public static function getMultiple(
+        ArrayAccess&Countable $param1,
+        ArrayAccess&Countable $param2,
+        ArrayAccess&Countable $param3,
+        ArrayAccess&Countable $param4
+    ): array {
+        return \func_get_args();
+    }
 }

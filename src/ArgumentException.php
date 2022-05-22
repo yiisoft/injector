@@ -46,7 +46,8 @@ abstract class ArgumentException extends \InvalidArgumentException
             $fileAndLine = " in \"$fileName\" at line $line";
         }
 
-        parent::__construct(sprintf((string)static::EXCEPTION_MESSAGE, $parameter, $method, $fileAndLine));
+        /** @psalm-suppress MixedArgument */
+        parent::__construct(sprintf(static::EXCEPTION_MESSAGE, $parameter, $method, $fileAndLine));
     }
 
     private function renderClosureSignature(ReflectionFunctionAbstract $reflection): string
