@@ -19,6 +19,7 @@
         "chat": "https://t.me/yii3en",
         "source": "https://github.com/yiisoft/injector"
     },
+    "minimum-stability": "stable",
     "require": {
         "php": "^7.4|^8.0",
         "psr/container": "^1.0|^2.0"
@@ -51,7 +52,5 @@
             "infection/extension-installer": true,
             "composer/package-versions-deprecated": true
         }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    }
 }
