@@ -99,8 +99,9 @@ final class ResolvingState
     }
 
     /**
-     * Resolve parameter using type intersection rules
-     * @psalm-param array<int, class-string> $classNames
+     * Resolve parameter using type intersection rules.
+     *
+     * @psalm-param array<int, class-string> $cla   ssNames
      */
     public function resolveParameterByClasses(array $classNames, bool $variadic): bool
     {

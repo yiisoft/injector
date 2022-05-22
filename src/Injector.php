@@ -189,7 +189,7 @@ final class Injector
         $error = null;
 
         if ($hasType) {
-            /** @var ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType $reflectionType */
+            /** @var ReflectionType $reflectionType */
             $reflectionType = $parameter->getType();
 
             if ($this->resolveParameterType($state, $reflectionType, $isVariadic, $error)) {
@@ -229,9 +229,10 @@ final class Injector
      * Resolve parameter using its type.
      *
      * @param null|NotFoundExceptionInterface $error Last caught {@see NotFoundExceptionInterface} exception.
-     * @return bool {@see true} if argument was resolved
      *
      * @throws ContainerExceptionInterface
+     *
+     * @return bool {@see true} if argument was resolved
      *
      * @psalm-suppress MixedAssignment
      * @psalm-suppress PossiblyUndefinedMethod
@@ -245,6 +246,7 @@ final class Injector
         switch (true) {
             case $type instanceof ReflectionNamedType:
                 $types = [$type];
+                // no break
             case $type instanceof ReflectionUnionType:
                 $types ??= $type->getTypes();
                 /** @var array<int, ReflectionNamedType> $types */
