@@ -233,6 +233,7 @@ final class Injector
      *
      * @throws ContainerExceptionInterface
      *
+     * @psalm-suppress MixedAssignment
      * @psalm-suppress PossiblyUndefinedMethod
      * @psalm-suppress UndefinedMethod
      * @psalm-suppress UndefinedDocblockClass
@@ -249,7 +250,6 @@ final class Injector
             case $type instanceof ReflectionNamedType:
                 $types = [$type];
             case $type instanceof ReflectionUnionType:
-                /** @psalm-suppress MixedAssignment */
                 $types ??= $type->getTypes();
                 /** @var array<int, ReflectionNamedType> $types */
                 foreach ($types as $namedType) {
@@ -264,8 +264,8 @@ final class Injector
                 break;
             case $type instanceof ReflectionIntersectionType:
                 $classes = [];
+                /** @var ReflectionNamedType $namedType */
                 foreach ($type->getTypes() as $namedType) {
-                    /** @psalm-suppress MixedAssignment */
                     $classes[] = $namedType->getName();
                 }
                 /** @var array<int, class-string> $classes */
