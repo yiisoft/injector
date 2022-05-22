@@ -14,6 +14,7 @@ use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\Tests\Common\BaseInjectorTest;
 use Yiisoft\Injector\Tests\Php8\Support\TimerUnionTypes;
 use Yiisoft\Injector\Tests\Php8\Support\TypesIntersection;
+use Yiisoft\Injector\Tests\Php8\Support\TypesIntersectionReferencedConstructor;
 
 class InjectorTest extends BaseInjectorTest
 {
@@ -54,7 +55,20 @@ class InjectorTest extends BaseInjectorTest
         self::assertSame($argument, $object->collection);
     }
 
-    public function testTypeIntersectionFromContainer(): void
+    public function testTypeIntersectionReferenced(): void
+    {
+        $obj1 = new ArrayIterator();
+        $obj2 = new ArrayIterator();
+        $container = $this->getContainer();
+
+        $object = (new Injector($container))
+            ->make(TypesIntersectionReferencedConstructor::class, [&$obj1]);
+        $object->collection = $obj2;
+
+        self::assertSame($obj1, $obj2);
+    }
+
+    public function testTypeIntersectionMustNotBePulledFromContainer(): void
     {
         $collection = new ArrayIterator();
         $container = $this->getContainer([
