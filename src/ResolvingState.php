@@ -99,12 +99,13 @@ final class ResolvingState
     }
 
     /**
+     * Resolve parameter using type intersection rules
      * @psalm-param array<int, class-string> $classNames
      */
     public function resolveParameterByClasses(array $classNames, bool $variadic): bool
     {
         $resolved = false;
-        foreach ($this->numericArguments as $key => $argument) {
+        foreach ($this->numericArguments as $key => &$argument) {
             foreach ($classNames as $class) {
                 if (!$argument instanceof $class) {
                     continue 2;

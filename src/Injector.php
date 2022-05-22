@@ -15,7 +15,9 @@ use ReflectionFunctionAbstract;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionParameter;
+use ReflectionType;
 use ReflectionUnionType;
+use Throwable;
 
 /**
  * Injector is able to analyze callable dependencies based on type hinting and
@@ -191,37 +193,8 @@ final class Injector
             /** @var ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType $reflectionType */
             $reflectionType = $parameter->getType();
 
-            /**
-             * @psalm-suppress PossiblyNullReference
-             *
-             * @var ReflectionNamedType[] $types
-             */
-            $or = true;
-            if ($reflectionType instanceof ReflectionNamedType) {
-                $types = [$reflectionType];
-            } else {
-                $types = $reflectionType->getTypes();
-                $or = $reflectionType instanceof ReflectionUnionType;
-            }
-            if ($or) {
-                foreach ($types as $namedType) {
-                    try {
-                        if ($this->resolveNamedType($state, $namedType, $isVariadic)) {
-                            return true;
-                        }
-                    } catch (NotFoundExceptionInterface $e) {
-                        $error = $e;
-                    }
-                }
-            } else {
-                /** @var class-string[] $classes */
-                $classes = [];
-                foreach ($types as $namedType) {
-                    $classes[] = $namedType->getName();
-                }
-                if ($state->resolveParameterByClasses($classes, $isVariadic)) {
-                    return true;
-                }
+            if ($this->resolveParameterType($state, $reflectionType, $isVariadic, $error)) {
+                return true;
             }
         }
 
@@ -251,6 +224,45 @@ final class Injector
             return true;
         }
         return null;
+    }
+
+    private function resolveParameterType(
+        ResolvingState $state,
+        ReflectionType $type,
+        bool $variadic,
+        ?Throwable &$error
+    ): bool {
+        $typeClass = \get_class($type);
+        /**
+         * @psalm-suppress PossiblyNullReference
+         */
+        switch (true) {
+            case $typeClass === ReflectionNamedType::class:
+                $types = [$type];
+            case $typeClass === ReflectionUnionType::class:
+                $types ??= $type->getTypes();
+                foreach ($types as $namedType) {
+                    try {
+                        if ($this->resolveNamedType($state, $namedType, $variadic)) {
+                            return true;
+                        }
+                    } catch (NotFoundExceptionInterface $e) {
+                        $error = $e;
+                    }
+                }
+                break;
+            case $typeClass === ReflectionIntersectionType::class:
+                /** @var array<int, class-string> $classes */
+                $classes = [];
+                foreach ($type->getTypes() as $namedType) {
+                    $classes[] = $namedType->getName();
+                }
+                if ($state->resolveParameterByClasses($classes, $variadic)) {
+                    return true;
+                }
+                break;
+        }
+        return false;
     }
 
     /**
