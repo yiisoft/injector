@@ -12,6 +12,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
 use ReflectionFunctionAbstract;
+use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionUnionType;
@@ -187,7 +188,7 @@ final class Injector
         $error = null;
 
         if ($hasType) {
-            /** @var ReflectionNamedType|ReflectionUnionType|null $reflectionType */
+            /** @var ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType $reflectionType */
             $reflectionType = $parameter->getType();
 
             /**
@@ -195,14 +196,31 @@ final class Injector
              *
              * @var ReflectionNamedType[] $types
              */
-            $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
-            foreach ($types as $namedType) {
-                try {
-                    if ($this->resolveNamedType($state, $namedType, $isVariadic)) {
-                        return true;
+            $or = true;
+            if ($reflectionType instanceof ReflectionNamedType) {
+                $types = [$reflectionType];
+            } else {
+                $types = $reflectionType->getTypes();
+                $or = $reflectionType instanceof ReflectionUnionType;
+            }
+            if ($or) {
+                foreach ($types as $namedType) {
+                    try {
+                        if ($this->resolveNamedType($state, $namedType, $isVariadic)) {
+                            return true;
+                        }
+                    } catch (NotFoundExceptionInterface $e) {
+                        $error = $e;
                     }
-                } catch (NotFoundExceptionInterface $e) {
-                    $error = $e;
+                }
+            } else {
+                /** @var class-string[] $classes */
+                $classes = [];
+                foreach ($types as $namedType) {
+                    $classes[] = $namedType->getName();
+                }
+                if ($state->resolveParameterByClasses($classes, $isVariadic)) {
+                    return true;
                 }
             }
         }

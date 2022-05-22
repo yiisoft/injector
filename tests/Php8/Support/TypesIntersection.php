@@ -14,7 +14,6 @@ class TypesIntersection
     public function __construct(
         public ArrayAccess&Countable $collection
     ) {
-        $this->collection = $collection;
     }
 
     public function getCollection(): ArrayAccess&Countable

@@ -98,6 +98,29 @@ final class ResolvingState
         return true;
     }
 
+    /**
+     * @psalm-param array<int, class-string> $classNames
+     */
+    public function resolveParameterByClasses(array $classNames, bool $variadic): bool
+    {
+        $resolved = false;
+        foreach ($this->numericArguments as $key => $argument) {
+            foreach ($classNames as $class) {
+                if (!$argument instanceof $class) {
+                    continue 2;
+                }
+            }
+            unset($this->numericArguments[$key]);
+            $this->addResolvedValue($argument);
+            if (!$variadic) {
+                return true;
+            }
+            $resolved = true;
+        }
+
+        return $resolved;
+    }
+
     public function getResolvedValues(): array
     {
         return $this->shouldPushTrailingArguments
