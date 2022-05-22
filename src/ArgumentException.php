@@ -84,10 +84,6 @@ abstract class ArgumentException extends \InvalidArgumentException
         return $static . 'function (' . implode(', ', $closureParameters) . ')';
     }
 
-    /**
-     * @psalm-suppress UndefinedDocblockClass
-     * @psalm-suppress UndefinedClass
-     */
     private function renderParameterType(ReflectionParameter $parameter): string
     {
         /** @var ReflectionIntersectionType|ReflectionNamedType|ReflectionUnionType|null $type */
