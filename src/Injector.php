@@ -228,7 +228,7 @@ final class Injector
     /**
      * Resolve parameter using its type.
      *
-     * @param null|NotFoundExceptionInterface $error Last caught {@see NotFoundExceptionInterface} exception.
+     * @param NotFoundExceptionInterface|null $error Last caught {@see NotFoundExceptionInterface} exception.
      *
      * @throws ContainerExceptionInterface
      *
