@@ -45,6 +45,9 @@ class InjectorTest extends BaseInjectorTest
         $this->assertSame($object->getTime(), $time);
     }
 
+    /**
+     * @requires PHP >= 8.1
+     */
     public function testTypeIntersection(): void
     {
         $argument = new ArrayIterator();
@@ -56,6 +59,9 @@ class InjectorTest extends BaseInjectorTest
         self::assertSame($argument, $object->collection);
     }
 
+    /**
+     * @requires PHP >= 8.1
+     */
     public function testTypeIntersectionReferenced(): void
     {
         $obj1 = new ArrayIterator();
@@ -69,6 +75,9 @@ class InjectorTest extends BaseInjectorTest
         self::assertSame($obj1, $obj2);
     }
 
+    /**
+     * @requires PHP >= 8.1
+     */
     public function testTypeIntersectionVariadic(): void
     {
         $obj1 = new ArrayIterator();
@@ -93,6 +102,9 @@ class InjectorTest extends BaseInjectorTest
         self::assertSame([$obj1, $obj2, $obj3, $obj4], $result);
     }
 
+    /**
+     * @requires PHP >= 8.1
+     */
     public function testTypeIntersectionMustNotBePulledFromContainer(): void
     {
         $collection = new ArrayIterator();
