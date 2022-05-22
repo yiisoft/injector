@@ -245,7 +245,6 @@ final class Injector
         bool $variadic,
         ?NotFoundExceptionInterface &$error
     ): bool {
-        /** @var ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType $type */
         switch (true) {
             case $type instanceof ReflectionNamedType:
                 $types = [$type];
