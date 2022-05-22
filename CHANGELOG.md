@@ -1,5 +1,9 @@
 # Yii Injector Change Log
 
+## 1.0.6 under development
+
+- no changes in this release.
+
 ## 1.0.5 May 22, 2022
 
 - Enh #56: Declare return value in `Injector::make()` and improve psalm annotations (vjik)
