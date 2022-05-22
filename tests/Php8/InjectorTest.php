@@ -10,6 +10,7 @@ use Countable;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
+use stdClass;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\Tests\Common\BaseInjectorTest;
 use Yiisoft\Injector\Tests\Php8\Support\TimerUnionTypes;
@@ -66,6 +67,30 @@ class InjectorTest extends BaseInjectorTest
         $object->collection = $obj2;
 
         self::assertSame($obj1, $obj2);
+    }
+
+    public function testTypeIntersectionVariadic(): void
+    {
+        $obj1 = new ArrayIterator();
+        $obj2 = new ArrayIterator();
+        $obj3 = new ArrayIterator();
+        $obj4 = new ArrayIterator();
+        $container = $this->getContainer();
+
+        $result = (new Injector($container))
+            ->invoke([new TypesIntersection($obj1), 'getVariadic'], [
+                new stdClass(),
+                $obj1,
+                new stdClass(),
+                $obj2,
+                new stdClass(),
+                $obj3,
+                new stdClass(),
+                $obj4,
+                new stdClass(),
+            ]);
+
+        self::assertSame([$obj1, $obj2, $obj3, $obj4], $result);
     }
 
     public function testTypeIntersectionMustNotBePulledFromContainer(): void

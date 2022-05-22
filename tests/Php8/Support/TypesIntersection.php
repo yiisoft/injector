@@ -25,4 +25,9 @@ class TypesIntersection
     {
         return static fn (ArrayAccess&Countable $collection = new ArrayIterator()): ArrayAccess&Countable => $collection;
     }
+
+    public static function getVariadic(ArrayAccess&Countable ...$variadic): array
+    {
+        return $variadic;
+    }
 }

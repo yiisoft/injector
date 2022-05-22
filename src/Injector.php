@@ -17,7 +17,6 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionType;
 use ReflectionUnionType;
-use Throwable;
 
 /**
  * Injector is able to analyze callable dependencies based on type hinting and
@@ -172,8 +171,8 @@ final class Injector
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      *
-     * @return bool|null True if argument resolved; False if not resolved; Null if parameter is optional but without
-     * default value in a Reflection object. This is possible for internal functions.
+     * @return bool|null {@see true} if argument resolved; False if not resolved; Null if parameter is optional but
+     * without default value in a Reflection object. This is possible for internal functions.
      */
     private function resolveParameter(ReflectionParameter $parameter, ResolvingState $state): ?bool
     {
@@ -226,21 +225,31 @@ final class Injector
         return null;
     }
 
+    /**
+     * Resolve parameter using its type.
+     *
+     * @param null|NotFoundExceptionInterface $error Last caught {@see NotFoundExceptionInterface} exception.
+     * @return bool {@see true} if argument was resolved
+     *
+     * @throws ContainerExceptionInterface
+     *
+     * @psalm-suppress PossiblyUndefinedMethod
+     * @psalm-suppress UndefinedMethod
+     */
     private function resolveParameterType(
         ResolvingState $state,
         ReflectionType $type,
         bool $variadic,
-        ?Throwable &$error
+        ?NotFoundExceptionInterface &$error
     ): bool {
-        $typeClass = \get_class($type);
-        /**
-         * @psalm-suppress PossiblyNullReference
-         */
+        /** @var ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType $type */
         switch (true) {
-            case $typeClass === ReflectionNamedType::class:
+            case $type instanceof ReflectionNamedType:
                 $types = [$type];
-            case $typeClass === ReflectionUnionType::class:
+            case $type instanceof ReflectionUnionType:
+                /** @psalm-suppress MixedAssignment */
                 $types ??= $type->getTypes();
+                /** @var array<int, ReflectionNamedType> $types */
                 foreach ($types as $namedType) {
                     try {
                         if ($this->resolveNamedType($state, $namedType, $variadic)) {
@@ -251,12 +260,13 @@ final class Injector
                     }
                 }
                 break;
-            case $typeClass === ReflectionIntersectionType::class:
-                /** @var array<int, class-string> $classes */
+            case $type instanceof ReflectionIntersectionType:
                 $classes = [];
                 foreach ($type->getTypes() as $namedType) {
+                    /** @psalm-suppress MixedAssignment */
                     $classes[] = $namedType->getName();
                 }
+                /** @var array<int, class-string> $classes */
                 if ($state->resolveParameterByClasses($classes, $variadic)) {
                     return true;
                 }
@@ -269,7 +279,7 @@ final class Injector
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      *
-     * @return bool True if argument was resolved
+     * @return bool {@see true} if argument was resolved
      */
     private function resolveNamedType(ResolvingState $state, ReflectionNamedType $parameter, bool $isVariadic): bool
     {
