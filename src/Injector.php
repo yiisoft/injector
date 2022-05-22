@@ -235,9 +235,6 @@ final class Injector
      *
      * @psalm-suppress MixedAssignment
      * @psalm-suppress PossiblyUndefinedMethod
-     * @psalm-suppress UndefinedMethod
-     * @psalm-suppress UndefinedDocblockClass
-     * @psalm-suppress UndefinedClass
      */
     private function resolveParameterType(
         ResolvingState $state,
