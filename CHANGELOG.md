@@ -1,8 +1,8 @@
 # Yii Injector Change Log
 
-## 1.0.6 under development
+## 1.1.0 under development
 
-- no changes in this release.
+- Enh #64: Support for type intersection when arguments resolving (roxblnfk)
 
 ## 1.0.5 May 22, 2022
 

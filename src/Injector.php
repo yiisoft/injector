@@ -12,8 +12,10 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
 use ReflectionFunctionAbstract;
+use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionParameter;
+use ReflectionType;
 use ReflectionUnionType;
 
 /**
@@ -169,8 +171,8 @@ final class Injector
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      *
-     * @return bool|null True if argument resolved; False if not resolved; Null if parameter is optional but without
-     * default value in a Reflection object. This is possible for internal functions.
+     * @return bool|null {@see true} if argument resolved; False if not resolved; Null if parameter is optional but
+     * without default value in a Reflection object. This is possible for internal functions.
      */
     private function resolveParameter(ReflectionParameter $parameter, ResolvingState $state): ?bool
     {
@@ -187,23 +189,11 @@ final class Injector
         $error = null;
 
         if ($hasType) {
-            /** @var ReflectionNamedType|ReflectionUnionType|null $reflectionType */
+            /** @var ReflectionType $reflectionType */
             $reflectionType = $parameter->getType();
 
-            /**
-             * @psalm-suppress PossiblyNullReference
-             *
-             * @var ReflectionNamedType[] $types
-             */
-            $types = $reflectionType instanceof ReflectionNamedType ? [$reflectionType] : $reflectionType->getTypes();
-            foreach ($types as $namedType) {
-                try {
-                    if ($this->resolveNamedType($state, $namedType, $isVariadic)) {
-                        return true;
-                    }
-                } catch (NotFoundExceptionInterface $e) {
-                    $error = $e;
-                }
+            if ($this->resolveParameterType($state, $reflectionType, $isVariadic, $error)) {
+                return true;
             }
         }
 
@@ -236,10 +226,60 @@ final class Injector
     }
 
     /**
+     * Resolve parameter using its type.
+     *
+     * @param NotFoundExceptionInterface|null $error Last caught {@see NotFoundExceptionInterface} exception.
+     *
+     * @throws ContainerExceptionInterface
+     *
+     * @return bool {@see true} if argument was resolved
+     *
+     * @psalm-suppress MixedAssignment
+     * @psalm-suppress PossiblyUndefinedMethod
+     */
+    private function resolveParameterType(
+        ResolvingState $state,
+        ReflectionType $type,
+        bool $variadic,
+        ?NotFoundExceptionInterface &$error
+    ): bool {
+        switch (true) {
+            case $type instanceof ReflectionNamedType:
+                $types = [$type];
+                // no break
+            case $type instanceof ReflectionUnionType:
+                $types ??= $type->getTypes();
+                /** @var array<int, ReflectionNamedType> $types */
+                foreach ($types as $namedType) {
+                    try {
+                        if ($this->resolveNamedType($state, $namedType, $variadic)) {
+                            return true;
+                        }
+                    } catch (NotFoundExceptionInterface $e) {
+                        $error = $e;
+                    }
+                }
+                break;
+            case $type instanceof ReflectionIntersectionType:
+                $classes = [];
+                /** @var ReflectionNamedType $namedType */
+                foreach ($type->getTypes() as $namedType) {
+                    $classes[] = $namedType->getName();
+                }
+                /** @var array<int, class-string> $classes */
+                if ($state->resolveParameterByClasses($classes, $variadic)) {
+                    return true;
+                }
+                break;
+        }
+        return false;
+    }
+
+    /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      *
-     * @return bool True if argument was resolved
+     * @return bool {@see true} if argument was resolved
      */
     private function resolveNamedType(ResolvingState $state, ReflectionNamedType $parameter, bool $isVariadic): bool
     {

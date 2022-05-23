@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector\Tests\Php8;
 
+use ArrayAccess;
+use ArrayIterator;
+use Countable;
 use DateTimeImmutable;
 use DateTimeInterface;
+use stdClass;
 use Yiisoft\Injector\Injector;
+use Yiisoft\Injector\MissingRequiredArgumentException;
 use Yiisoft\Injector\Tests\Common\BaseInjectorTest;
 use Yiisoft\Injector\Tests\Php8\Support\TimerUnionTypes;
+use Yiisoft\Injector\Tests\Php8\Support\TypesIntersection;
+use Yiisoft\Injector\Tests\Php8\Support\TypesIntersectionReferencedConstructor;
 
 class InjectorTest extends BaseInjectorTest
 {
@@ -36,5 +43,121 @@ class InjectorTest extends BaseInjectorTest
             ->make(TimerUnionTypes::class);
 
         $this->assertSame($object->getTime(), $time);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testTypeIntersection(): void
+    {
+        $argument = new ArrayIterator();
+        $container = $this->getContainer();
+
+        $object = (new Injector($container))
+            ->make(TypesIntersection::class, [$argument]);
+
+        $this->assertSame($argument, $object->collection);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testTypeIntersectionReferenced(): void
+    {
+        $obj1 = new ArrayIterator();
+        $obj2 = new ArrayIterator();
+        $container = $this->getContainer();
+
+        $object = (new Injector($container))
+            ->make(TypesIntersectionReferencedConstructor::class, [&$obj1]);
+        $object->collection = $obj2;
+
+        $this->assertSame($obj1, $obj2);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testTypeIntersectionVariadic(): void
+    {
+        $obj1 = new ArrayIterator();
+        $obj2 = new ArrayIterator();
+        $obj3 = new ArrayIterator();
+        $obj4 = new ArrayIterator();
+        $container = $this->getContainer();
+
+        $result = (new Injector($container))
+            ->invoke([new TypesIntersection($obj1), 'getVariadic'], [
+                new stdClass(),
+                $obj1,
+                new stdClass(),
+                $obj2,
+                new stdClass(),
+                $obj3,
+                new stdClass(),
+                $obj4,
+                new stdClass(),
+            ]);
+
+        $this->assertSame([$obj1, $obj2, $obj3, $obj4], $result);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testResolveMultiple(): void
+    {
+        $obj1 = new ArrayIterator();
+        $obj2 = new ArrayIterator();
+        $obj3 = new ArrayIterator();
+        $obj4 = new ArrayIterator();
+        $container = $this->getContainer();
+
+        $result = (new Injector($container))
+            ->invoke([new TypesIntersection($obj1), 'getMultiple'], [
+                new stdClass(),
+                $obj1,
+                new stdClass(),
+                $obj2,
+                new stdClass(),
+                $obj3,
+                new stdClass(),
+                $obj4,
+                new stdClass(),
+            ]);
+
+        $this->assertSame($obj1, $result[0]);
+        $this->assertSame($obj2, $result[1]);
+        $this->assertSame($obj3, $result[2]);
+        $this->assertSame($obj4, $result[3]);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testTypeIntersectionMustNotBePulledFromContainer(): void
+    {
+        $collection = new ArrayIterator();
+        $container = $this->getContainer([
+            ArrayAccess::class => $collection,
+            Countable::class => $collection,
+        ]);
+
+        $this->expectException(MissingRequiredArgumentException::class);
+
+        (new Injector($container))
+            ->make(TypesIntersection::class);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testTypeIntersectionNotResolved(): void
+    {
+        $container = $this->getContainer();
+
+        $this->expectException(MissingRequiredArgumentException::class);
+
+        (new Injector($container))->make(TypesIntersection::class);
     }
 }
