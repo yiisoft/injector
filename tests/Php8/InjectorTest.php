@@ -15,6 +15,7 @@ use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\MissingRequiredArgumentException;
 use Yiisoft\Injector\Tests\Common\BaseInjectorTest;
 use Yiisoft\Injector\Tests\Php8\Support\IntEnum;
+use Yiisoft\Injector\Tests\Php8\Support\NonBackedEnum;
 use Yiisoft\Injector\Tests\Php8\Support\StrEnum;
 use Yiisoft\Injector\Tests\Php8\Support\TimerUnionTypes;
 use Yiisoft\Injector\Tests\Php8\Support\TypesIntersection;
@@ -171,15 +172,17 @@ class InjectorTest extends BaseInjectorTest
     {
         $str = $this->createEnumValue(StrEnum::class, 'Bar');
         $int = $this->createEnumValue(IntEnum::class, 'Bar');
+        $nb = $this->createEnumValue(NonBackedEnum::class, 'Bar');
         $container = $this->getContainer([
             StrEnum::class => $str,
             IntEnum::class => $int,
+            NonBackedEnum::class => $nb,
         ]);
 
         $result = (new Injector($container))
-            ->invoke(static fn (StrEnum $arg1, IntEnum $arg2) => [$arg1, $arg2]);
+            ->invoke(static fn (StrEnum $arg1, IntEnum $arg2, NonBackedEnum $arg3) => [$arg1, $arg2, $arg3]);
 
-        $this->assertSame([$str, $int], $result);
+        $this->assertSame([$str, $int, $nb], $result);
     }
 
     /**
@@ -189,15 +192,16 @@ class InjectorTest extends BaseInjectorTest
     {
         $str = $this->createEnumValue(StrEnum::class, 'Bar');
         $int = $this->createEnumValue(IntEnum::class, 'Bar');
+        $nb = $this->createEnumValue(NonBackedEnum::class, 'Bar');
         $container = $this->getContainer();
 
         $result = (new Injector($container))
             ->invoke(
-                static fn (StrEnum $arg1, IntEnum $arg2) => [$arg1, $arg2],
-                [$int, $str]
+                static fn (StrEnum $arg1, IntEnum $arg2, NonBackedEnum $arg3) => [$arg1, $arg2, $arg3],
+                [$nb, $int, $str]
             );
 
-        $this->assertSame([$str, $int], $result);
+        $this->assertSame([$str, $int, $nb], $result);
     }
 
     /**
