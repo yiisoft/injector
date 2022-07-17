@@ -9,10 +9,14 @@ use ArrayIterator;
 use Countable;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use stdClass;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\MissingRequiredArgumentException;
 use Yiisoft\Injector\Tests\Common\BaseInjectorTest;
+use Yiisoft\Injector\Tests\Php8\Support\IntEnum;
+use Yiisoft\Injector\Tests\Php8\Support\NonBackedEnum;
+use Yiisoft\Injector\Tests\Php8\Support\StrEnum;
 use Yiisoft\Injector\Tests\Php8\Support\TimerUnionTypes;
 use Yiisoft\Injector\Tests\Php8\Support\TypesIntersection;
 use Yiisoft\Injector\Tests\Php8\Support\TypesIntersectionReferencedConstructor;
@@ -159,5 +163,63 @@ class InjectorTest extends BaseInjectorTest
         $this->expectException(MissingRequiredArgumentException::class);
 
         (new Injector($container))->make(TypesIntersection::class);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testResolveEnumFromContainer(): void
+    {
+        $str = $this->createEnumValue(StrEnum::class, 'Bar');
+        $int = $this->createEnumValue(IntEnum::class, 'Bar');
+        $nb = $this->createEnumValue(NonBackedEnum::class, 'Bar');
+        $container = $this->getContainer([
+            StrEnum::class => $str,
+            IntEnum::class => $int,
+            NonBackedEnum::class => $nb,
+        ]);
+
+        $result = (new Injector($container))
+            ->invoke(static fn (StrEnum $arg1, IntEnum $arg2, NonBackedEnum $arg3) => [$arg1, $arg2, $arg3]);
+
+        $this->assertSame([$str, $int, $nb], $result);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testResolveEnumFromArguments(): void
+    {
+        $str = $this->createEnumValue(StrEnum::class, 'Bar');
+        $int = $this->createEnumValue(IntEnum::class, 'Bar');
+        $nb = $this->createEnumValue(NonBackedEnum::class, 'Bar');
+        $container = $this->getContainer();
+
+        $result = (new Injector($container))
+            ->invoke(
+                static fn (StrEnum $arg1, IntEnum $arg2, NonBackedEnum $arg3) => [$arg1, $arg2, $arg3],
+                [$nb, $int, $str]
+            );
+
+        $this->assertSame([$str, $int, $nb], $result);
+    }
+
+    /**
+     * @requires PHP >= 8.1
+     */
+    public function testEnumCanNotBeAutowired(): void
+    {
+        $container = $this->getContainer();
+
+        $this->expectException(NotFoundExceptionInterface::class);
+
+        (new Injector($container))
+            ->invoke(static fn (StrEnum $arg1, IntEnum $arg2) => [$arg1, $arg2]);
+    }
+
+    private function createEnumValue(string $enumClass, string $case)
+    {
+        $reflection = new \ReflectionEnum($enumClass);
+        return $reflection->getCase($case)->getValue();
     }
 }
