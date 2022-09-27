@@ -11,12 +11,10 @@ use ReflectionParameter;
 use ReflectionUnionType;
 
 use function array_map;
-use function get_class;
 use function implode;
 use function is_object;
 use function method_exists;
 use function sprintf;
-use function substr;
 use function var_export;
 
 abstract class ArgumentException extends \InvalidArgumentException
