@@ -14,8 +14,6 @@ use ReflectionFunctionAbstract;
  */
 final class ResolvingState
 {
-    private ReflectionFunctionAbstract $reflection;
-
     /**
      * @psalm-var array<int, object>
      */
@@ -37,9 +35,8 @@ final class ResolvingState
      * @param ReflectionFunctionAbstract $reflection Function reflection.
      * @param array $arguments User arguments.
      */
-    public function __construct(ReflectionFunctionAbstract $reflection, array $arguments)
+    public function __construct(private ReflectionFunctionAbstract $reflection, array $arguments)
     {
-        $this->reflection = $reflection;
         $this->shouldPushTrailingArguments = !$reflection->isInternal();
         $this->sortArguments($arguments);
     }
@@ -57,10 +54,7 @@ final class ResolvingState
         $this->shouldPushTrailingArguments = $this->shouldPushTrailingArguments && !$condition;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function addResolvedValue(&$value): void
+    public function addResolvedValue(mixed &$value): void
     {
         $this->resolvedValues[] = &$value;
     }
@@ -146,8 +140,6 @@ final class ResolvingState
     }
 
     /**
-     * @param array $arguments
-     *
      * @throws InvalidArgumentException
      */
     private function sortArguments(array $arguments): void

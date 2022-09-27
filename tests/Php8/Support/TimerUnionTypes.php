@@ -8,10 +8,8 @@ use DateTimeInterface;
 
 class TimerUnionTypes
 {
-    private string|DateTimeInterface $time;
-    public function __construct(string|DateTimeInterface $time)
+    public function __construct(private string|DateTimeInterface $time)
     {
-        $this->time = $time;
     }
     public function getTime(): string|DateTimeInterface
     {

@@ -31,7 +31,7 @@ abstract class ArgumentException extends \InvalidArgumentException
 
         if ($class === null) {
             $method = $function;
-            if (substr($method, -9) === '{closure}') {
+            if (str_ends_with($method, '{closure}')) {
                 $method = $this->renderClosureSignature($reflection);
             }
         } else {
@@ -70,7 +70,7 @@ abstract class ArgumentException extends \InvalidArgumentException
                 $default = $parameter->getDefaultValue();
                 $parameterString .= ' = ';
                 if (is_object($default)) {
-                    $parameterString .= 'new ' . get_class($default) . '(...)';
+                    $parameterString .= 'new ' . $default::class . '(...)';
                 } elseif ($parameter->isDefaultValueConstant()) {
                     /** @psalm-suppress PossiblyNullOperand */
                     $parameterString .= $parameter->getDefaultValueConstantName();

@@ -240,9 +240,7 @@ class InjectorTest extends BaseInjectorTest
     {
         $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
 
-        $compareEngines = static function (EngineInterface $engine1, EngineInterface $engine2) {
-            return $engine1->getPower() <=> $engine2->getPower();
-        };
+        $compareEngines = static fn(EngineInterface $engine1, EngineInterface $engine2) => $engine1->getPower() <=> $engine2->getPower();
         $zilEngine = new EngineZIL130();
 
         $result = (new Injector($container))->invoke($compareEngines, [$zilEngine]);
@@ -257,9 +255,7 @@ class InjectorTest extends BaseInjectorTest
     {
         $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
 
-        $compareEngines = static function (EngineInterface $engine1, EngineInterface $engine2) {
-            return $engine1->getPower() <=> $engine2->getPower();
-        };
+        $compareEngines = static fn(EngineInterface $engine1, EngineInterface $engine2) => $engine1->getPower() <=> $engine2->getPower();
         $zilEngine = new EngineZIL130();
 
         $result = (new Injector($container))->invoke($compareEngines, ['engine2' => $zilEngine]);
@@ -275,9 +271,7 @@ class InjectorTest extends BaseInjectorTest
     {
         $container = $this->getContainer([LightEngine::class => new EngineVAZ2101()]);
 
-        $concatEngineNames = static function (EngineInterface $engine1, LightEngine $engine2) {
-            return $engine1->getName() . $engine2->getName();
-        };
+        $concatEngineNames = static fn(EngineInterface $engine1, LightEngine $engine2) => $engine1->getName() . $engine2->getName();
 
         $result = (new Injector($container))->invoke($concatEngineNames, [
             new EngineMarkTwo(), // LightEngine, EngineInterface
@@ -291,9 +285,7 @@ class InjectorTest extends BaseInjectorTest
     {
         $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
 
-        $getEngineName = static function (EngineInterface $engine, string $two) {
-            return $engine->getName() . $two;
-        };
+        $getEngineName = static fn(EngineInterface $engine, string $two) => $engine->getName() . $two;
 
         $injector = new Injector($container);
 
@@ -305,9 +297,7 @@ class InjectorTest extends BaseInjectorTest
     {
         $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
 
-        $getEngineName = static function (EngineInterface $engine, $two) {
-            return $engine->getName() . $two;
-        };
+        $getEngineName = static fn(EngineInterface $engine, $two) => $engine->getName() . $two;
         $injector = new Injector($container);
 
         $this->expectException(MissingRequiredArgumentException::class);
@@ -319,9 +309,7 @@ class InjectorTest extends BaseInjectorTest
     {
         $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
 
-        $getEngineName = static function (EngineInterface $engine, ColorInterface $color) {
-            return $engine->getName() . $color->getColor();
-        };
+        $getEngineName = static fn(EngineInterface $engine, ColorInterface $color) => $engine->getName() . $color->getColor();
 
         $injector = new Injector($container);
 
@@ -437,14 +425,7 @@ class InjectorTest extends BaseInjectorTest
     {
         $container = $this->getContainer();
 
-        $callable = static function (
-            /** @scrutinizer ignore-unused */
-            ?EngineInterface $engine,
-            /** @scrutinizer ignore-unused */
-            $id = 'test'
-        ) {
-            return func_num_args();
-        };
+        $callable = static fn(?EngineInterface $engine, $id = 'test') => func_num_args();
 
         $result = (new Injector($container))->invoke($callable, [
             new DateTimeImmutable(),
@@ -462,7 +443,7 @@ class InjectorTest extends BaseInjectorTest
     public function testInvokeWithObjectType(): void
     {
         $container = $this->getContainer();
-        $callable = fn (object $object) => get_class($object);
+        $callable = fn (object $object) => $object::class;
 
         $result = (new Injector($container))->invoke($callable, [new DateTimeImmutable()]);
 
@@ -475,7 +456,7 @@ class InjectorTest extends BaseInjectorTest
     public function testInvokeWithRequiredObjectTypeWithoutInstance(): void
     {
         $container = $this->getContainer();
-        $callable = fn (object $object) => get_class($object);
+        $callable = fn (object $object) => $object::class;
 
         $this->expectException(MissingRequiredArgumentException::class);
 
