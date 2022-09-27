@@ -11,12 +11,10 @@ use ReflectionParameter;
 use ReflectionUnionType;
 
 use function array_map;
-use function get_class;
 use function implode;
 use function is_object;
 use function method_exists;
 use function sprintf;
-use function substr;
 use function var_export;
 
 abstract class ArgumentException extends \InvalidArgumentException
@@ -31,7 +29,7 @@ abstract class ArgumentException extends \InvalidArgumentException
 
         if ($class === null) {
             $method = $function;
-            if (substr($method, -9) === '{closure}') {
+            if (str_ends_with($method, '{closure}')) {
                 $method = $this->renderClosureSignature($reflection);
             }
         } else {
@@ -70,7 +68,7 @@ abstract class ArgumentException extends \InvalidArgumentException
                 $default = $parameter->getDefaultValue();
                 $parameterString .= ' = ';
                 if (is_object($default)) {
-                    $parameterString .= 'new ' . get_class($default) . '(...)';
+                    $parameterString .= 'new ' . $default::class . '(...)';
                 } elseif ($parameter->isDefaultValueConstant()) {
                     /** @psalm-suppress PossiblyNullOperand */
                     $parameterString .= $parameter->getDefaultValueConstantName();
