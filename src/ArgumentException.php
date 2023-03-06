@@ -21,6 +21,9 @@ use function var_export;
 
 abstract class ArgumentException extends \InvalidArgumentException
 {
+    /**
+     * @var string
+     */
     protected const EXCEPTION_MESSAGE = 'Something is wrong with argument "%s" when calling "%s"%s.';
 
     public function __construct(ReflectionFunctionAbstract $reflection, string $parameter)
