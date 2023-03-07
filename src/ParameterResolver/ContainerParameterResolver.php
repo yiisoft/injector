@@ -33,11 +33,7 @@ final class ContainerParameterResolver implements ParameterResolverInterface
         }
 
         if ($parameter->hasType()) {
-            $reflectionType = $parameter->getType();
-            if ($reflectionType === null) {
-                throw new ParameterNotResolvedException();
-            }
-            return $this->resolveType($reflectionType);
+            return $this->resolveType($parameter->getType());
         }
 
         throw new ParameterNotResolvedException();

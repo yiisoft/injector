@@ -8,6 +8,9 @@ use ReflectionParameter;
 
 final class CompositeParameterResolver implements ParameterResolverInterface
 {
+    /**
+     * @var ParameterResolverInterface[]
+     */
     private array $resolvers;
 
     public function __construct(ParameterResolverInterface ...$resolvers)
