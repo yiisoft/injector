@@ -7,7 +7,6 @@ namespace Yiisoft\Injector\ParameterResolver;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionType;
@@ -47,10 +46,10 @@ final class ContainerParameterResolver implements ParameterResolverInterface
     }
 
     /**
-     * @return mixed
-     *
      * @throws ParameterNotResolvedException
      * @throws ContainerExceptionInterface
+     *
+     * @return mixed
      */
     private function resolveType(ReflectionType $type)
     {
@@ -72,10 +71,10 @@ final class ContainerParameterResolver implements ParameterResolverInterface
     }
 
     /**
-     * @return mixed
-     *
      * @throws ParameterNotResolvedException
      * @throws ContainerExceptionInterface
+     *
+     * @return mixed
      */
     private function resolveNamedType(ReflectionNamedType $parameter)
     {
