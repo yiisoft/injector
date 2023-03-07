@@ -17,6 +17,9 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionType;
 use ReflectionUnionType;
+use Yiisoft\Injector\ParameterResolver\ContainerParameterResolver;
+use Yiisoft\Injector\ParameterResolver\ParameterNotResolvedException;
+use Yiisoft\Injector\ParameterResolver\ParameterResolverInterface;
 
 /**
  * Injector is able to analyze callable dependencies based on type hinting and
@@ -24,11 +27,13 @@ use ReflectionUnionType;
  */
 final class Injector
 {
-    private ContainerInterface $container;
+    private ParameterResolverInterface $parameterResolver;
 
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        ContainerInterface $container,
+        ?ParameterResolverInterface $parameterResolver = null
+    ) {
+        $this->parameterResolver = $parameterResolver ?? new ContainerParameterResolver($container);
     }
 
     /**
@@ -186,15 +191,20 @@ final class Injector
             return true;
         }
 
-        $error = null;
-
         if ($hasType) {
             /** @var ReflectionType $reflectionType */
             $reflectionType = $parameter->getType();
-
-            if ($this->resolveParameterType($state, $reflectionType, $isVariadic, $error)) {
+            if ($this->resolveParameterType($state, $reflectionType, $isVariadic)) {
                 return true;
             }
+        }
+
+        try {
+            /** @var mixed $value */
+            $value = $this->parameterResolver->resolve($parameter);
+            $state->addResolvedValue($value);
+            return true;
+        } catch (ParameterNotResolvedException $e) {
         }
 
         if ($parameter->isDefaultValueAvailable()) {
@@ -211,12 +221,7 @@ final class Injector
                 return true;
             }
 
-            if ($error === null) {
-                return false;
-            }
-
-            // Throw NotFoundExceptionInterface
-            throw $error;
+            return false;
         }
 
         if ($isVariadic) {
@@ -240,23 +245,18 @@ final class Injector
     private function resolveParameterType(
         ResolvingState $state,
         ReflectionType $type,
-        bool $variadic,
-        ?NotFoundExceptionInterface &$error
+        bool $variadic
     ): bool {
         switch (true) {
             case $type instanceof ReflectionNamedType:
                 $types = [$type];
-                // no break
+            // no break
             case $type instanceof ReflectionUnionType:
                 $types ??= $type->getTypes();
                 /** @var array<int, ReflectionNamedType> $types */
                 foreach ($types as $namedType) {
-                    try {
-                        if ($this->resolveNamedType($state, $namedType, $variadic)) {
-                            return true;
-                        }
-                    } catch (NotFoundExceptionInterface $e) {
-                        $error = $e;
+                    if ($this->resolveNamedType($state, $namedType, $variadic)) {
+                        return true;
                     }
                 }
                 break;
@@ -276,9 +276,6 @@ final class Injector
     }
 
     /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     *
      * @return bool {@see true} if argument was resolved
      */
     private function resolveNamedType(ResolvingState $state, ReflectionNamedType $parameter, bool $isVariadic): bool
@@ -293,9 +290,6 @@ final class Injector
     /**
      * @psalm-param class-string|null $class
      *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     *
      * @return bool True if argument resolved
      */
     private function resolveObjectParameter(ResolvingState $state, ?string $class, bool $isVariadic): bool
@@ -303,12 +297,6 @@ final class Injector
         $found = $state->resolveParameterByClass($class, $isVariadic);
         if ($found || $isVariadic) {
             return $found;
-        }
-        if ($class !== null) {
-            /** @var mixed $argument */
-            $argument = $this->container->get($class);
-            $state->addResolvedValue($argument);
-            return true;
         }
         return false;
     }
