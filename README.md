@@ -15,14 +15,14 @@
 [![static analysis](https://github.com/yiisoft/injector/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/injector/actions?query=workflow%3A%22static+analysis%22)
 [![type-coverage](https://shepherd.dev/github/yiisoft/injector/coverage.svg)](https://shepherd.dev/github/yiisoft/injector)
 
-A [dependency injection](http://en.wikipedia.org/wiki/Dependency_injection)
+A [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection)
 implementation based on autowiring and
-[PSR-11](http://www.php-fig.org/psr/psr-11/) compatible dependency injection containers.
+[PSR-11](https://www.php-fig.org/psr/psr-11/) compatible dependency injection containers.
 
 #### Features
 
  * Injects dependencies when calling functions and creating objects
- * Works with any dependency injection container (DIC) that is [PSR-11](http://www.php-fig.org/psr/psr-11/) compatible
+ * Works with any dependency injection container (DIC) that is [PSR-11](https://www.php-fig.org/psr/psr-11/) compatible
  * Accepts additional dependencies and arguments passed as array
  * Allows passing arguments *by parameter name* in the array
  * Resolves object type dependencies from the container and the passed array
@@ -52,7 +52,7 @@ instantiate and then tries to resolve all arguments by several strategies.
 
 The main purpose is to find dependency objects - that is arguments of type
 object that are declared with a classname or an interface - in a (mandatory)
-[PSR-11](http://www.php-fig.org/psr/psr-11/) compatible *dependency injection
+[PSR-11](https://www.php-fig.org/psr/psr-11/) compatible *dependency injection
 container* (DIC). The container must therefore use the class or interface name
 as ID.
 
