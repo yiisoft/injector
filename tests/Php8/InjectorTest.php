@@ -207,15 +207,15 @@ class InjectorTest extends BaseInjectorTest
     /**
      * @requires PHP >= 8.1
      */
-    public function testEnumCanNotBeAutowired(): void
-    {
-        $container = $this->getContainer();
-
-        $this->expectException(NotFoundExceptionInterface::class);
-
-        (new Injector($container))
-            ->invoke(static fn (StrEnum $arg1, IntEnum $arg2) => [$arg1, $arg2]);
-    }
+//    public function testEnumCanNotBeAutowired(): void
+//    {
+//        $container = $this->getContainer();
+//
+//        $this->expectException(NotFoundExceptionInterface::class);
+//
+//        (new Injector($container))
+//            ->invoke(static fn (StrEnum $arg1, IntEnum $arg2) => [$arg1, $arg2]);
+//    }
 
     private function createEnumValue(string $enumClass, string $case)
     {

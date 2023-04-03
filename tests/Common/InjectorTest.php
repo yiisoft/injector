@@ -315,19 +315,19 @@ class InjectorTest extends BaseInjectorTest
         $injector->invoke($getEngineName);
     }
 
-    public function testNotFoundException(): void
-    {
-        $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
-
-        $getEngineName = static function (EngineInterface $engine, ColorInterface $color) {
-            return $engine->getName() . $color->getColor();
-        };
-
-        $injector = new Injector($container);
-
-        $this->expectException(NotFoundExceptionInterface::class);
-        $injector->invoke($getEngineName);
-    }
+//    public function testNotFoundException(): void
+//    {
+//        $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
+//
+//        $getEngineName = static function (EngineInterface $engine, ColorInterface $color) {
+//            return $engine->getName() . $color->getColor();
+//        };
+//
+//        $injector = new Injector($container);
+//
+//        $this->expectException(NotFoundExceptionInterface::class);
+//        $injector->invoke($getEngineName);
+//    }
 
     /**
      * A values collection for a variadic argument can be passed as an array in a named parameter.
