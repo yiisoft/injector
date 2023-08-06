@@ -39,8 +39,9 @@ implementation based on autowiring and
 The package could be installed with composer:
 
 ```shell
-composer require yiisoft/injector --prefer-dist
+composer require yiisoft/injector
 ```
+
 ## About
 
 Injector can automatically resolve and inject dependencies when calling

@@ -98,3 +98,13 @@ Additionally:
   (new Injector($container))->invoke($increment, ['value' => &$foo]);
   echo $foo; // 2
   ```
+
+## Reflection caching
+
+In the process of creating an object, injector uses reflection of class being created. In cases where many objects
+of the same class are created, you can enable reflection caching to improve performance using the parameter 
+`cacheReflections` in `Injector` constructor (disabled by default):
+
+```php
+$injector = new Injector($container, true);
+```

@@ -101,3 +101,13 @@ $result = $stringFormatter->getFormattedString();
   (new Injector($container))->invoke($increment, ['value' => &$foo]);
   echo $foo; // 2
   ```
+
+## Кэширование рефлексий
+
+В процессе создания объекта инжектор использует рефлексию создаваемого класса. В случаях, когда создаётся много объектов
+одного и того же класса, для повышения производительности можно включить кэширование рефлексий с помощью параметра
+`cacheReflections` в конструкторе `Injector` (по умолчанию выключен):
+
+```php
+$injector = new Injector($container, true);
+```
