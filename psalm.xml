@@ -11,6 +11,7 @@
         <directory name="src" />
     </projectFiles>
     <issueHandlers>
+        <MixedAssignment errorLevel="suppress" />
         <InvalidThrow>
             <errorLevel type="suppress">
                 <referencedClass name="Psr\Container\ContainerExceptionInterface" />
