@@ -9,15 +9,17 @@
         "reflection",
         "injector"
     ],
-    "homepage": "http://www.yiiframework.com/",
+    "homepage": "https://www.yiiframework.com/",
     "license": "BSD-3-Clause",
     "support": {
         "issues": "https://github.com/yiisoft/injector/issues?state=open",
-        "forum": "http://www.yiiframework.com/forum/",
-        "wiki": "http://www.yiiframework.com/wiki/",
+        "forum": "https://www.yiiframework.com/forum/",
+        "wiki": "https://www.yiiframework.com/wiki/",
         "irc": "irc://irc.freenode.net/yii",
+        "chat": "https://t.me/yii3en",
         "source": "https://github.com/yiisoft/injector"
     },
+    "minimum-stability": "stable",
     "require": {
         "php": "^7.4|^8.0",
         "psr/container": "^1.0|^2.0"
@@ -25,9 +27,9 @@
     "require-dev": {
         "phpbench/phpbench": "^1.1",
         "phpunit/phpunit": "^9.5",
-        "roave/infection-static-analysis-plugin": "^1.7",
+        "roave/infection-static-analysis-plugin": "^1.16",
         "spatie/phpunit-watcher": "^1.23",
-        "vimeo/psalm": "^4.6",
+        "vimeo/psalm": "^4.30|^5.7",
         "yiisoft/test-support": "^1.2"
     },
     "autoload": {
@@ -45,8 +47,10 @@
         "test-watch": "phpunit-watcher watch"
     },
     "config": {
-        "sort-packages": true
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "infection/extension-installer": true,
+            "composer/package-versions-deprecated": true
+        }
+    }
 }

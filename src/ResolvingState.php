@@ -15,11 +15,22 @@ use ReflectionFunctionAbstract;
 final class ResolvingState
 {
     private ReflectionFunctionAbstract $reflection;
-    /** @var array<int, object> */
+
+    /**
+     * @psalm-var array<int, object>
+     */
     private array $numericArguments = [];
-    /** @var array<string, mixed> */
+
+    /**
+     * @psalm-var array<string, mixed>
+     */
     private array $namedArguments = [];
+
     private bool $shouldPushTrailingArguments;
+
+    /**
+     * @psalm-var list<mixed>
+     */
     private array $resolvedValues = [];
 
     /**
@@ -51,6 +62,7 @@ final class ResolvingState
      */
     public function addResolvedValue(&$value): void
     {
+        /** @psalm-suppress UnsupportedReferenceUsage */
         $this->resolvedValues[] = &$value;
     }
 
@@ -87,6 +99,31 @@ final class ResolvingState
         return true;
     }
 
+    /**
+     * Resolve parameter using type intersection rules.
+     *
+     * @psalm-param array<int, class-string> $classNames
+     */
+    public function resolveParameterByClasses(array $classNames, bool $variadic): bool
+    {
+        $resolved = false;
+        foreach ($this->numericArguments as $key => &$argument) {
+            foreach ($classNames as $class) {
+                if (!$argument instanceof $class) {
+                    continue 2;
+                }
+            }
+            unset($this->numericArguments[$key]);
+            $this->addResolvedValue($argument);
+            if (!$variadic) {
+                return true;
+            }
+            $resolved = true;
+        }
+
+        return $resolved;
+    }
+
     public function getResolvedValues(): array
     {
         return $this->shouldPushTrailingArguments
@@ -121,6 +158,7 @@ final class ResolvingState
                 if (!is_object($value)) {
                     throw new InvalidArgumentException($this->reflection, (string)$key);
                 }
+                /** @psalm-suppress UnsupportedReferenceUsage */
                 $this->numericArguments[] = &$value;
             } else {
                 $this->namedArguments[$key] = &$value;
