@@ -26,6 +26,11 @@ final class Injector
 {
     private ContainerInterface $container;
     private bool $cacheReflections;
+
+    /**
+     * @var ReflectionClass[]
+     * @psalm-var array<class-string,ReflectionClass>
+     */
     private array $reflectionsCache = [];
 
     public function __construct(ContainerInterface $container, bool $cacheReflections = false)
