@@ -25,11 +25,13 @@ use ReflectionUnionType;
 final class Injector
 {
     private ContainerInterface $container;
+    private bool $cacheReflections;
     private array $reflectionsCache = [];
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, bool $cacheReflections = false)
     {
         $this->container = $container;
+        $this->cacheReflections = $cacheReflections;
     }
 
     /**
@@ -111,7 +113,7 @@ final class Injector
      */
     public function make(string $class, array $arguments = []): object
     {
-        $classReflection = $this->reflectionsCache[$class] ??= new ReflectionClass($class);
+        $classReflection = $this->getClassReflection($class);
         if (!$classReflection->isInstantiable()) {
             throw new \InvalidArgumentException("Class $class is not instantiable.");
         }
@@ -312,5 +314,19 @@ final class Injector
             return true;
         }
         return false;
+    }
+
+    /**
+     * @psalm-param class-string $class
+     *
+     * @throws ReflectionException
+     */
+    private function getClassReflection(string $class): ReflectionClass
+    {
+        if ($this->cacheReflections) {
+            return $this->reflectionsCache[$class] ??= new ReflectionClass($class);
+        }
+
+        return new ReflectionClass($class);
     }
 }
