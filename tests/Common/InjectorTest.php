@@ -786,8 +786,8 @@ class InjectorTest extends BaseInjectorTest
     {
         $injector = new Injector(
             $this->getContainer([ColorInterface::class => new Red()]),
-            true
         );
+        $injector = $injector->withCacheReflections(true);
 
         $object1 = $injector->make(Circle::class, ['name' => 'obj1']);
         $object2 = $injector->make(Circle::class, ['name' => 'obj2']);

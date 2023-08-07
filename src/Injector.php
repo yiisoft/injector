@@ -25,7 +25,7 @@ use ReflectionUnionType;
 final class Injector
 {
     private ContainerInterface $container;
-    private bool $cacheReflections;
+    private bool $cacheReflections = false;
 
     /**
      * @var ReflectionClass[]
@@ -33,10 +33,19 @@ final class Injector
      */
     private array $reflectionsCache = [];
 
-    public function __construct(ContainerInterface $container, bool $cacheReflections = false)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->cacheReflections = $cacheReflections;
+    }
+
+    /**
+     * Caches reflection objects in memory for performance.
+     */
+    public function withCacheReflections(bool $cacheReflections): self
+    {
+        $new = clone $this;
+        $new->cacheReflections = $cacheReflections;
+        return $new;
     }
 
     /**

@@ -68,6 +68,8 @@ arguments of other types.
 ## Basic Example
 
 ```php
+use Yiisoft\Injector\Injector;
+
 // A function to call
 $fn = function (\App\Foo $a, \App\Bar $b, int $c) { /* ... */ };
 
@@ -85,6 +87,19 @@ $result = $injector->invoke($fn, [
     new Bar(),  // will be used as $b
 ]);
 ```
+
+### Caching reflection objects
+
+Enable caching of reflection objects to improve performance by calling `withCacheReflections(true)`:
+
+```php
+use Yiisoft\Injector\Injector;
+
+$injector = (new Injector($container))
+    ->withCacheReflections(true);
+```
+
+By default, caching is disabled.
 
 ## Documentation
 
