@@ -41,7 +41,7 @@ final class Injector
     /**
      * Caches reflection objects in memory for performance.
      */
-    public function withCacheReflections(bool $cacheReflections): self
+    public function withCacheReflections(bool $cacheReflections = true): self
     {
         $new = clone $this;
         $new->cacheReflections = $cacheReflections;

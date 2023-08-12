@@ -782,12 +782,21 @@ class InjectorTest extends BaseInjectorTest
         (new Injector($container))->make(MakeEngineMatherWithParam::class, ['parameter' => 100500]);
     }
 
-    public function testCorrectInjectWithReflectionCache(): void
+    public function testWithCacheReflectionIsImmutable(): void
+    {
+        $injector1 = new Injector($this->getContainer());
+        $injector2 = $injector1->withCacheReflections();
+
+        $this->assertInstanceOf(Injector::class, $injector2);
+        $this->assertNotSame($injector1, $injector2);
+    }
+
+    public function testReflectionCacheDoesNotAffectInjector(): void
     {
         $injector = new Injector(
             $this->getContainer([ColorInterface::class => new Red()]),
         );
-        $injector = $injector->withCacheReflections(true);
+        $injector = $injector->withCacheReflections();
 
         $object1 = $injector->make(Circle::class, ['name' => 'obj1']);
         $object2 = $injector->make(Circle::class, ['name' => 'obj2']);
