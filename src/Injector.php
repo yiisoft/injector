@@ -39,7 +39,8 @@ final class Injector
     }
 
     /**
-     * Caches reflection objects in memory for performance.
+     * Turn on memoization of resolving classes reflections.
+     * This may improve performance, but may stack up memory.
      */
     public function withCacheReflections(bool $cacheReflections = true): self
     {
