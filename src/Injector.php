@@ -39,8 +39,8 @@ final class Injector
     }
 
     /**
-     * Turn on memoization of resolving classes reflections.
-     * This may improve performance, but may stack up memory.
+ * Enable memoization of class reflections for improved performance when resolving the same objects multiple times.
+ * Note: Enabling this feature may increase memory usage.
      */
     public function withCacheReflections(bool $cacheReflections = true): self
     {
