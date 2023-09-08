@@ -94,6 +94,8 @@ $result = $stringFormatter->getFormattedString();
 * Если параметры функции принимают аргументы по ссылке, то для правильной передачи переменной по ссылке, вам следует
   указывать аргументы также по ссылке:
   ```php
+  use Yiisoft\Injector\Injector;
+  
   $foo = 1;
   $increment = static function (int &$value) {
       ++$value;
@@ -101,3 +103,17 @@ $result = $stringFormatter->getFormattedString();
   (new Injector($container))->invoke($increment, ['value' => &$foo]);
   echo $foo; // 2
   ```
+
+## Кэширование рефлексий
+
+`Injector` использует `Reflection API` для разбора и анализа классов. По умолчанию он создаёт новые объекты `Reflection` при каждом вызове.
+Чтобы предотвратить такое поведение и кэшировать объекты, вызовите метод `withCacheReflections(true)`.
+Рекомендуется включать кэширование в production-окружении, т.к. это позволит увеличить производительность. 
+Если вы используете асинхронные фреймворки, такие, как `RoadRunner`, `AMPHP` или `Swoole`, не забудьте сбросить состояние `Injector`.
+
+```php
+use Yiisoft\Injector\Injector;
+
+$injector = (new Injector($container))
+    ->withCacheReflections(true);
+```

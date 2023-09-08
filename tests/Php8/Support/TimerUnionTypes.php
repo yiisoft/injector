@@ -11,6 +11,7 @@ class TimerUnionTypes
     public function __construct(private string|DateTimeInterface $time)
     {
     }
+
     public function getTime(): string|DateTimeInterface
     {
         return $this->time;

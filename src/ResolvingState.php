@@ -56,6 +56,7 @@ final class ResolvingState
 
     public function addResolvedValue(mixed &$value): void
     {
+        /** @psalm-suppress UnsupportedReferenceUsage */
         $this->resolvedValues[] = &$value;
     }
 
@@ -149,6 +150,7 @@ final class ResolvingState
                 if (!is_object($value)) {
                     throw new InvalidArgumentException($this->reflection, (string)$key);
                 }
+                /** @psalm-suppress UnsupportedReferenceUsage */
                 $this->numericArguments[] = &$value;
             } else {
                 $this->namedArguments[$key] = &$value;

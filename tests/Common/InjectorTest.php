@@ -15,6 +15,7 @@ use Yiisoft\Injector\MissingRequiredArgumentException;
 use Yiisoft\Injector\Tests\Common\Support\CallStaticObject;
 use Yiisoft\Injector\Tests\Common\Support\CallStaticWithSelfObject;
 use Yiisoft\Injector\Tests\Common\Support\CallStaticWithStaticObject;
+use Yiisoft\Injector\Tests\Common\Support\Circle;
 use Yiisoft\Injector\Tests\Common\Support\ColorInterface;
 use Yiisoft\Injector\Tests\Common\Support\EngineInterface;
 use Yiisoft\Injector\Tests\Common\Support\EngineMarkTwo;
@@ -27,6 +28,7 @@ use Yiisoft\Injector\Tests\Common\Support\MakeEngineCollector;
 use Yiisoft\Injector\Tests\Common\Support\MakeEngineMatherWithParam;
 use Yiisoft\Injector\Tests\Common\Support\MakeNoConstructor;
 use Yiisoft\Injector\Tests\Common\Support\MakePrivateConstructor;
+use Yiisoft\Injector\Tests\Common\Support\Red;
 use Yiisoft\Injector\Tests\Common\Support\StaticWithSelfObject;
 use Yiisoft\Injector\Tests\Common\Support\StaticWithStaticObject;
 
@@ -759,5 +761,30 @@ class InjectorTest extends BaseInjectorTest
         $this->expectException(\TypeError::class);
 
         (new Injector($container))->make(MakeEngineMatherWithParam::class, ['parameter' => 100500]);
+    }
+
+    public function testWithCacheReflectionIsImmutable(): void
+    {
+        $injector1 = new Injector($this->getContainer());
+        $injector2 = $injector1->withCacheReflections();
+
+        $this->assertInstanceOf(Injector::class, $injector2);
+        $this->assertNotSame($injector1, $injector2);
+    }
+
+    public function testReflectionCacheDoesNotAffectInjector(): void
+    {
+        $injector = new Injector(
+            $this->getContainer([ColorInterface::class => new Red()]),
+        );
+        $injector = $injector->withCacheReflections();
+
+        $object1 = $injector->make(Circle::class, ['name' => 'obj1']);
+        $object2 = $injector->make(Circle::class, ['name' => 'obj2']);
+
+        $this->assertSame('red', $object1->getColor());
+        $this->assertSame('obj1', $object1->getName());
+        $this->assertSame('red', $object2->getColor());
+        $this->assertSame('obj2', $object2->getName());
     }
 }

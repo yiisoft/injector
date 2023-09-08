@@ -10,7 +10,7 @@ final class StaticWithStaticObject
 
     public static function foo(): string
     {
-        static::$wasCalled = true;
+        self::$wasCalled = true;
         return 'bar';
     }
 }
