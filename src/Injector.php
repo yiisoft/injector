@@ -102,7 +102,9 @@ final class Injector
      * @psalm-suppress MixedMethodCall
      *
      * @psalm-template T
+     *
      * @psalm-param class-string<T> $class
+     *
      * @psalm-return T
      */
     public function make(string $class, array $arguments = []): object
