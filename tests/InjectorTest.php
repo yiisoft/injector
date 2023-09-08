@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Injector\Tests\Php8;
+namespace Yiisoft\Injector\Tests;
 
 use ArrayAccess;
 use ArrayIterator;
@@ -14,12 +14,12 @@ use stdClass;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\MissingRequiredArgumentException;
 use Yiisoft\Injector\Tests\Common\BaseInjectorTest;
-use Yiisoft\Injector\Tests\Php8\Support\IntEnum;
-use Yiisoft\Injector\Tests\Php8\Support\NonBackedEnum;
-use Yiisoft\Injector\Tests\Php8\Support\StrEnum;
-use Yiisoft\Injector\Tests\Php8\Support\TimerUnionTypes;
-use Yiisoft\Injector\Tests\Php8\Support\TypesIntersection;
-use Yiisoft\Injector\Tests\Php8\Support\TypesIntersectionReferencedConstructor;
+use Yiisoft\Injector\Tests\Support\IntEnum;
+use Yiisoft\Injector\Tests\Support\NonBackedEnum;
+use Yiisoft\Injector\Tests\Support\StrEnum;
+use Yiisoft\Injector\Tests\Support\TimerUnionTypes;
+use Yiisoft\Injector\Tests\Support\TypesIntersection;
+use Yiisoft\Injector\Tests\Support\TypesIntersectionReferencedConstructor;
 
 class InjectorTest extends BaseInjectorTest
 {

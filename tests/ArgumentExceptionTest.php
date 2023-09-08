@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Injector\Tests\Php8;
+namespace Yiisoft\Injector\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Yiisoft\Injector\ArgumentException;
-use Yiisoft\Injector\Tests\Php8\Support\TypesIntersection;
+use Yiisoft\Injector\Tests\Support\TypesIntersection;
 
 abstract class ArgumentExceptionTest extends TestCase
 {

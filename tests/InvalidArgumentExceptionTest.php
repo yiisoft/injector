@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yiisoft\Injector\Tests\Php8;
+namespace Yiisoft\Injector\Tests;
 
 class InvalidArgumentExceptionTest extends ArgumentExceptionTest
 {
