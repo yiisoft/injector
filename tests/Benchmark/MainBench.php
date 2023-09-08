@@ -33,8 +33,11 @@ final class MainBench
 
     /**
      * @Revs(10000)
+     *
      * @Iterations(10)
+     *
      * @ParamProviders("provider")
+     *
      * @Warmup(1)
      */
     public function benchMake(array $params): void
