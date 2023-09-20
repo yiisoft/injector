@@ -30,4 +30,5 @@ jobs:
       os: >-
         ['ubuntu-latest']
       php: >-
-        ['8.0', '8.1', '8.2']
+        ['7.4', '8.0', '8.1', '8.2']
+      config: ./composer-require-checker.json
