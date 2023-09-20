@@ -25,10 +25,28 @@ use ReflectionUnionType;
 final class Injector
 {
     private ContainerInterface $container;
+    private bool $cacheReflections = false;
+
+    /**
+     * @var ReflectionClass[]
+     * @psalm-var array<class-string,ReflectionClass>
+     */
+    private array $reflectionsCache = [];
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+    }
+
+    /**
+     * Enable memoization of class reflections for improved performance when resolving the same objects multiple times.
+     * Note: Enabling this feature may increase memory usage.
+     */
+    public function withCacheReflections(bool $cacheReflections = true): self
+    {
+        $new = clone $this;
+        $new->cacheReflections = $cacheReflections;
+        return $new;
     }
 
     /**
@@ -59,7 +77,7 @@ final class Injector
      * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
      * @throws ReflectionException
      *
-     * @return mixed the callable return value.
+     * @return mixed The callable return value.
      */
     public function invoke(callable $callable, array $arguments = [])
     {
@@ -110,7 +128,7 @@ final class Injector
      */
     public function make(string $class, array $arguments = []): object
     {
-        $classReflection = new ReflectionClass($class);
+        $classReflection = $this->getClassReflection($class);
         if (!$classReflection->isInstantiable()) {
             throw new \InvalidArgumentException("Class $class is not instantiable.");
         }
@@ -171,7 +189,7 @@ final class Injector
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      *
-     * @return bool|null {@see true} if argument resolved; False if not resolved; Null if parameter is optional but
+     * @return bool|null True if argument resolved; False if not resolved; Null if parameter is optional but
      * without default value in a Reflection object. This is possible for internal functions.
      */
     private function resolveParameter(ReflectionParameter $parameter, ResolvingState $state): ?bool
@@ -198,7 +216,6 @@ final class Injector
         }
 
         if ($parameter->isDefaultValueAvailable()) {
-            /** @var mixed $argument */
             $argument = $parameter->getDefaultValue();
             $state->addResolvedValue($argument);
             return true;
@@ -232,9 +249,8 @@ final class Injector
      *
      * @throws ContainerExceptionInterface
      *
-     * @return bool {@see true} if argument was resolved
+     * @return bool True if argument was resolved
      *
-     * @psalm-suppress MixedAssignment
      * @psalm-suppress PossiblyUndefinedMethod
      */
     private function resolveParameterType(
@@ -279,7 +295,7 @@ final class Injector
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      *
-     * @return bool {@see true} if argument was resolved
+     * @return bool True if argument was resolved
      */
     private function resolveNamedType(ResolvingState $state, ReflectionNamedType $parameter, bool $isVariadic): bool
     {
@@ -305,11 +321,24 @@ final class Injector
             return $found;
         }
         if ($class !== null) {
-            /** @var mixed $argument */
             $argument = $this->container->get($class);
             $state->addResolvedValue($argument);
             return true;
         }
         return false;
+    }
+
+    /**
+     * @psalm-param class-string $class
+     *
+     * @throws ReflectionException
+     */
+    private function getClassReflection(string $class): ReflectionClass
+    {
+        if ($this->cacheReflections) {
+            return $this->reflectionsCache[$class] ??= new ReflectionClass($class);
+        }
+
+        return new ReflectionClass($class);
     }
 }

@@ -13,7 +13,7 @@ final class CallStaticWithStaticObject
     public static function __callStatic(string $name, array $args): string
     {
         if ($name === 'foo') {
-            static::$wasCalled = true;
+            self::$wasCalled = true;
             return 'bar';
         }
         throw new Exception('Unknown method.');

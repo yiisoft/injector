@@ -21,6 +21,9 @@ use function var_export;
 
 abstract class ArgumentException extends \InvalidArgumentException
 {
+    /**
+     * @var string
+     */
     protected const EXCEPTION_MESSAGE = 'Something is wrong with argument "%s" when calling "%s"%s.';
 
     public function __construct(ReflectionFunctionAbstract $reflection, string $parameter)
@@ -46,7 +49,6 @@ abstract class ArgumentException extends \InvalidArgumentException
             $fileAndLine = " in \"$fileName\" at line $line";
         }
 
-        /** @psalm-suppress MixedArgument */
         parent::__construct(sprintf(static::EXCEPTION_MESSAGE, $parameter, $method, $fileAndLine));
     }
 
@@ -66,7 +68,6 @@ abstract class ArgumentException extends \InvalidArgumentException
                 $parameter->getName(),
             );
             if ($parameter->isDefaultValueAvailable()) {
-                /** @var mixed $default */
                 $default = $parameter->getDefaultValue();
                 $parameterString .= ' = ';
                 if (is_object($default)) {

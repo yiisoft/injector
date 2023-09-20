@@ -91,6 +91,8 @@ Additionally:
 * Unused named arguments are ignored.
 * If parameters are accepting arguments by reference, arguments should be explicitly passed by reference:
   ```php
+  use Yiisoft\Injector\Injector;
+  
   $foo = 1;
   $increment = function (int &$value) {
       ++$value;
@@ -98,3 +100,17 @@ Additionally:
   (new Injector($container))->invoke($increment, ['value' => &$foo]);
   echo $foo; // 2
   ```
+
+## Reflection caching
+
+`Injector` uses `Reflection API` to analyze class signatures. By default, it creates new `Reflection` objects each time.
+Call `withCacheReflections(true)` to prevent this behavior and cache reflection objects. 
+It is recommended to enable caching in production environment, because it improves performance. 
+If you use async frameworks such as `RoadRunner`, `AMPHP` or `Swoole` don't forget to reset injector state.
+
+```php
+use Yiisoft\Injector\Injector;
+
+$injector = (new Injector($container))
+    ->withCacheReflections(true);
+```

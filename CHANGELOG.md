@@ -1,8 +1,9 @@
 # Yii Injector Change Log
 
-## 1.1.1 under development
+## 1.2.0 under development
 
 - Enh: Add composer require checker into CI
+- New #52: Add optional reflection caching (@xepozz, @vjik)
 
 ## 1.1.0 July 18, 2022
 
