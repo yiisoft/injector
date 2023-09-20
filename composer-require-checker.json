@@ -1,0 +1,6 @@
+{
+    "symbol-whitelist": [
+        "ReflectionIntersectionType",
+        "ReflectionUnionType"
+    ]
+}
