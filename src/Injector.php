@@ -320,10 +320,7 @@ final class Injector
         if ($found || $isVariadic) {
             return $found;
         }
-        if ($class !== null) {
-            if ($this->container === null) {
-                throw new ContainerNotSetException($class);
-            }
+        if ($class !== null && $this->container !== null) {
             $argument = $this->container->get($class);
             $state->addResolvedValue($argument);
             return true;

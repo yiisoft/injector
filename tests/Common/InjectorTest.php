@@ -9,7 +9,6 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use stdClass;
-use Yiisoft\Injector\ContainerNotSetException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\InvalidArgumentException;
 use Yiisoft\Injector\MissingRequiredArgumentException;
@@ -832,9 +831,9 @@ class InjectorTest extends BaseInjectorTest
     {
         $injector = new Injector();
 
-        $this->expectException(ContainerNotSetException::class);
+        $this->expectException(MissingRequiredArgumentException::class);
         $this->expectExceptionMessage(
-            'Container is not set in injector, so impossible resolve "' . ColorInterface::class . '".'
+            'Missing required argument "color" when calling "Yiisoft\Injector\Tests\Common\Support\Circle::__construct" in'
         );
         $injector->make(Circle::class);
     }
