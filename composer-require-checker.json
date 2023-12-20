@@ -1,5 +1,6 @@
 {
     "symbol-whitelist": [
+        "Psr\\Container\\NotFoundExceptionInterface",
         "ReflectionIntersectionType",
         "ReflectionUnionType",
         "null",
