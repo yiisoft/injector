@@ -325,7 +325,6 @@ final class Injector
                 throw new ContainerNotSetException($class);
             }
             $argument = $this->container->get($class);
-
             $state->addResolvedValue($argument);
             return true;
         }
