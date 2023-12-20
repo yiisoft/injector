@@ -1,6 +1,6 @@
 # Yii Injector Change Log
 
-## 1.2.0 under development
+## 1.2.0 December 20, 2023
 
 - New #52: Add optional reflection caching (@xepozz, @vjik)
 - Enh #86: Make container optional (@vjik)
