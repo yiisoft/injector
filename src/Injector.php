@@ -24,7 +24,7 @@ use ReflectionUnionType;
  */
 final class Injector
 {
-    private ContainerInterface $container;
+    private ?ContainerInterface $container;
     private bool $cacheReflections = false;
 
     /**
@@ -33,7 +33,7 @@ final class Injector
      */
     private array $reflectionsCache = [];
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(?ContainerInterface $container = null)
     {
         $this->container = $container;
     }
@@ -320,7 +320,7 @@ final class Injector
         if ($found || $isVariadic) {
             return $found;
         }
-        if ($class !== null) {
+        if ($class !== null && $this->container !== null) {
             $argument = $this->container->get($class);
             $state->addResolvedValue($argument);
             return true;

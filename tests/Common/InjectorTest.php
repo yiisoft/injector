@@ -31,6 +31,7 @@ use Yiisoft\Injector\Tests\Common\Support\MakePrivateConstructor;
 use Yiisoft\Injector\Tests\Common\Support\Red;
 use Yiisoft\Injector\Tests\Common\Support\StaticWithSelfObject;
 use Yiisoft\Injector\Tests\Common\Support\StaticWithStaticObject;
+use Yiisoft\Injector\Tests\Common\Support\Table;
 
 class InjectorTest extends BaseInjectorTest
 {
@@ -805,5 +806,46 @@ class InjectorTest extends BaseInjectorTest
         $this->assertSame('obj1', $object1->getName());
         $this->assertSame('red', $object2->getColor());
         $this->assertSame('obj2', $object2->getName());
+    }
+
+    public function testWithoutContainer(): void
+    {
+        $injector = new Injector();
+
+        $object = $injector->make(Red::class);
+
+        $this->assertInstanceOf(Red::class, $object);
+    }
+
+    public function testWithoutContainerWithArguments(): void
+    {
+        $injector = new Injector();
+
+        $object = $injector->make(Circle::class, ['color' => new Red()]);
+
+        $this->assertInstanceOf(Circle::class, $object);
+        $this->assertSame('red', $object->getColor());
+        $this->assertSame(null, $object->getName());
+    }
+
+    public function testUnresolvedWithoutContainer(): void
+    {
+        $injector = new Injector();
+
+        $this->expectException(MissingRequiredArgumentException::class);
+        $this->expectExceptionMessage(
+            'Missing required argument "color" when calling "Yiisoft\Injector\Tests\Common\Support\Circle::__construct" in'
+        );
+        $injector->make(Circle::class);
+    }
+
+    public function testOptionalWithoutContainer(): void
+    {
+        $injector = new Injector();
+
+        $object = $injector->make(Table::class);
+
+        $this->assertInstanceOf(Table::class, $object);
+        $this->assertSame(null, $object->color);
     }
 }
