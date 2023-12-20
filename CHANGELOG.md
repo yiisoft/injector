@@ -3,6 +3,7 @@
 ## 1.2.0 under development
 
 - New #52: Add optional reflection caching (@xepozz, @vjik)
+- Enh #86: Make container optional (@vjik)
 
 ## 1.1.0 July 18, 2022
 

@@ -9,6 +9,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use stdClass;
+use Yiisoft\Injector\ContainerNotSetException;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\InvalidArgumentException;
 use Yiisoft\Injector\MissingRequiredArgumentException;
@@ -805,5 +806,36 @@ class InjectorTest extends BaseInjectorTest
         $this->assertSame('obj1', $object1->getName());
         $this->assertSame('red', $object2->getColor());
         $this->assertSame('obj2', $object2->getName());
+    }
+
+    public function testWithoutContainer(): void
+    {
+        $injector = new Injector();
+
+        $object = $injector->make(Red::class);
+
+        $this->assertInstanceOf(Red::class, $object);
+    }
+
+    public function testWithoutContainerWithArguments(): void
+    {
+        $injector = new Injector();
+
+        $object = $injector->make(Circle::class, ['color' => new Red()]);
+
+        $this->assertInstanceOf(Circle::class, $object);
+        $this->assertSame('red', $object->getColor());
+        $this->assertSame(null, $object->getName());
+    }
+
+    public function testUnresolvedWithoutContainer(): void
+    {
+        $injector = new Injector();
+
+        $this->expectException(ContainerNotSetException::class);
+        $this->expectExceptionMessage(
+            'Container is not set in injector, so impossible resolve "' . ColorInterface::class . '".'
+        );
+        $injector->make(Circle::class);
     }
 }
