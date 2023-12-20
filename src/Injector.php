@@ -323,9 +323,9 @@ final class Injector
         if ($class !== null) {
             if ($this->container === null) {
                 throw new ContainerNotSetException($class);
-            } else {
-                $argument = $this->container->get($class);
             }
+            $argument = $this->container->get($class);
+
             $state->addResolvedValue($argument);
             return true;
         }
