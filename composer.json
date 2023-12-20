@@ -35,7 +35,7 @@
         "yiisoft/test-support": "^1.2"
     },
     "suggest": {
-        "psr/container": "To automatically dependencies resolving"
+        "psr/container": "For automatic resolving of dependencies"
     },
     "autoload": {
         "psr-4": {
