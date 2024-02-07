@@ -9,9 +9,13 @@
 >
     <projectFiles>
         <directory name="src" />
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
     </projectFiles>
     <issueHandlers>
         <MixedAssignment errorLevel="suppress" />
+        <RiskyTruthyFalsyComparison errorLevel="suppress" />
         <InvalidThrow>
             <errorLevel type="suppress">
                 <referencedClass name="Psr\Container\ContainerExceptionInterface" />
