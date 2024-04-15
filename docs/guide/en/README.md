@@ -46,7 +46,7 @@ public function calculate(DataProvider $dataProvider, float $multiplier)
 }
 ```
 
-We have passed two arguments. One is `multiplier`. It is explicitly named. Such arguments passed as is. Another is 
+We have passed two arguments. One is `multiplier`. It is explicitly named. Such arguments passed as is. Another is
 data provider. It is not named explicitly so injector finds matching parameter that has the same type.
 
 Creating an instance of an object of a given class behaves similar to `invoke()`:
@@ -80,7 +80,7 @@ parameter names / types and an optional array of explicit values.
 
 Algorithm is the following:
 
-![Algorithm](img/algorithm.svg)
+![Algorithm](image/algorithm.svg)
 
 Additionally:
 
@@ -90,6 +90,7 @@ Additionally:
   `func_get_args()`.
 * Unused named arguments are ignored.
 * If parameters are accepting arguments by reference, arguments should be explicitly passed by reference:
+
   ```php
   use Yiisoft\Injector\Injector;
   
@@ -104,8 +105,8 @@ Additionally:
 ## Reflection caching
 
 `Injector` uses `Reflection API` to analyze class signatures. By default, it creates new `Reflection` objects each time.
-Call `withCacheReflections(true)` to prevent this behavior and cache reflection objects. 
-It is recommended to enable caching in production environment, because it improves performance. 
+Call `withCacheReflections(true)` to prevent this behavior and cache reflection objects.
+It is recommended to enable caching in production environment, because it improves performance.
 If you use async frameworks such as `RoadRunner`, `AMPHP` or `Swoole` don't forget to reset injector state.
 
 ```php
