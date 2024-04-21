@@ -103,12 +103,9 @@ By default, caching is disabled.
 ## Documentation
 
 * [English](docs/guide/en/README.md)
-* [Portuguese - Brazil](docs/guide/pt-BR/README.md)
+* [Português - Brasil](docs/guide/pt-BR/README.md)
 * [Russian](docs/guide/ru/README.md)
-
-Testing:
-
-* More information can be found in the [Internals.](docs/internals.md)
+* [Internals](docs/internals.md)
 
 ## Support
 
