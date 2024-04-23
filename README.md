@@ -21,18 +21,18 @@ implementation based on autowiring and
 
 #### Features
 
- * Injects dependencies when calling functions and creating objects
- * Works with any dependency injection container (DIC) that is [PSR-11](https://www.php-fig.org/psr/psr-11/) compatible
- * Accepts additional dependencies and arguments passed as array
- * Allows passing arguments *by parameter name* in the array
- * Resolves object type dependencies from the container and the passed array
+* Injects dependencies when calling functions and creating objects
+* Works with any dependency injection container (DIC) that is [PSR-11](https://www.php-fig.org/psr/psr-11/) compatible
+* Accepts additional dependencies and arguments passed as array
+* Allows passing arguments *by parameter name* in the array
+* Resolves object type dependencies from the container and the passed array
    by [parameter type declaration](https://www.php.net/manual/en/functions.arguments.php#functions.arguments.type-declaration)
- * Resolves [variadic arguments](https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list)
+* Resolves [variadic arguments](https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list)
    i.e. `function (MyClass ...$a)`
 
 ## Requirements
 
-- PHP 7.4 or higher.
+* PHP 7.4 or higher.
 
 ## Installation
 
@@ -63,7 +63,6 @@ objects), arguments in that array can optionally use a function parameter name
 as key. This way basically any callable can be invoked and any object
 be instantiated by the Injector even if it uses a mix of object dependencies and
 arguments of other types.
-
 
 ## Basic Example
 
@@ -103,42 +102,15 @@ By default, caching is disabled.
 
 ## Documentation
 
-- [English](docs/en/README.md)
-- [Russian](docs/ru/README.md)
+* [English](docs/guide/en/README.md)
+* [Português - Brasil](docs/guide/pt-BR/README.md)
+* [Russian](docs/guide/ru/README.md)
+* [Internals](docs/internals.md)
 
-## Testing
+## Support
 
-### Unit testing
-
-The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
-
-```shell
-./vendor/bin/phpunit
-```
-
-### Mutation testing
-
-The package tests are checked with [Infection](https://infection.github.io/) mutation framework with
-[Infection Static Analysis Plugin](https://github.com/Roave/infection-static-analysis-plugin). To run it:
-
-```shell
-./vendor/bin/roave-infection-static-analysis-plugin
-```
-
-### Static analysis
-
-The code is statically analyzed with [Psalm](https://psalm.dev/). To run static analysis:
-
-```shell
-./vendor/bin/psalm
-```
-
-## License
-
-The Yii Injector is free software. It is released under the terms of the BSD License.
-Please see [`LICENSE`](./LICENSE.md) for more information.
-
-Maintained by [Yii Software](https://www.yiiframework.com/).
+If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
+You may also check out other [Yii Community Resources](https://www.yiiframework.com/community).
 
 ## Support the project
 
@@ -151,3 +123,10 @@ Maintained by [Yii Software](https://www.yiiframework.com/).
 [![Telegram](https://img.shields.io/badge/telegram-join-1DA1F2?style=flat&logo=telegram)](https://t.me/yii3en)
 [![Facebook](https://img.shields.io/badge/facebook-join-1DA1F2?style=flat&logo=facebook&logoColor=ffffff)](https://www.facebook.com/groups/yiitalk)
 [![Slack](https://img.shields.io/badge/slack-join-1DA1F2?style=flat&logo=slack)](https://yiiframework.com/go/slack)
+
+## License
+
+The Yii Injector is free software. It is released under the terms of the BSD License.
+Please see [`LICENSE`](./LICENSE.md) for more information.
+
+Maintained by [Yii Software](https://www.yiiframework.com/).
