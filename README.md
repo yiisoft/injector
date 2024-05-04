@@ -36,7 +36,7 @@ implementation based on autowiring and
 
 ## Installation
 
-The package could be installed with composer:
+The package could be installed via [composer](https://getcomposer.org/download/)
 
 ```shell
 composer require yiisoft/injector
@@ -102,7 +102,7 @@ By default, caching is disabled.
 
 ## Documentation
 
-- Guide: [English](docs/guide/en/README.md), [Russian](docs/guide/ru/README.md)
+- Guide: [English](docs/guide/en/README.md), [Português - Brasil](docs/guide/pt-BR/README.md), [Russian](docs/guide/ru/README.md)
 - [Internals](docs/internals.md)
 
 If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
