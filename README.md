@@ -19,6 +19,17 @@ A [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection)
 implementation based on autowiring and
 [PSR-11](https://www.php-fig.org/psr/psr-11/) compatible dependency injection containers.
 
+#### Features
+
+- Injects dependencies when calling functions and creating objects
+- Works with any dependency injection container (DIC) that is [PSR-11](https://www.php-fig.org/psr/psr-11/) compatible
+- Accepts additional dependencies and arguments passed as array
+- Allows passing arguments *by parameter name* in the array
+- Resolves object type dependencies from the container and the passed array
+   by [parameter type declaration](https://www.php.net/manual/en/functions.arguments.php#functions.arguments.type-declaration)
+- Resolves [variadic arguments](https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list)
+   i.e. `function (MyClass ...$a)`
+
 Injector can automatically resolve and inject dependencies when calling
 functions and creating objects.
 
@@ -38,17 +49,6 @@ objects), arguments in that array can optionally use a function parameter name
 as key. This way basically any callable can be invoked and any object
 be instantiated by the Injector even if it uses a mix of object dependencies and
 arguments of other types.
-
-#### Features
-
-- Injects dependencies when calling functions and creating objects
-- Works with any dependency injection container (DIC) that is [PSR-11](https://www.php-fig.org/psr/psr-11/) compatible
-- Accepts additional dependencies and arguments passed as array
-- Allows passing arguments *by parameter name* in the array
-- Resolves object type dependencies from the container and the passed array
-   by [parameter type declaration](https://www.php.net/manual/en/functions.arguments.php#functions.arguments.type-declaration)
-- Resolves [variadic arguments](https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list)
-   i.e. `function (MyClass ...$a)`
 
 ## Requirements
 
