@@ -19,7 +19,7 @@ $getEngineName = static function (EngineInterface $engine) {
 
 $injector = new Injector($container);
 echo $injector->invoke($getEngineName);
-// outputs "Mark Two"
+// saída "Mark Two"
 ```
 
 No código acima, alimentamos nosso contêiner com `Injector` ao criá-lo. Qualquer recipiente [PSR-11](https://www.php-fig.org/psr/psr-11/)
