@@ -83,7 +83,7 @@ final class Injector
     {
         $callable = Closure::fromCallable($callable);
         $reflection = new ReflectionFunction($callable);
-        return ($callable)(...$this->resolveDependencies($reflection, $arguments));
+        return $callable(...$this->resolveDependencies($reflection, $arguments));
     }
 
     /**
