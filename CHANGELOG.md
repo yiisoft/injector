@@ -2,7 +2,7 @@
 
 ## 1.2.1 under development
 
-- no changes in this release.
+- Enh #98: Fix callable call (@xepozz)
 
 ## 1.2.0 December 20, 2023
 
