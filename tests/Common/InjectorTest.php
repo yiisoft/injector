@@ -656,8 +656,8 @@ class InjectorTest extends BaseInjectorTest
         $traces = $e->getTrace();
 
         foreach ($traces as $trace) {
-            $this->assertArrayHasKey('line',$trace);
-            $this->assertArrayHasKey('file',$trace);
+            $this->assertArrayHasKey('line', $trace);
+            $this->assertArrayHasKey('file', $trace);
         }
     }
 
