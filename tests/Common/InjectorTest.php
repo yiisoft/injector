@@ -641,7 +641,9 @@ class InjectorTest extends BaseInjectorTest
 
     public function testBacktraceContaintsRequiredInfo(): void
     {
-        $callable = fn () => throw new \Exception();
+        $callable = function () {
+            throw new \Exception();
+        };
 
         $e = null;
         try {
