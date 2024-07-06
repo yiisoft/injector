@@ -2,7 +2,7 @@
 
 ## 1.2.1 under development
 
-- Enh #98: Fix callable call (@xepozz)
+- Enh #98: Refactor `Injector::invoke()` to improve debug trace (@xepozz)
 
 ## 1.2.0 December 20, 2023
 
