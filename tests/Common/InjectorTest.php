@@ -639,6 +639,28 @@ class InjectorTest extends BaseInjectorTest
         (new Injector($container))->invoke($callable, [new \SplStack()]);
     }
 
+    public function testBacktraceContaintsRequiredInfo(): void
+    {
+        $callable = function () {
+            throw new \Exception();
+        };
+
+        $e = null;
+        try {
+            (new Injector())->invoke($callable);
+        } catch (\Exception $e) {
+        }
+
+        $this->assertNotNull($e);
+
+        $traces = $e->getTrace();
+
+        foreach ($traces as $trace) {
+            $this->assertArrayHasKey('line', $trace);
+            $this->assertArrayHasKey('file', $trace);
+        }
+    }
+
     public function testUnnamedScalarParam(): void
     {
         $container = $this->getContainer();

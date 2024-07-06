@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://github.com/yiisoft" target="_blank">
-        <img src="https://yiisoft.github.io/docs/images/yii_logo.svg" height="100px">
+        <img src="https://yiisoft.github.io/docs/images/yii_logo.svg" height="100px" alt="Yii">
     </a>
     <h1 align="center">Yii Injector</h1>
     <br>
@@ -21,22 +21,22 @@ implementation based on autowiring and
 
 #### Features
 
-* Injects dependencies when calling functions and creating objects
-* Works with any dependency injection container (DIC) that is [PSR-11](https://www.php-fig.org/psr/psr-11/) compatible
-* Accepts additional dependencies and arguments passed as array
-* Allows passing arguments *by parameter name* in the array
-* Resolves object type dependencies from the container and the passed array
+- Injects dependencies when calling functions and creating objects
+- Works with any dependency injection container (DIC) that is [PSR-11](https://www.php-fig.org/psr/psr-11/) compatible
+- Accepts additional dependencies and arguments passed as array
+- Allows passing arguments *by parameter name* in the array
+- Resolves object type dependencies from the container and the passed array
    by [parameter type declaration](https://www.php.net/manual/en/functions.arguments.php#functions.arguments.type-declaration)
-* Resolves [variadic arguments](https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list)
+- Resolves [variadic arguments](https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list)
    i.e. `function (MyClass ...$a)`
 
 ## Requirements
 
-* PHP 7.4 or higher.
+- PHP 7.4 or higher.
 
 ## Installation
 
-The package could be installed with composer:
+The package could be installed with [Composer](https://getcomposer.org):
 
 ```shell
 composer require yiisoft/injector
@@ -102,7 +102,7 @@ By default, caching is disabled.
 
 ## Documentation
 
-- Guide: [English](docs/guide/en/README.md), [Russian](docs/guide/ru/README.md)
+- Guide: [English](docs/guide/en/README.md), [Português - Brasil](docs/guide/pt-BR/README.md), [Русский](docs/guide/ru/README.md)
 - [Internals](docs/internals.md)
 
 If you need help or have a question, the [Yii Forum](https://forum.yiiframework.com/c/yii-3-0/63) is a good place for that.
