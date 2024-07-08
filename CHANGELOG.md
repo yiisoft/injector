@@ -2,6 +2,7 @@
 
 ## 1.2.1 under development
 
+- Enh #96: Adjust pretty name of closures on PHP 8.4 in exception messages (@staabm)  
 - Enh #98: Refactor `Injector::invoke()` to improve debug trace (@xepozz)
 
 ## 1.2.0 December 20, 2023
