@@ -23,6 +23,8 @@ abstract class ArgumentException extends \InvalidArgumentException
 {
     /**
      * @var string
+     *
+     * @psalm-suppress MissingClassConstType Add constant type after raise minimal PHP version to 8.3
      */
     protected const EXCEPTION_MESSAGE = 'Something is wrong with argument "%s" when calling "%s"%s.';
 
