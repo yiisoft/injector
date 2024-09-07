@@ -6,9 +6,9 @@
     <br>
 </p>
 
-[![Latest Stable Version](https://poser.pugx.org/yiisoft/injector/v/stable.png)](https://packagist.org/packages/yiisoft/injector)
-[![Total Downloads](https://poser.pugx.org/yiisoft/injector/downloads.png)](https://packagist.org/packages/yiisoft/injector)
-[![Build status](https://github.com/yiisoft/injector/workflows/build/badge.svg)](https://github.com/yiisoft/injector/actions)
+[![Latest Stable Version](https://poser.pugx.org/yiisoft/injector/v)](https://packagist.org/packages/yiisoft/injector)
+[![Total Downloads](https://poser.pugx.org/yiisoft/injector/downloads)](https://packagist.org/packages/yiisoft/injector)
+[![Build status](https://github.com/yiisoft/injector/actions/workflows/build.yml/badge.svg)](https://github.com/yiisoft/injector/actions/workflows/build.yml)
 [![Code Coverage](https://codecov.io/gh/yiisoft/injector/graph/badge.svg?token=UX1E0SFD1P)](https://codecov.io/gh/yiisoft/injector)
 [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Finjector%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/injector/master)
 [![static analysis](https://github.com/yiisoft/injector/workflows/static%20analysis/badge.svg)](https://github.com/yiisoft/injector/actions?query=workflow%3A%22static+analysis%22)
