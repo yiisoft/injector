@@ -211,7 +211,7 @@ class InjectorTest extends BaseInjectorTest
     {
         $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
 
-        $callable = fn (EngineInterface $engine = null) => $engine;
+        $callable = fn (?EngineInterface $engine = null) => $engine;
 
         $result = (new Injector($container))->invoke($callable);
 

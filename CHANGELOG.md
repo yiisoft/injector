@@ -3,6 +3,7 @@
 ## 1.2.1 under development
 
 - Enh #98: Refactor `Injector::invoke()` to improve debug trace (@xepozz)
+- Chg #105: Change PHP constraint in `composer.json` to `~7.4.0 || ~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0` (@vjik)
 
 ## 1.2.0 December 20, 2023
 
