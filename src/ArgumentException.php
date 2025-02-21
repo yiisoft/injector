@@ -36,7 +36,7 @@ abstract class ArgumentException extends \InvalidArgumentException
 
         if ($class === null) {
             $method = $function;
-            if (substr($method, -9) === '{closure}') {
+            if (strpos($method, '{closure') !== false) {
                 $method = $this->renderClosureSignature($reflection);
             }
         } else {
