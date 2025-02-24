@@ -42,7 +42,7 @@
         "roave/infection-static-analysis-plugin": "^1.16",
         "spatie/phpunit-watcher": "^1.23",
         "vimeo/psalm": "^4.30|^5.25",
-        "yiisoft/test-support": "^1.2"
+        "yiisoft/test-support": "^3.0"
     },
     "suggest": {
         "psr/container": "For automatic resolving of dependencies"
