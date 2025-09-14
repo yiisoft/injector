@@ -69,7 +69,9 @@ final class Injector
      * This will pass the string `'Hello World!'` as the first argument, and a formatter instance created
      * by the DI container as the second argument.
      *
-     * @param callable $callable callable to be invoked.
+     * @template TReturn
+     *
+     * @param callable(): TReturn $callable callable to be invoked.
      * @param array $arguments The array of the function arguments.
      * This can be either a list of arguments, or an associative array where keys are argument names.
      *
@@ -78,6 +80,9 @@ final class Injector
      * @throws ReflectionException
      *
      * @return mixed The callable return value.
+     *
+     * @psalm-param callable(...): TReturn $callable
+     * @psalm-return TReturn
      */
     public function invoke(callable $callable, array $arguments = [])
     {
