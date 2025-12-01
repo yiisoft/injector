@@ -1,10 +1,10 @@
 # Yii Injector Change Log
 
-## 1.2.1 under development
+## 1.2.1 December 01, 2025
 
-- Enh #98: Refactor `Injector::invoke()` to improve debug trace (@xepozz)
 - Chg #105, #111: Change PHP constraint in `composer.json` to `7.4 - 8.5` (@vjik)
 - Enh #105: Adjust pretty name of closures on PHP 8.4 in exception messages (@staabm)
+- Enh #98: Refactor `Injector::invoke()` to improve debug trace (@xepozz)
 
 ## 1.2.0 December 20, 2023
 
