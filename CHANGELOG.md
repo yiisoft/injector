@@ -1,5 +1,9 @@
 # Yii Injector Change Log
 
+## 1.2.2 under development
+
+- no changes in this release.
+
 ## 1.2.1 December 01, 2025
 
 - Chg #105, #111: Change PHP constraint in `composer.json` to `7.4 - 8.5` (@vjik)
