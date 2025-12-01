@@ -31,7 +31,7 @@ implementation based on autowiring and
 
 ## Requirements
 
-- PHP 7.4 or higher.
+- PHP 7.4 - 8.5.
 
 ## Installation
 
