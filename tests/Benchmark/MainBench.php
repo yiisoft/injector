@@ -33,8 +33,11 @@ final class MainBench
 
     /**
      * @Revs(10000)
+     *
      * @Iterations(10)
+     *
      * @ParamProviders("provider")
+     *
      * @Warmup(1)
      */
     public function benchMake(array $params): void
@@ -45,15 +48,15 @@ final class MainBench
     public function provider(): Generator
     {
         yield 'without constructor' => [
-            'class' => MakeNoConstructor::class,
+            'class'       => MakeNoConstructor::class,
             'definitions' => [],
         ];
         yield 'with empty constructor' => [
-            'class' => MakeEmptyConstructor::class,
+            'class'       => MakeEmptyConstructor::class,
             'definitions' => [],
         ];
         yield 'with not empty constructor' => [
-            'class' => MakeEngineCollector::class,
+            'class'       => MakeEngineCollector::class,
             'definitions' => [EngineInterface::class => new EngineMarkTwo()],
         ];
     }

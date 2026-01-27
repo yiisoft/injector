@@ -6,5 +6,7 @@ namespace Yiisoft\Injector\Tests\Common\Support;
 
 class MakePrivateConstructor
 {
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 }

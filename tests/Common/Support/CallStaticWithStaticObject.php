@@ -14,8 +14,10 @@ final class CallStaticWithStaticObject
     {
         if ($name === 'foo') {
             self::$wasCalled = true;
+
             return 'bar';
         }
+
         throw new Exception('Unknown method.');
     }
 }

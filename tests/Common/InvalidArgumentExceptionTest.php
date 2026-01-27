@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector\Tests\Common;
 
-use Yiisoft\Injector\InvalidArgumentException;
 use ReflectionFunction;
+use Yiisoft\Injector\InvalidArgumentException;
 
 class InvalidArgumentExceptionTest extends ArgumentExceptionTest
 {
@@ -18,7 +18,7 @@ class InvalidArgumentExceptionTest extends ArgumentExceptionTest
 
         $this->assertSame(
             'Invalid argument "someParameter" when calling "array_map". Non-interface argument should be named'
-            . ' explicitly when passed.',
+            .' explicitly when passed.',
             $exception->getMessage(),
         );
     }

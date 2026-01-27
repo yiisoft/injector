@@ -18,6 +18,7 @@ class EngineVAZ2101 extends LightEngine
     public function rust(float $index): self
     {
         $this->power = (int) ceil($this->power / $index);
+
         return $this;
     }
 }

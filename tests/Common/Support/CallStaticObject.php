@@ -13,6 +13,7 @@ final class CallStaticObject
         if ($name === 'foo') {
             return 'bar';
         }
+
         throw new Exception('Unknown method.');
     }
 }

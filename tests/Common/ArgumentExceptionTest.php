@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector\Tests\Common;
 
+use Closure;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionFunction;
+use ReflectionFunctionAbstract;
 use stdClass;
 use Yiisoft\Injector\ArgumentException;
 use Yiisoft\Injector\Tests\Common\Support\ColorInterface;
 use Yiisoft\Injector\Tests\Common\Support\EngineVAZ2101;
 use Yiisoft\Injector\Tests\Common\Support\MakeEngineMatherWithParam;
-use Closure;
-use ReflectionClass;
-use ReflectionFunction;
-use ReflectionFunctionAbstract;
 
 use function func_get_args;
 
 use const FILTER_CALLBACK;
 
-function testFunction(): void {}
+function testFunction(): void
+{
+}
 
 abstract class ArgumentExceptionTest extends TestCase
 {
@@ -49,17 +51,17 @@ abstract class ArgumentExceptionTest extends TestCase
     public function testSimpleClosureReflection(): void
     {
         $functionLine = __LINE__ + 1;
-        $reflection = new ReflectionFunction(fn(bool $toInverse) => !$toInverse);
+        $reflection = new ReflectionFunction(fn (bool $toInverse) => !$toInverse);
         $exception = $this->createException($reflection, 'toInverse');
 
         $this->assertStringContainsString(__FILE__, $exception->getMessage());
-        $this->assertStringContainsString(' at line ' . $functionLine, $exception->getMessage());
+        $this->assertStringContainsString(' at line '.$functionLine, $exception->getMessage());
         $this->assertStringContainsString('toInverse', $exception->getMessage());
     }
 
     public function testRenderClosureWithConstantDefaultValue(): void
     {
-        $reflection = new ReflectionFunction(fn(int $filter = FILTER_CALLBACK) => $filter);
+        $reflection = new ReflectionFunction(fn (int $filter = FILTER_CALLBACK) => $filter);
         $exception = $this->createException($reflection, 'notInt');
 
         $this->assertStringContainsString('function (int $filter = FILTER_CALLBACK)', $exception->getMessage());
@@ -84,17 +86,17 @@ abstract class ArgumentExceptionTest extends TestCase
         $exception = $this->createException($reflection, 'toInverse');
 
         $this->assertStringContainsString('function ('
-            . 'callable $callable,'
-            . ' object $object,'
-            . ' Yiisoft\Injector\Tests\Common\Support\ColorInterface $class,'
-            . ' bool $boolean = false,'
-            . ' int $int = 10,'
-            . ' float $float = 0.0,'
-            . " array \$array = array (\n  0 => 0,\n),"
-            . ' ?string $string = \'\','
-            . ' ?stdClass $nullable = NULL,'
-            . ' &...$variadic'
-        . ')', $exception->getMessage());
+            .'callable $callable,'
+            .' object $object,'
+            .' Yiisoft\Injector\Tests\Common\Support\ColorInterface $class,'
+            .' bool $boolean = false,'
+            .' int $int = 10,'
+            .' float $float = 0.0,'
+            ." array \$array = array (\n  0 => 0,\n),"
+            .' ?string $string = \'\','
+            .' ?stdClass $nullable = NULL,'
+            .' &...$variadic'
+        .')', $exception->getMessage());
     }
 
     public function testInternalStaticCallableReflection(): void
@@ -119,10 +121,10 @@ abstract class ArgumentExceptionTest extends TestCase
 
     public function testUserFunctionInNameSpaceReflection(): void
     {
-        $reflection = new ReflectionFunction(__NAMESPACE__ . '\\testFunction');
+        $reflection = new ReflectionFunction(__NAMESPACE__.'\\testFunction');
         $exception = $this->createException($reflection, 'anyParameter');
 
-        $this->assertStringContainsString(__NAMESPACE__ . '\\testFunction', $exception->getMessage());
+        $this->assertStringContainsString(__NAMESPACE__.'\\testFunction', $exception->getMessage());
         $this->assertStringContainsString('anyParameter', $exception->getMessage());
     }
 
@@ -131,6 +133,7 @@ abstract class ArgumentExceptionTest extends TestCase
         $class = static::EXCEPTION_CLASS_NAME;
         /** @var ArgumentException $exception */
         $exception = new $class($reflection, $parameter);
+
         return $exception;
     }
 }

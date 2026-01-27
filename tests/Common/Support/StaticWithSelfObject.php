@@ -11,6 +11,7 @@ final class StaticWithSelfObject
     public static function foo(): string
     {
         self::$wasCalled = true;
+
         return 'bar';
     }
 }

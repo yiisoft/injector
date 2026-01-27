@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector\Tests\Common;
 
-use Yiisoft\Injector\MissingRequiredArgumentException;
 use ReflectionFunction;
+use Yiisoft\Injector\MissingRequiredArgumentException;
 
 class MissingRequiredArgumentExceptionTest extends ArgumentExceptionTest
 {

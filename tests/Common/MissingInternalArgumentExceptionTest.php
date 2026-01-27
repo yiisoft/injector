@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector\Tests\Common;
 
-use Yiisoft\Injector\MissingInternalArgumentException;
 use ReflectionFunction;
+use Yiisoft\Injector\MissingInternalArgumentException;
 
 class MissingInternalArgumentExceptionTest extends ArgumentExceptionTest
 {
@@ -18,7 +18,7 @@ class MissingInternalArgumentExceptionTest extends ArgumentExceptionTest
 
         $this->assertSame(
             'Can not determine default value of parameter "someParameter" when calling "array_map" because it is PHP'
-            . ' internal. Please specify argument explicitly.',
+            .' internal. Please specify argument explicitly.',
             $exception->getMessage(),
         );
     }
