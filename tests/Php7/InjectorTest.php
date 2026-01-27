@@ -7,6 +7,7 @@ namespace Yiisoft\Injector\Tests\Php7;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\MissingInternalArgumentException;
 use Yiisoft\Injector\Tests\Common\BaseInjectorTest;
+use SplFileObject;
 
 class InjectorTest extends BaseInjectorTest
 {
@@ -17,7 +18,7 @@ class InjectorTest extends BaseInjectorTest
         $this->expectException(MissingInternalArgumentException::class);
         $this->expectExceptionMessageMatches('/PHP internal/');
 
-        (new Injector($container))->make(\SplFileObject::class, [
+        (new Injector($container))->make(SplFileObject::class, [
             'file_name' => __FILE__,
             // second parameter skipped
             // third parameter skipped

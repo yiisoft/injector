@@ -10,6 +10,8 @@ use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionUnionType;
 
+use InvalidArgumentException;
+
 use function array_map;
 use function get_class;
 use function implode;
@@ -18,7 +20,7 @@ use function method_exists;
 use function sprintf;
 use function var_export;
 
-abstract class ArgumentException extends \InvalidArgumentException
+abstract class ArgumentException extends InvalidArgumentException
 {
     /**
      * @var string
@@ -95,23 +97,23 @@ abstract class ArgumentException extends \InvalidArgumentException
             return sprintf(
                 '%s%s ',
                 $parameter->allowsNull() ? '?' : '',
-                $type->getName()
+                $type->getName(),
             );
         }
         if ($type instanceof ReflectionUnionType) {
             /** @var ReflectionNamedType[] $types */
             $types = $type->getTypes();
             return implode('|', array_map(
-                static fn (ReflectionNamedType $r) => $r->getName(),
-                $types
+                static fn(ReflectionNamedType $r) => $r->getName(),
+                $types,
             )) . ' ';
         }
         if ($type instanceof ReflectionIntersectionType) {
             /** @var ReflectionNamedType[] $types */
             $types = $type->getTypes();
             return implode('&', array_map(
-                static fn (ReflectionNamedType $r) => $r->getName(),
-                $types
+                static fn(ReflectionNamedType $r) => $r->getName(),
+                $types,
             )) . ' ';
         }
         return '';

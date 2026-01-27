@@ -10,10 +10,16 @@ use Yiisoft\Injector\ArgumentException;
 use Yiisoft\Injector\Tests\Common\Support\ColorInterface;
 use Yiisoft\Injector\Tests\Common\Support\EngineVAZ2101;
 use Yiisoft\Injector\Tests\Common\Support\MakeEngineMatherWithParam;
+use Closure;
+use ReflectionClass;
+use ReflectionFunction;
+use ReflectionFunctionAbstract;
 
-function testFunction(): void
-{
-}
+use function func_get_args;
+
+use const FILTER_CALLBACK;
+
+function testFunction(): void {}
 
 abstract class ArgumentExceptionTest extends TestCase
 {
@@ -22,7 +28,7 @@ abstract class ArgumentExceptionTest extends TestCase
     public function testConstructorReflection(): void
     {
         $class = MakeEngineMatherWithParam::class;
-        $reflection = (new \ReflectionClass($class))->getConstructor();
+        $reflection = (new ReflectionClass($class))->getConstructor();
         $exception = $this->createException($reflection, 'parameter');
 
         $this->assertStringContainsString("{$class}::__construct", $exception->getMessage());
@@ -32,7 +38,7 @@ abstract class ArgumentExceptionTest extends TestCase
     {
         $class = EngineVAZ2101::class;
         $method = 'rust';
-        $classReflection = new \ReflectionClass($class);
+        $classReflection = new ReflectionClass($class);
         $reflection = $classReflection->getMethod($method);
         $exception = $this->createException($reflection, 'index');
 
@@ -43,7 +49,7 @@ abstract class ArgumentExceptionTest extends TestCase
     public function testSimpleClosureReflection(): void
     {
         $functionLine = __LINE__ + 1;
-        $reflection = new \ReflectionFunction(fn (bool $toInverse) => !$toInverse);
+        $reflection = new ReflectionFunction(fn(bool $toInverse) => !$toInverse);
         $exception = $this->createException($reflection, 'toInverse');
 
         $this->assertStringContainsString(__FILE__, $exception->getMessage());
@@ -53,7 +59,7 @@ abstract class ArgumentExceptionTest extends TestCase
 
     public function testRenderClosureWithConstantDefaultValue(): void
     {
-        $reflection = new \ReflectionFunction(fn (int $filter = \FILTER_CALLBACK) => $filter);
+        $reflection = new ReflectionFunction(fn(int $filter = FILTER_CALLBACK) => $filter);
         $exception = $this->createException($reflection, 'notInt');
 
         $this->assertStringContainsString('function (int $filter = FILTER_CALLBACK)', $exception->getMessage());
@@ -61,7 +67,7 @@ abstract class ArgumentExceptionTest extends TestCase
 
     public function testRichClosureReflection(): void
     {
-        $reflection = new \ReflectionFunction(static function (
+        $reflection = new ReflectionFunction(static function (
             callable $callable,
             object $object,
             ColorInterface $class,
@@ -93,8 +99,8 @@ abstract class ArgumentExceptionTest extends TestCase
 
     public function testInternalStaticCallableReflection(): void
     {
-        $callable = \Closure::fromCallable('\DateTimeImmutable::createFromMutable');
-        $reflection = new \ReflectionFunction($callable);
+        $callable = Closure::fromCallable('\DateTimeImmutable::createFromMutable');
+        $reflection = new ReflectionFunction($callable);
         $exception = $this->createException($reflection, 'anyParameter');
 
         $this->assertStringContainsString('createFromMutable', $exception->getMessage());
@@ -103,7 +109,7 @@ abstract class ArgumentExceptionTest extends TestCase
 
     public function testInternalFunctionReflection(): void
     {
-        $reflection = new \ReflectionFunction('\\array_map');
+        $reflection = new ReflectionFunction('\\array_map');
         $exception = $this->createException($reflection, 'anyParameter');
 
         $this->assertStringContainsString('array_map', $exception->getMessage());
@@ -113,14 +119,14 @@ abstract class ArgumentExceptionTest extends TestCase
 
     public function testUserFunctionInNameSpaceReflection(): void
     {
-        $reflection = new \ReflectionFunction(__NAMESPACE__ . '\\testFunction');
+        $reflection = new ReflectionFunction(__NAMESPACE__ . '\\testFunction');
         $exception = $this->createException($reflection, 'anyParameter');
 
         $this->assertStringContainsString(__NAMESPACE__ . '\\testFunction', $exception->getMessage());
         $this->assertStringContainsString('anyParameter', $exception->getMessage());
     }
 
-    protected function createException(\ReflectionFunctionAbstract $reflection, string $parameter): ArgumentException
+    protected function createException(ReflectionFunctionAbstract $reflection, string $parameter): ArgumentException
     {
         $class = static::EXCEPTION_CLASS_NAME;
         /** @var ArgumentException $exception */

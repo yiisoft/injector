@@ -7,6 +7,11 @@ namespace Yiisoft\Injector;
 use Generator;
 use ReflectionFunctionAbstract;
 
+use function array_key_exists;
+use function is_array;
+use function is_int;
+use function is_object;
+
 /**
  * Intermediate arguments resolving data to pass around until resolving is finished.
  *
@@ -156,7 +161,7 @@ final class ResolvingState
         foreach ($arguments as $key => &$value) {
             if (is_int($key)) {
                 if (!is_object($value)) {
-                    throw new InvalidArgumentException($this->reflection, (string)$key);
+                    throw new InvalidArgumentException($this->reflection, (string) $key);
                 }
                 /** @psalm-suppress UnsupportedReferenceUsage */
                 $this->numericArguments[] = &$value;
