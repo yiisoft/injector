@@ -18,7 +18,7 @@ class MissingInternalArgumentExceptionTest extends ArgumentExceptionTest
 
         $this->assertSame(
             'Can not determine default value of parameter "someParameter" when calling "array_map" because it is PHP'
-            . ' internal. Please specify argument explicitly.',
+            .' internal. Please specify argument explicitly.',
             $exception->getMessage(),
         );
     }
