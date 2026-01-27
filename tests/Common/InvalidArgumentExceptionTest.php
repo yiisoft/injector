@@ -18,7 +18,7 @@ class InvalidArgumentExceptionTest extends ArgumentExceptionTest
 
         $this->assertSame(
             'Invalid argument "someParameter" when calling "array_map". Non-interface argument should be named'
-            .' explicitly when passed.',
+            . ' explicitly when passed.',
             $exception->getMessage(),
         );
     }
