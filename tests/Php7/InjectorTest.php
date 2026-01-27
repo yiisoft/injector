@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector\Tests\Php7;
 
-use SplFileObject;
 use Yiisoft\Injector\Injector;
 use Yiisoft\Injector\MissingInternalArgumentException;
 use Yiisoft\Injector\Tests\Common\BaseInjectorTest;
+use SplFileObject;
 
 class InjectorTest extends BaseInjectorTest
 {
@@ -22,7 +22,7 @@ class InjectorTest extends BaseInjectorTest
             'file_name' => __FILE__,
             // second parameter skipped
             // third parameter skipped
-            'context'         => null,
+            'context' => null,
             'other-parameter' => true,
         ]);
     }

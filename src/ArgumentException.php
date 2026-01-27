@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Yiisoft\Injector;
 
-use InvalidArgumentException;
 use ReflectionFunctionAbstract;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionUnionType;
+
+use InvalidArgumentException;
 
 use function array_map;
 use function get_class;
@@ -73,7 +74,7 @@ abstract class ArgumentException extends InvalidArgumentException
                 $default = $parameter->getDefaultValue();
                 $parameterString .= ' = ';
                 if (is_object($default)) {
-                    $parameterString .= 'new '.get_class($default).'(...)';
+                    $parameterString .= 'new ' . get_class($default) . '(...)';
                 } elseif ($parameter->isDefaultValueConstant()) {
                     /** @psalm-suppress PossiblyNullOperand */
                     $parameterString .= $parameter->getDefaultValueConstantName();
@@ -85,8 +86,7 @@ abstract class ArgumentException extends InvalidArgumentException
         }
 
         $static = method_exists($reflection, 'isStatic') && $reflection->isStatic() ? 'static ' : '';
-
-        return $static.'function ('.implode(', ', $closureParameters).')';
+        return $static . 'function (' . implode(', ', $closureParameters) . ')';
     }
 
     private function renderParameterType(ReflectionParameter $parameter): string
@@ -103,22 +103,19 @@ abstract class ArgumentException extends InvalidArgumentException
         if ($type instanceof ReflectionUnionType) {
             /** @var ReflectionNamedType[] $types */
             $types = $type->getTypes();
-
             return implode('|', array_map(
-                static fn (ReflectionNamedType $r) => $r->getName(),
+                static fn(ReflectionNamedType $r) => $r->getName(),
                 $types,
-            )).' ';
+            )) . ' ';
         }
         if ($type instanceof ReflectionIntersectionType) {
             /** @var ReflectionNamedType[] $types */
             $types = $type->getTypes();
-
             return implode('&', array_map(
-                static fn (ReflectionNamedType $r) => $r->getName(),
+                static fn(ReflectionNamedType $r) => $r->getName(),
                 $types,
-            )).' ';
+            )) . ' ';
         }
-
         return '';
     }
 }

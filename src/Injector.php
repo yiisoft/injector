@@ -29,7 +29,6 @@ final class Injector
 
     /**
      * @var ReflectionClass[]
-     *
      * @psalm-var array<class-string,ReflectionClass>
      */
     private array $reflectionsCache = [];
@@ -47,7 +46,6 @@ final class Injector
     {
         $new = clone $this;
         $new->cacheReflections = $cacheReflections;
-
         return $new;
     }
 
@@ -71,12 +69,12 @@ final class Injector
      * This will pass the string `'Hello World!'` as the first argument, and a formatter instance created
      * by the DI container as the second argument.
      *
-     * @param callable $callable  callable to be invoked.
-     * @param array    $arguments The array of the function arguments.
-     *                            This can be either a list of arguments, or an associative array where keys are argument names.
+     * @param callable $callable callable to be invoked.
+     * @param array $arguments The array of the function arguments.
+     * This can be either a list of arguments, or an associative array where keys are argument names.
      *
      * @throws MissingRequiredArgumentException if required argument is missing.
-     * @throws ContainerExceptionInterface      if a dependency cannot be resolved or if a dependency cannot be fulfilled.
+     * @throws ContainerExceptionInterface if a dependency cannot be resolved or if a dependency cannot be fulfilled.
      * @throws ReflectionException
      *
      * @return mixed The callable return value.
@@ -85,7 +83,6 @@ final class Injector
     {
         $callable = Closure::fromCallable($callable);
         $reflection = new ReflectionFunction($callable);
-
         return $callable(...$this->resolveDependencies($reflection, $arguments));
     }
 
@@ -113,9 +110,9 @@ final class Injector
      * This will pass the string `'Hello World!'` as the first argument, and a formatter instance created
      * by the DI container as the second argument.
      *
-     * @param string $class     name of the class to be created.
-     * @param array  $arguments The array of the function arguments.
-     *                          This can be either a list of arguments, or an associative array where keys are argument names.
+     * @param string $class name of the class to be created.
+     * @param array $arguments The array of the function arguments.
+     * This can be either a list of arguments, or an associative array where keys are argument names.
      *
      * @throws ContainerExceptionInterface
      * @throws InvalidArgumentException|MissingRequiredArgumentException
@@ -126,9 +123,7 @@ final class Injector
      * @psalm-suppress MixedMethodCall
      *
      * @psalm-template T
-     *
      * @psalm-param class-string<T> $class
-     *
      * @psalm-return T
      */
     public function make(string $class, array $arguments = []): object
@@ -151,7 +146,7 @@ final class Injector
      * and return array of arguments to call the function with.
      *
      * @param ReflectionFunctionAbstract $reflection function reflection.
-     * @param array                      $arguments  concrete arguments.
+     * @param array $arguments concrete arguments.
      *
      * @throws ContainerExceptionInterface
      * @throws InvalidArgumentException|MissingRequiredArgumentException
@@ -195,7 +190,7 @@ final class Injector
      * @throws ReflectionException
      *
      * @return bool|null True if argument resolved; False if not resolved; Null if parameter is optional but
-     *                   without default value in a Reflection object. This is possible for internal functions.
+     * without default value in a Reflection object. This is possible for internal functions.
      */
     private function resolveParameter(ReflectionParameter $parameter, ResolvingState $state): ?bool
     {
@@ -223,7 +218,6 @@ final class Injector
         if ($parameter->isDefaultValueAvailable()) {
             $argument = $parameter->getDefaultValue();
             $state->addResolvedValue($argument);
-
             return true;
         }
 
@@ -231,7 +225,6 @@ final class Injector
             if ($hasType && $parameter->allowsNull()) {
                 $argument = null;
                 $state->addResolvedValue($argument);
-
                 return true;
             }
 
@@ -246,7 +239,6 @@ final class Injector
         if ($isVariadic) {
             return true;
         }
-
         return null;
     }
 
@@ -296,7 +288,6 @@ final class Injector
                 }
                 break;
         }
-
         return false;
     }
 
@@ -312,7 +303,6 @@ final class Injector
         /** @psalm-var class-string|null $class */
         $class = $parameter->isBuiltin() ? null : $type;
         $isClass = $class !== null || $type === 'object';
-
         return $isClass && $this->resolveObjectParameter($state, $class, $isVariadic);
     }
 
@@ -333,10 +323,8 @@ final class Injector
         if ($class !== null && $this->container !== null) {
             $argument = $this->container->get($class);
             $state->addResolvedValue($argument);
-
             return true;
         }
-
         return false;
     }
 

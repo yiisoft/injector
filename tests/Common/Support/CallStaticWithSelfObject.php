@@ -14,10 +14,8 @@ final class CallStaticWithSelfObject
     {
         if ($name === 'foo') {
             self::$wasCalled = true;
-
             return 'bar';
         }
-
         throw new Exception('Unknown method.');
     }
 }

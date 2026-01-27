@@ -31,7 +31,7 @@ class InjectorTest extends BaseInjectorTest
             'filename' => __FILE__,
             // second parameter skipped
             // third parameter skipped
-            'context'         => null,
+            'context' => null,
             'other-parameter' => true,
         ]);
 
@@ -144,7 +144,7 @@ class InjectorTest extends BaseInjectorTest
         $collection = new ArrayIterator();
         $container = $this->getContainer([
             ArrayAccess::class => $collection,
-            Countable::class   => $collection,
+            Countable::class => $collection,
         ]);
 
         $this->expectException(MissingRequiredArgumentException::class);
@@ -174,8 +174,8 @@ class InjectorTest extends BaseInjectorTest
         $int = $this->createEnumValue(IntEnum::class, 'Bar');
         $nb = $this->createEnumValue(NonBackedEnum::class, 'Bar');
         $container = $this->getContainer([
-            StrEnum::class       => $str,
-            IntEnum::class       => $int,
+            StrEnum::class => $str,
+            IntEnum::class => $int,
             NonBackedEnum::class => $nb,
         ]);
 
@@ -220,7 +220,6 @@ class InjectorTest extends BaseInjectorTest
     private function createEnumValue(string $enumClass, string $case)
     {
         $reflection = new \ReflectionEnum($enumClass);
-
         return $reflection->getCase($case)->getValue();
     }
 }

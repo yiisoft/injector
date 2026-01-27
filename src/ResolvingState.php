@@ -40,7 +40,7 @@ final class ResolvingState
 
     /**
      * @param ReflectionFunctionAbstract $reflection Function reflection.
-     * @param array                      $arguments  User arguments.
+     * @param array $arguments User arguments.
      */
     public function __construct(ReflectionFunctionAbstract $reflection, array $arguments)
     {
@@ -81,7 +81,6 @@ final class ResolvingState
         } else {
             $this->addResolvedValue($this->namedArguments[$name]);
         }
-
         return true;
     }
 
@@ -97,13 +96,11 @@ final class ResolvingState
             }
             $value = $generator->current();
             $this->addResolvedValue($value);
-
             return true;
         }
         foreach ($generator as &$value) {
             $this->addResolvedValue($value);
         }
-
         return true;
     }
 

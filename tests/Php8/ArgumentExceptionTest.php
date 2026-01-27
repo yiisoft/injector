@@ -70,7 +70,6 @@ abstract class ArgumentExceptionTest extends TestCase
         $class = static::EXCEPTION_CLASS_NAME;
         /** @var ArgumentException $exception */
         $exception = new $class($reflection, $parameter);
-
         return $exception;
     }
 }
