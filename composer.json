@@ -35,12 +35,14 @@
     },
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.8.3",
+        "friendsofphp/php-cs-fixer": "^3.93",
         "maglnet/composer-require-checker": "^3.8 || ^4.2",
         "phpbench/phpbench": "^1.1",
         "phpunit/phpunit": "^9.5",
         "psr/container": "^1.0 || ^2.0",
         "rector/rector": "^2.0.10",
         "spatie/phpunit-watcher": "^1.23",
+        "yiisoft/code-style": "^1.0",
         "yiisoft/test-support": "^1.4 || ^3.1"
     },
     "suggest": {
@@ -58,7 +60,8 @@
     },
     "scripts": {
         "test": "phpunit --testdox --no-interaction",
-        "test-watch": "phpunit-watcher watch"
+        "test-watch": "phpunit-watcher watch",
+        "cs-fix": "php-cs-fixer fix"
     },
     "extra": {
         "bamarni-bin": {
