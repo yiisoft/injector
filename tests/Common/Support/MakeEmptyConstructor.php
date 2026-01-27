@@ -6,7 +6,5 @@ namespace Yiisoft\Injector\Tests\Common\Support;
 
 class MakeEmptyConstructor
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 }

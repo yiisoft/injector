@@ -30,4 +30,6 @@ phpunit.phar
 # phpunit cache
 .phpunit.result.cache
 
-
+# PHP CS Fixer
+/.php-cs-fixer.cache
+/.php-cs-fixer.php
