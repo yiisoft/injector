@@ -7,10 +7,6 @@ updates:
       interval: "weekly"
     cooldown:
       default-days: 7
-    groups:
-      github-actions:
-        patterns:
-          - "*"
     ignore:
       - dependency-name: "yiisoft/*"
 
@@ -21,8 +17,4 @@ updates:
       interval: "daily"
     cooldown:
       default-days: 7
-    groups:
-      composer-dependencies:
-        patterns:
-          - "*"
     versioning-strategy: increase-if-necessary
