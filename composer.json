@@ -40,9 +40,9 @@
         "phpbench/phpbench": "^1.1",
         "phpunit/phpunit": "^9.5",
         "psr/container": "^1.0 || ^2.0",
-        "rector/rector": "^2.0.10",
+        "rector/rector": "^2.5.8",
         "spatie/phpunit-watcher": "^1.23",
-        "yiisoft/code-style": "^1.0",
+        "yiisoft/code-style": "^1.1",
         "yiisoft/test-support": "^1.4 || ^3.1"
     },
     "suggest": {
@@ -59,9 +59,10 @@
         }
     },
     "scripts": {
+        "cs-fix": "php-cs-fixer fix",
+        "rector": "rector",
         "test": "phpunit --testdox --no-interaction",
-        "test-watch": "phpunit-watcher watch",
-        "cs-fix": "php-cs-fixer fix"
+        "test-watch": "phpunit-watcher watch"
     },
     "extra": {
         "bamarni-bin": {
