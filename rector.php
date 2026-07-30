@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-use Rector\CodeQuality\Rector\Class_\InlineConstructorDefaultToPropertyRector;
 use Rector\Config\RectorConfig;
-use Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector;
+use Yiisoft\CodeStyle\Rector\SetList;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -12,9 +11,9 @@ return RectorConfig::configure()
         __DIR__ . '/tests',
     ])
     ->withPhp74Sets()
-    ->withRules([
-        InlineConstructorDefaultToPropertyRector::class,
+    ->withSets([
+        SetList::YII_CORE,
     ])
     ->withSkip([
-        ClosureToArrowFunctionRector::class,
+        __DIR__ . '/tests/Php8',
     ]);

@@ -40,7 +40,7 @@
         "phpbench/phpbench": "^1.1",
         "phpunit/phpunit": "^9.5",
         "psr/container": "^1.0 || ^2.0",
-        "rector/rector": "^2.0.10",
+        "rector/rector": "^2.5.8",
         "spatie/phpunit-watcher": "^1.23",
         "yiisoft/code-style": "^1.1",
         "yiisoft/test-support": "^1.4 || ^3.1"
