@@ -8,6 +8,6 @@ use ShipMonk\ComposerDependencyAnalyser\Config\ErrorType;
 return (new Configuration())
     ->disableComposerAutoloadPathScan()
     ->setFileExtensions(['php'])
-    ->addPathToScan(__DIR__ . '/src', isDev: false)
-    ->addPathToScan(__DIR__ . '/tests', isDev: true)
+    ->addPathToScan(__DIR__ . '/src', false)
+    ->addPathToScan(__DIR__ . '/tests', true)
     ->ignoreErrorsOnPackages(['psr/container'], [ErrorType::DEV_DEPENDENCY_IN_PROD]);
