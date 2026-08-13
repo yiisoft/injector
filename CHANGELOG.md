@@ -3,6 +3,7 @@
 ## 1.2.2 under development
 
 - Enh #114: Explicitly import classes and functions in "use" section (@mspirkov)
+- Enh #123: Exclude unnecessary files from distribution archive via `.gitattributes` (@vjik)
 
 ## 1.2.1 December 01, 2025
 
