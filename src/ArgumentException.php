@@ -90,7 +90,6 @@ abstract class ArgumentException extends InvalidArgumentException
 
     private function renderParameterType(ReflectionParameter $parameter): string
     {
-        /** @var ReflectionIntersectionType|ReflectionNamedType|ReflectionUnionType|null $type */
         $type = $parameter->getType();
         if ($type instanceof ReflectionNamedType) {
             return sprintf(

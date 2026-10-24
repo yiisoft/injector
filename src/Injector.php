@@ -202,7 +202,6 @@ final class Injector
         $error = null;
 
         if ($hasType) {
-            /** @var ReflectionType $reflectionType */
             $reflectionType = $parameter->getType();
 
             if ($this->resolveParameterType($state, $reflectionType, $isVariadic, $error)) {
@@ -254,10 +253,8 @@ final class Injector
     ): bool {
         switch (true) {
             case $type instanceof ReflectionNamedType:
-                $types = [$type];
-                // no break
             case $type instanceof ReflectionUnionType:
-                $types ??= $type->getTypes();
+                $types = $type instanceof ReflectionNamedType ? [$type] : $type->getTypes();
                 /** @var array<int, ReflectionNamedType> $types */
                 foreach ($types as $namedType) {
                     try {
