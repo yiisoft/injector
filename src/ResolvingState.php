@@ -22,25 +22,25 @@ final class ResolvingState
     private ReflectionFunctionAbstract $reflection;
 
     /**
-     * @psalm-var array<int, object>
+     * @var array<int, object>
      */
     private array $numericArguments = [];
 
     /**
-     * @psalm-var array<string, mixed>
+     * @var array<string, mixed>
      */
     private array $namedArguments = [];
 
     private bool $shouldPushTrailingArguments;
 
     /**
-     * @psalm-var list<mixed>
+     * @var list<mixed>
      */
     private array $resolvedValues = [];
 
     /**
      * @param ReflectionFunctionAbstract $reflection Function reflection.
-     * @param array $arguments User arguments.
+     * @param array<mixed> $arguments User arguments.
      */
     public function __construct(ReflectionFunctionAbstract $reflection, array $arguments)
     {
@@ -67,7 +67,6 @@ final class ResolvingState
      */
     public function addResolvedValue(&$value): void
     {
-        /** @psalm-suppress UnsupportedReferenceUsage */
         $this->resolvedValues[] = &$value;
     }
 
@@ -85,7 +84,7 @@ final class ResolvingState
     }
 
     /**
-     * @psalm-param class-string|null $className
+     * @param class-string|null $className
      */
     public function resolveParameterByClass(?string $className, bool $variadic): bool
     {
@@ -107,7 +106,7 @@ final class ResolvingState
     /**
      * Resolve parameter using type intersection rules.
      *
-     * @psalm-param array<int, class-string> $classNames
+     * @param array<int, class-string> $classNames
      */
     public function resolveParameterByClasses(array $classNames, bool $variadic): bool
     {
@@ -129,6 +128,9 @@ final class ResolvingState
         return $resolved;
     }
 
+    /**
+     * @return list<mixed>
+     */
     public function getResolvedValues(): array
     {
         return $this->shouldPushTrailingArguments
@@ -137,9 +139,9 @@ final class ResolvingState
     }
 
     /**
-     * @psalm-param class-string|null $className
+     * @param class-string|null $className
      *
-     * @psalm-return Generator<int, object, mixed, void>
+     * @return Generator<int, object, mixed, void>
      */
     private function &pullNumericArgument(?string $className): Generator
     {
@@ -152,7 +154,7 @@ final class ResolvingState
     }
 
     /**
-     * @param array $arguments
+     * @param array<mixed> $arguments
      *
      * @throws InvalidArgumentException
      */
@@ -163,7 +165,6 @@ final class ResolvingState
                 if (!is_object($value)) {
                     throw new InvalidArgumentException($this->reflection, (string) $key);
                 }
-                /** @psalm-suppress UnsupportedReferenceUsage */
                 $this->numericArguments[] = &$value;
             } else {
                 $this->namedArguments[$key] = &$value;
