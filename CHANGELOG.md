@@ -1,5 +1,9 @@
 # Yii Injector Change Log
 
+## 1.2.3 under development
+
+- no changes in this release.
+
 ## 1.2.2 October 25, 2026
 
 - Enh #114: Explicitly import classes and functions in "use" section (@mspirkov)
