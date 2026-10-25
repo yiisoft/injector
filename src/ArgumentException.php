@@ -35,7 +35,9 @@ abstract class ArgumentException extends InvalidArgumentException
 
         if ($class === null) {
             $method = $function;
-            if (strpos($method, '{closure') !== false) {
+            if (strpos($method, '{closure:pfa:') === 0) {
+                $method = $this->renderPartialApplicationSignature($reflection);
+            } elseif (strpos($method, '{closure') !== false) {
                 $method = $this->renderClosureSignature($reflection);
             }
         } else {
@@ -54,6 +56,22 @@ abstract class ArgumentException extends InvalidArgumentException
     }
 
     private function renderClosureSignature(ReflectionFunctionAbstract $reflection): string
+    {
+        // `ReflectionFunctionAbstract::isStatic()` is available since PHP 8.0 only.
+        // @phpstan-ignore function.alreadyNarrowedType
+        $static = method_exists($reflection, 'isStatic') && $reflection->isStatic() ? 'static ' : '';
+        return $static . 'function (' . $this->renderParameters($reflection) . ')';
+    }
+
+    /**
+     * Renders signature of a closure created by partial function application (PHP 8.6+), e.g. `foo(?, 42)`.
+     */
+    private function renderPartialApplicationSignature(ReflectionFunctionAbstract $reflection): string
+    {
+        return 'partial application (' . $this->renderParameters($reflection) . ')';
+    }
+
+    private function renderParameters(ReflectionFunctionAbstract $reflection): string
     {
         $closureParameters = [];
 
@@ -82,10 +100,7 @@ abstract class ArgumentException extends InvalidArgumentException
             $closureParameters[] = $parameterString;
         }
 
-        // `ReflectionFunctionAbstract::isStatic()` is available since PHP 8.0 only.
-        // @phpstan-ignore function.alreadyNarrowedType
-        $static = method_exists($reflection, 'isStatic') && $reflection->isStatic() ? 'static ' : '';
-        return $static . 'function (' . implode(', ', $closureParameters) . ')';
+        return implode(', ', $closureParameters);
     }
 
     private function renderParameterType(ReflectionParameter $parameter): string

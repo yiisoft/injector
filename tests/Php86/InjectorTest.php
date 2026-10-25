@@ -54,7 +54,22 @@ final class InjectorTest extends BaseInjectorTest
         $injector = new Injector($container);
 
         $this->expectException(MissingRequiredArgumentException::class);
-        $this->expectExceptionMessage('Missing required argument "unit" when calling "static function (string $unit)"');
+        $this->expectExceptionMessage('Missing required argument "unit" when calling "partial application (string $unit)"');
+        $injector->invoke($callable);
+    }
+
+    public function testInvokePartialMethodApplicationWithMissingArgument(): void
+    {
+        $container = $this->getContainer();
+        $object = new class {
+            public function run(float $index): void {}
+        };
+        $callable = $object->run(?);
+
+        $injector = new Injector($container);
+
+        $this->expectException(MissingRequiredArgumentException::class);
+        $this->expectExceptionMessage('Missing required argument "index" when calling "partial application (float $index)"');
         $injector->invoke($callable);
     }
 }
