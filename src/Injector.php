@@ -28,8 +28,7 @@ final class Injector
     private bool $cacheReflections = false;
 
     /**
-     * @var ReflectionClass[]
-     * @psalm-var array<class-string,ReflectionClass>
+     * @var array<class-string, ReflectionClass<object>>
      */
     private array $reflectionsCache = [];
 
@@ -70,7 +69,7 @@ final class Injector
      * by the DI container as the second argument.
      *
      * @param callable $callable callable to be invoked.
-     * @param array $arguments The array of the function arguments.
+     * @param array<mixed> $arguments The array of the function arguments.
      * This can be either a list of arguments, or an associative array where keys are argument names.
      *
      * @throws MissingRequiredArgumentException if required argument is missing.
@@ -110,21 +109,17 @@ final class Injector
      * This will pass the string `'Hello World!'` as the first argument, and a formatter instance created
      * by the DI container as the second argument.
      *
-     * @param string $class name of the class to be created.
-     * @param array $arguments The array of the function arguments.
+     * @param class-string<T> $class name of the class to be created.
+     * @param array<mixed> $arguments The array of the function arguments.
      * This can be either a list of arguments, or an associative array where keys are argument names.
      *
      * @throws ContainerExceptionInterface
      * @throws InvalidArgumentException|MissingRequiredArgumentException
      * @throws ReflectionException
      *
-     * @return object The object of the given class.
+     * @return T The object of the given class.
      *
-     * @psalm-suppress MixedMethodCall
-     *
-     * @psalm-template T
-     * @psalm-param class-string<T> $class
-     * @psalm-return T
+     * @template T of object
      */
     public function make(string $class, array $arguments = []): object
     {
@@ -146,13 +141,13 @@ final class Injector
      * and return array of arguments to call the function with.
      *
      * @param ReflectionFunctionAbstract $reflection function reflection.
-     * @param array $arguments concrete arguments.
+     * @param array<mixed> $arguments concrete arguments.
      *
      * @throws ContainerExceptionInterface
      * @throws InvalidArgumentException|MissingRequiredArgumentException
      * @throws ReflectionException
      *
-     * @return array resolved arguments.
+     * @return list<mixed> resolved arguments.
      */
     private function resolveDependencies(ReflectionFunctionAbstract $reflection, array $arguments = []): array
     {
@@ -207,7 +202,6 @@ final class Injector
         $error = null;
 
         if ($hasType) {
-            /** @var ReflectionType $reflectionType */
             $reflectionType = $parameter->getType();
 
             if ($this->resolveParameterType($state, $reflectionType, $isVariadic, $error)) {
@@ -250,8 +244,6 @@ final class Injector
      * @throws ContainerExceptionInterface
      *
      * @return bool True if argument was resolved
-     *
-     * @psalm-suppress PossiblyUndefinedMethod
      */
     private function resolveParameterType(
         ResolvingState $state,
@@ -261,10 +253,8 @@ final class Injector
     ): bool {
         switch (true) {
             case $type instanceof ReflectionNamedType:
-                $types = [$type];
-                // no break
             case $type instanceof ReflectionUnionType:
-                $types ??= $type->getTypes();
+                $types = $type instanceof ReflectionNamedType ? [$type] : $type->getTypes();
                 /** @var array<int, ReflectionNamedType> $types */
                 foreach ($types as $namedType) {
                     try {
@@ -300,14 +290,14 @@ final class Injector
     private function resolveNamedType(ResolvingState $state, ReflectionNamedType $parameter, bool $isVariadic): bool
     {
         $type = $parameter->getName();
-        /** @psalm-var class-string|null $class */
+        /** @var class-string|null $class */
         $class = $parameter->isBuiltin() ? null : $type;
         $isClass = $class !== null || $type === 'object';
         return $isClass && $this->resolveObjectParameter($state, $class, $isVariadic);
     }
 
     /**
-     * @psalm-param class-string|null $class
+     * @param class-string|null $class
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -329,9 +319,8 @@ final class Injector
     }
 
     /**
-     * @psalm-param class-string $class
-     *
-     * @throws ReflectionException
+     * @param class-string $class
+     * @return ReflectionClass<object>
      */
     private function getClassReflection(string $class): ReflectionClass
     {

@@ -12,7 +12,6 @@
 [![Code Coverage](https://codecov.io/gh/yiisoft/injector/graph/badge.svg?token=UX1E0SFD1P)](https://codecov.io/gh/yiisoft/injector)
 [![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyiisoft%2Finjector%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/yiisoft/injector/master)
 [![Static analysis](https://github.com/yiisoft/injector/actions/workflows/static.yml/badge.svg?branch=master)](https://github.com/yiisoft/injector/actions/workflows/static.yml?query=branch%3Amaster)
-[![type-coverage](https://shepherd.dev/github/yiisoft/injector/coverage.svg)](https://shepherd.dev/github/yiisoft/injector)
 
 A [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection)
 implementation based on autowiring and

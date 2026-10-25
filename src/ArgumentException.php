@@ -24,15 +24,13 @@ abstract class ArgumentException extends InvalidArgumentException
 {
     /**
      * @var string
-     *
-     * @psalm-suppress MissingClassConstType Add constant type after raise minimal PHP version to 8.3
      */
     protected const EXCEPTION_MESSAGE = 'Something is wrong with argument "%s" when calling "%s"%s.';
 
     public function __construct(ReflectionFunctionAbstract $reflection, string $parameter)
     {
         $function = $reflection->getName();
-        /** @psalm-var class-string|null $class */
+        /** @var class-string|null $class */
         $class = $reflection->class ?? null;
 
         if ($class === null) {
@@ -76,7 +74,6 @@ abstract class ArgumentException extends InvalidArgumentException
                 if (is_object($default)) {
                     $parameterString .= 'new ' . get_class($default) . '(...)';
                 } elseif ($parameter->isDefaultValueConstant()) {
-                    /** @psalm-suppress PossiblyNullOperand */
                     $parameterString .= $parameter->getDefaultValueConstantName();
                 } else {
                     $parameterString .= var_export($default, true);
@@ -85,13 +82,14 @@ abstract class ArgumentException extends InvalidArgumentException
             $closureParameters[] = $parameterString;
         }
 
+        // `ReflectionFunctionAbstract::isStatic()` is available since PHP 8.0 only.
+        // @phpstan-ignore function.alreadyNarrowedType
         $static = method_exists($reflection, 'isStatic') && $reflection->isStatic() ? 'static ' : '';
         return $static . 'function (' . implode(', ', $closureParameters) . ')';
     }
 
     private function renderParameterType(ReflectionParameter $parameter): string
     {
-        /** @var ReflectionIntersectionType|ReflectionNamedType|ReflectionUnionType|null $type */
         $type = $parameter->getType();
         if ($type instanceof ReflectionNamedType) {
             return sprintf(
