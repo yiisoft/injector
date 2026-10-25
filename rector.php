@@ -16,4 +16,5 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         __DIR__ . '/tests/Php8',
+        __DIR__ . '/tests/Php86',
     ]);

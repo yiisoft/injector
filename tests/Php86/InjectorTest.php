@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Yiisoft\Injector\Tests\Php86;
+
+use Yiisoft\Injector\Injector;
+use Yiisoft\Injector\MissingRequiredArgumentException;
+use Yiisoft\Injector\Tests\Common\BaseInjectorTest;
+use Yiisoft\Injector\Tests\Common\Support\EngineInterface;
+use Yiisoft\Injector\Tests\Common\Support\EngineMarkTwo;
+
+final class InjectorTest extends BaseInjectorTest
+{
+    public function testInvokePartialFunctionApplicationWithPlaceholder(): void
+    {
+        $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
+        $closure = static fn (EngineInterface $engine, string $unit): string => $engine->getName() . ' ' . $unit;
+        $callable = $closure(?, 'km/h');
+
+        $result = new Injector($container)->invoke($callable);
+
+        $this->assertSame('Mark Two km/h', $result);
+    }
+
+    public function testInvokePartialFunctionApplicationWithVariadicPlaceholder(): void
+    {
+        $container = $this->getContainer([EngineInterface::class => new EngineMarkTwo()]);
+        $closure = static fn (EngineInterface $engine, string $unit): string => $engine->getName() . ' ' . $unit;
+        $callable = $closure(unit: 'mph', ...);
+
+        $result = new Injector($container)->invoke($callable);
+
+        $this->assertSame('Mark Two mph', $result);
+    }
+
+    public function testInvokePartialFunctionApplicationWithArguments(): void
+    {
+        $container = $this->getContainer();
+        $closure = static fn (EngineInterface $engine, string $unit): string => $engine->getName() . ' ' . $unit;
+        $callable = $closure(?, ?);
+
+        $result = new Injector($container)->invoke($callable, [new EngineMarkTwo(), 'unit' => 'm/s']);
+
+        $this->assertSame('Mark Two m/s', $result);
+    }
+
+    public function testInvokePartialFunctionApplicationWithMissingArgument(): void
+    {
+        $container = $this->getContainer();
+        $closure = static fn (EngineInterface $engine, string $unit): string => $engine->getName() . ' ' . $unit;
+        $callable = $closure(new EngineMarkTwo(), ?);
+
+        $injector = new Injector($container);
+
+        $this->expectException(MissingRequiredArgumentException::class);
+        $this->expectExceptionMessage('Missing required argument "unit" when calling "static function (string $unit)"');
+        $injector->invoke($callable);
+    }
+}
