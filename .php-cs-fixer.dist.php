@@ -11,6 +11,7 @@ $finder = (new Finder())->in([
     __DIR__ . '/tests',
 ])->exclude([
     'Php8',
+    'Php86',
 ]);
 
 return ConfigBuilder::build()

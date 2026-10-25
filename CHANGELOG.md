@@ -2,6 +2,7 @@
 
 ## 1.2.2 under development
 
+- Enh #126: Add PHP 8.6 support (@vjik)
 - Enh #114: Explicitly import classes and functions in "use" section (@mspirkov)
 - Enh #123: Exclude unnecessary files from distribution archive via `.gitattributes` (@vjik)
 

@@ -24,6 +24,7 @@
             <directory>./tests/Common</directory>
             <directory phpVersion="8" phpVersionOperator="&lt;">./tests/Php7</directory>
             <directory phpVersion="8" phpVersionOperator=">=">./tests/Php8</directory>
+            <directory phpVersion="8.6" phpVersionOperator=">=">./tests/Php86</directory>
         </testsuite>
     </testsuites>
 
