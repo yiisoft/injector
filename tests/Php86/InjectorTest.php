@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yiisoft\Injector\Tests\Php86;
 
 use Yiisoft\Injector\Injector;
+use Yiisoft\Injector\InvalidArgumentException;
 use Yiisoft\Injector\MissingRequiredArgumentException;
 use Yiisoft\Injector\Tests\Common\BaseInjectorTest;
 use Yiisoft\Injector\Tests\Common\Support\EngineInterface;
@@ -71,5 +72,27 @@ final class InjectorTest extends BaseInjectorTest
         $this->expectException(MissingRequiredArgumentException::class);
         $this->expectExceptionMessage('Missing required argument "index" when calling "partial application (float $index)"');
         $injector->invoke($callable);
+    }
+
+    public function testInvokePartialFunctionApplicationWithNamedScalarArgument(): void
+    {
+        $container = $this->getContainer();
+        $callable = (static fn (int $a): int => $a)(?);
+
+        $result = new Injector($container)->invoke($callable, ['a' => 5]);
+
+        $this->assertSame(5, $result);
+    }
+
+    public function testInvokePartialFunctionApplicationWithUnnamedScalarArgument(): void
+    {
+        $container = $this->getContainer();
+        $callable = (static fn (int $a): int => $a)(?);
+
+        $injector = new Injector($container);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid argument "0" when calling "partial application (int $a)"');
+        $injector->invoke($callable, [5]);
     }
 }
